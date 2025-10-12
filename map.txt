@@ -1,0 +1,43 @@
+src/
+├─ modules/
+│  ├─ users/
+│  ├─ auth/
+│  ├─ prisma/
+│  ├─ workshop/
+│  │  ├─ domain/
+│  │  │  ├─ entities/
+│  │  │  │  ├─ workshop-item.entity.ts
+│  │  │  │  ├─ replay.entity.ts
+│  │  │  │  └─ steam-user.entity.ts
+│  │  │  ├─ repositories/
+│  │  │  │  ├─ workshop-item.repository.ts
+│  │  │  │  ├─ replay.repository.ts
+│  │  │  │  └─ steam-user.repository.ts
+│  │  │  └─ services/
+│  │  ├─ infrastructure/
+│  │  │  └─ prisma/
+│  │  ├─ application/
+│  │  │  └─ use-cases/
+│  │  └─ presentation/
+│  │     ├─ controllers/
+│  │     │  └─ workshop.controller.ts
+│  │     └─ routes.ts
+│  │
+│  ├─ data-requester/
+│  │  ├─ domain/
+│  │  │  └─ steam-request.entity.ts
+│  │  ├─ application/
+│  │  │  ├─ use-cases/
+│  │  │  │  ├─ fetch-all.usecase.ts
+│  │  │  │  ├─ fetch-item.usecase.ts
+│  │  │  │  ├─ fetch-leaderboards.usecase.ts
+│  │  │  │  └─ refresh-database.usecase.ts
+│  │  │  └─ adapters/
+│  │  │     ├─ grpc-client.ts
+│  │  │     └─ http-steam-api.ts
+│  │  └─ infrastructure/
+│  │     └─ schedulers/
+│  │        └─ get-new-maps.schedule.ts
+│  │
+│  └─ shared/
+└─ main.ts

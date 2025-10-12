@@ -1,0 +1,45 @@
+datasource db {
+    provider = "mongodb"
+    url      = env("DATABASE_URL")
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+model SteamUser {
+    id       String         @id @default(auto()) @map("_id") @db.ObjectId
+    steamId  String         @unique
+    username String
+    items    String[]
+    replays  String[]
+}
+
+model WorkshopItem {
+    id         String    @id @default(auto()) @map("_id") @db.ObjectId
+    title      String
+    steamId    String    @unique
+    creator    String
+    creatorId  String
+    createDate DateTime  @default(now())
+    ratingUp   Int       @default(0)
+    ratingDown Int       @default(0)
+    previewUrl String
+    previews   String[]
+}
+
+model Replay {
+    id        String    @id @default(auto()) @map("_id") @db.ObjectId
+    creator   String
+    creatorId String
+    mapId     String    @unique
+    score     Int
+    date      DateTime? @default(now())
+}
+
+model Comment {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    userId    String
+    data      String
+    createdAt DateTime @default(now())
+}

@@ -1,0 +1,37 @@
+.prose a {
+  color: #60a5fa; /* голубая ссылка */
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+.prose a:hover {
+  color: #93c5fd;
+}
+
+.prose b, .prose strong {
+  color: #fff;
+  font-weight: 700;
+}
+
+.prose i, .prose em {
+  color: #d1d5db;
+  font-style: italic;
+}
+
+.prose ul, .prose ol {
+  margin-left: 1.5rem;
+  list-style-position: inside;
+}
+
+.prose h1, .prose h2, .prose h3 {
+  color: #f9fafb;
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.prose code {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.3rem;
+  font-size: 0.9em;
+}
