@@ -29,7 +29,7 @@ const PlayerPage = ({ id }: { id: string }) => {
 
       <div className="flex flex-col h-full justify-between">
         {loaded ?
-          <div className="flex gap-2 pt-32 px-4 min-h-screen w-full">
+          <div className="flex gap-2 pt-32 min-h-screen w-full">
             <div className="flex flex-col gap-2 w-full text-gray-300">
               <Container className="flex justify-center gap-10 text-4xl tracking-wide place-items-center">
                 <div className="flex gap-3">
@@ -42,10 +42,12 @@ const PlayerPage = ({ id }: { id: string }) => {
                   >{player?.username.toUpperCase()}</a>
                 </div>
               </Container>
-              <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[300px] gap-6 p-6 w-full">
-                {mapData.map(m => (
-                  <MapTile key={m.id} {...m} />
-                ))}
+              <div className="px-4">
+                <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[300px] gap-6 p-6 w-full">
+                  {mapData.map(m => (
+                    <MapTile key={m.id} {...m} />
+                  ))}
+                </div>
               </div>
             </div>
           </div>
