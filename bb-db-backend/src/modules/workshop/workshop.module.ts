@@ -6,6 +6,8 @@ import { FetchItemUseCase } from '../data-requester/application/use-cases/fetch-
 import { SteamApiService } from '../data-requester/application/adapters/http-steam-api';
 import { RefreshDatabaseUseCase } from '../data-requester/application/use-cases/refresh-database.usecase';
 import { SyncUserMapsUseCase } from '../data-requester/application/use-cases/sync-user-maps.usecase';
+import { FetchBBLBUseCase } from '../data-requester/application/use-cases/fetch-bblb.usecase';
+import { BBLBApiService } from '../data-requester/application/adapters/bblb-api';
 
 @Module({
   imports: [PrismaModule],
@@ -15,7 +17,9 @@ import { SyncUserMapsUseCase } from '../data-requester/application/use-cases/syn
     FetchItemUseCase,
     RefreshDatabaseUseCase,
     SteamApiService,
+    BBLBApiService,
     SyncUserMapsUseCase,
+    FetchBBLBUseCase,
   ],
 })
 export class WorkshopModule {}

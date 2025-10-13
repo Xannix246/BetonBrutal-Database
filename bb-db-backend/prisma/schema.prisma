@@ -28,14 +28,31 @@ model WorkshopItem {
     previews   String[]
 }
 
-model Replay {
+model LeaderboardEntry {
     id        String    @id @default(auto()) @map("_id") @db.ObjectId
-    creator   String
-    creatorId String
-    mapId     String    @unique
+    mapId     String
+    steamId   String
+    username  String
     score     Int
-    date      DateTime? @default(now())
+    date      DateTime?
+
+    @@unique([mapId, steamId])
 }
+
+model Leaderboard {
+    id        String    @id @default(auto()) @map("_id") @db.ObjectId
+    mapId     String    @unique
+    enteries  String[] //LeaderboardEntry id's
+}
+
+// model Replay {
+//     id        String    @id @default(auto()) @map("_id") @db.ObjectId
+//     creator   String
+//     creatorId String
+//     mapId     String    @unique
+//     score     Int
+//     date      DateTime? @default(now())
+// }
 
 model Comment {
     id        String   @id @default(auto()) @map("_id") @db.ObjectId

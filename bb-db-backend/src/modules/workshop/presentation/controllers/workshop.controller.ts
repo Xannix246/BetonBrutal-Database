@@ -11,6 +11,7 @@ import {
 import { OptionalAuth } from '@thallesp/nestjs-better-auth';
 import { type Response } from 'express';
 import { env } from 'process';
+import { FetchBBLBUseCase } from 'src/modules/data-requester/application/use-cases/fetch-bblb.usecase';
 import { RefreshDatabaseUseCase } from 'src/modules/data-requester/application/use-cases/refresh-database.usecase';
 import { WorkshopService } from 'src/modules/workshop/domain/services/workshop.service';
 
@@ -19,6 +20,7 @@ export class WorkshopController {
   constructor(
     private readonly workshopService: WorkshopService,
     private readonly refreshDb: RefreshDatabaseUseCase,
+    private readonly fetchBblb: FetchBBLBUseCase,
   ) {}
 
   @Get()
@@ -63,7 +65,8 @@ export class WorkshopController {
       return res.status(HttpStatus.FORBIDDEN).send();
     }
 
-    void (await this.refreshDb.execute());
+    // void (await this.refreshDb.execute());
+    void (await this.fetchBblb.execute());
     return res.status(HttpStatus.OK).json({ message: 'done' }).send();
   }
 

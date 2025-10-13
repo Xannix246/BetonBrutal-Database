@@ -165,29 +165,29 @@ export class WorkshopService {
     }
   }
 
-  async getReplays(workshopItemId: string): Promise<Replay[]> {
-    const replays = await this.prisma.replay.findMany({
-      where: { mapId: workshopItemId },
-      orderBy: { score: 'desc' },
-    });
+  // async getReplays(workshopItemId: string): Promise<Replay[]> {
+  //   const replays = await this.prisma.replay.findMany({
+  //     where: { mapId: workshopItemId },
+  //     orderBy: { score: 'desc' },
+  //   });
 
-    const returnReplays: Replay[] = [];
+  //   const returnReplays: Replay[] = [];
 
-    for (const replay of replays) {
-      returnReplays.push({
-        id: replay.id,
-        creator: (await this.prisma.steamUser.findUnique({
-          where: { steamId: replay.creatorId },
-        }))!.username,
-        creatorId: replay.creatorId,
-        mapId: replay.mapId,
-        score: replay.score,
-        date: replay.date,
-      });
-    }
+  //   for (const replay of replays) {
+  //     returnReplays.push({
+  //       id: replay.id,
+  //       creator: (await this.prisma.steamUser.findUnique({
+  //         where: { steamId: replay.creatorId },
+  //       }))!.username,
+  //       creatorId: replay.creatorId,
+  //       mapId: replay.mapId,
+  //       score: replay.score,
+  //       date: replay.date,
+  //     });
+  //   }
 
-    return returnReplays;
-  }
+  //   return returnReplays;
+  // }
 
   async searchWorkshopItems(input: string) {
     const parsed = parseSearchInput(input);

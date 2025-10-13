@@ -27,8 +27,8 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
         {loaded ?
           <div className="flex gap-2 pt-32 px-4 min-h-screen w-full">
             <div className="flex flex-col gap-2">
-              <div className="relative min-w-128 h-128 bg-black/70">
-                <img src={mapData?.previewUrl} className="absolute w-128 h-128 object-cover bottom-0 right-0 hover:-bottom-5 hover:-right-5 transition-all duration-300" />
+              <div className="group relative min-w-128 h-128 bg-black/70">
+                <img src={mapData?.previewUrl} className="absolute w-128 h-128 object-cover bottom-0 right-0 group-hover:-bottom-5 group-hover:-right-5 transition-all duration-300" />
               </div>
               <Container className="text-white flex gap-16 text-4xl justify-center">
                 <h2 className="text-green">+ {mapData?.ratingUp}</h2>

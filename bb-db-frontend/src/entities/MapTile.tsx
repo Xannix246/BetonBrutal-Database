@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { navigate } from "vike/client/router";
 
 type Props = {
-  id: string;
+  steamId: string;
   title: string;
   creator: string;
   previewUrl: string;
@@ -16,18 +16,18 @@ const getTileSize = (title: string, ratingUp: number) => {
   return "tile-normal";
 };
 
-const MapTile = ({ id, title, creator, previewUrl, ratingUp }: Props) => {
+const MapTile = ({ steamId, title, creator, previewUrl, ratingUp }: Props) => {
   const sizeClass = getTileSize(title, ratingUp);
 
   return (
     <div
-      key={id}
+      key={steamId}
       className={clsx(
         "relative shadow-md group cursor-pointer bg-black/70",
         sizeClass
       )}
-      onClick={() => navigate(`/workshop/${id}`)}
-      onPointerDown={(e) => e.button === 1 && window.open(`/workshop/${id}`, "_blank")}
+      onClick={() => navigate(`/workshop/${steamId}`)}
+      onPointerDown={(e) => e.button === 1 && window.open(`/workshop/${steamId}`, "_blank")}
     >
       <div className="absolute right-0 bottom-0 w-full h-full group-hover:-right-5 group-hover:-bottom-5 transform transition-all duration-300">
         <div className="relative w-full h-full overflow-clip">
