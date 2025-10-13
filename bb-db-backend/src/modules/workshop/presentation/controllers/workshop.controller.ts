@@ -1,4 +1,13 @@
-import { Controller, Get, HttpStatus, Param, Query, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Param,
+  Post,
+  Query,
+  Res,
+} from '@nestjs/common';
 import { OptionalAuth } from '@thallesp/nestjs-better-auth';
 import { type Response } from 'express';
 import { env } from 'process';
@@ -36,10 +45,20 @@ export class WorkshopController {
     );
   }
 
+  @Post('get-query-list')
+  @OptionalAuth()
+  async getQueryList(@Body() body: { ids: string[] }) {
+    return this.workshopService.getQueryItems(body.ids);
+  }
+
+  @Get('search')
+  async search(@Query('q') query: string) {
+    return this.workshopService.searchWorkshopItems(query);
+  }
+
   @Get('force-update')
   @OptionalAuth()
   async forceUpdate(@Query('secret') secret: string, @Res() res: Response) {
-    console.log(secret, env.FORCE_UPDATE_SECRET);
     if (secret !== env.FORCE_UPDATE_SECRET) {
       return res.status(HttpStatus.FORBIDDEN).send();
     }
@@ -48,10 +67,15 @@ export class WorkshopController {
     return res.status(HttpStatus.OK).json({ message: 'done' }).send();
   }
 
+  @Get('player/:id')
+  @OptionalAuth()
+  async getPlayer(@Param('id') id: string) {
+    return this.workshopService.getPlayer(id);
+  }
+
   @Get(':id')
   @OptionalAuth()
   async getItem(@Param('id') id: string): Promise<WorkshopItem> {
-    console.log(id);
     return this.workshopService.getItem(id);
   }
 

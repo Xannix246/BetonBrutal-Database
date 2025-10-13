@@ -44,9 +44,7 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
               </Container>
               <Container className="text-gray-300 text-4xl w-full text-center flex justify-between">
                 <a 
-                  target="_blank" 
-                  href={`https://steamcommunity.com/profiles/${mapData?.creatorId}`} 
-                  rel="noreferrer"
+                  href={`/workshop/player/${mapData?.creatorId}`} 
                   className="hover:text-white hover:underline"
                 >BY {mapData?.creator.toUpperCase()}</a>
                 <a 

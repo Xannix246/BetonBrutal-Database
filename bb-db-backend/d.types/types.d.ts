@@ -26,6 +26,13 @@ declare type WorkshopItemHeader = {
   previews?: string[];
 }
 
+declare type Player = {
+  id: string;
+  username: string;
+  items: string[];
+  replays: string[];
+}
+
 declare type Replay = {
   id: string;
   creator: string;

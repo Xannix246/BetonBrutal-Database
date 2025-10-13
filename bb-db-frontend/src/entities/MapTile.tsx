@@ -27,6 +27,7 @@ const MapTile = ({ id, title, creator, previewUrl, ratingUp }: Props) => {
         sizeClass
       )}
       onClick={() => navigate(`/workshop/${id}`)}
+      onPointerDown={(e) => e.button === 1 && window.open(`/workshop/${id}`, "_blank")}
     >
       <div className="absolute right-0 bottom-0 w-full h-full group-hover:-right-5 group-hover:-bottom-5 transform transition-all duration-300">
         <div className="relative w-full h-full overflow-clip">

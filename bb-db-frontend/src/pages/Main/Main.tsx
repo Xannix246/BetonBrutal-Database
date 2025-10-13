@@ -8,12 +8,14 @@ import Footer from "../../widgets/Footer/Footer";
 import clsx from "clsx";
 import MapTile from "../../entities/MapTile";
 import { navigate } from "vike/client/router";
+import { handleEnterSearch, handleSearch } from "../../features/SearchManager";
 // import { CircleStackIcon } from "@heroicons/react/24/outline";
 
 const Main = () => {
   const [followedMaps, setFollowedMaps] = useState<WorkshopItem[]>([]);
   const [lastestMaps, setLastestMaps] = useState<WorkshopItem[]>([]);
   const [isSticky, setIsSticky] = useState(false);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -60,8 +62,14 @@ const Main = () => {
               <Input
                 className="text-4xl w-4xl"
                 placeholder="Search by name, author, id or url"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={(e) => handleEnterSearch(search, e)}
               />
-              <Button className="text-4xl">SEARCH</Button>
+              <Button 
+                className="text-4xl"
+                onClick={() => handleSearch(search)}
+              >SEARCH</Button>
             </div>
           </div>
         </div>

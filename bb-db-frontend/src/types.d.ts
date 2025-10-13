@@ -13,3 +13,10 @@ declare type WorkshopItem = {
   previewUrl: string;
   previews: string[];
 }
+
+declare type Player = {
+  id: string;
+  username: string;
+  items: string[];
+  replays: string[];
+}

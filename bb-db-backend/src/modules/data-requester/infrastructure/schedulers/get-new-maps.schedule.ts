@@ -12,7 +12,7 @@ export class GetNewMapsScheduler {
     private readonly steamApi: SteamApiService,
   ) {}
 
-  @Cron('0 */2 * * *')
+  @Cron('0 */10 * * * *')
   async handleCron() {
     this.logger.log('Checking for new maps in Steam Workshop...');
 

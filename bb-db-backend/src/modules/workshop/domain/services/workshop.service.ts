@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { SteamApiService } from 'src/modules/data-requester/application/adapters/http-steam-api';
 import { FetchItemUseCase } from 'src/modules/data-requester/application/use-cases/fetch-item.usecase';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
+import { parseSearchInput } from 'src/shared/parseSearchUriData';
 
 @Injectable()
 export class WorkshopService {
@@ -121,6 +122,49 @@ export class WorkshopService {
     };
   }
 
+  async getQueryItems(ids: string[]): Promise<WorkshopItemHeader[]> {
+    const items = await this.prisma.workshopItem.findMany({
+      where: { steamId: { in: ids } },
+    });
+
+    const returnItems: WorkshopItemHeader[] = [];
+
+    for (const item of items) {
+      returnItems.push({
+        id: item.steamId,
+        title: item.title,
+        creator: (
+          await this.prisma.steamUser.findUnique({
+            where: { steamId: item.creatorId },
+          })
+        )?.username as string,
+        createDate: item.createDate,
+        ratingUp: item.ratingUp,
+        ratingDown: item.ratingDown,
+        previewUrl: item.previewUrl,
+      });
+    }
+
+    return returnItems;
+  }
+
+  async getPlayer(id: string): Promise<Player | null> {
+    const player = await this.prisma.steamUser.findUnique({
+      where: { steamId: id },
+    });
+
+    if (player) {
+      return {
+        id: player.steamId,
+        username: player.username,
+        items: player.items || [],
+        replays: player.replays || [],
+      };
+    } else {
+      return null;
+    }
+  }
+
   async getReplays(workshopItemId: string): Promise<Replay[]> {
     const replays = await this.prisma.replay.findMany({
       where: { mapId: workshopItemId },
@@ -143,5 +187,30 @@ export class WorkshopService {
     }
 
     return returnReplays;
+  }
+
+  async searchWorkshopItems(input: string) {
+    const parsed = parseSearchInput(input);
+
+    if (parsed.id) {
+      return this.prisma.workshopItem.findMany({
+        where: { steamId: parsed.id },
+      });
+    }
+
+    return this.prisma.workshopItem.findMany({
+      where: {
+        OR: [
+          { title: { contains: parsed.text, mode: 'insensitive' } },
+          {
+            creator: {
+              contains: parsed.text,
+              mode: 'insensitive',
+            },
+          },
+        ],
+      },
+      take: 50,
+    });
   }
 }

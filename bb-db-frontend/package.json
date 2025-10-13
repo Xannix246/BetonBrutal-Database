@@ -8,6 +8,7 @@
   "dependencies": {
     "@headlessui/react": "^2.2.9",
     "@heroicons/react": "^2.2.0",
+    "@nanostores/react": "^1.0.0",
     "@vitejs/plugin-react": "^5.0.2",
     "axios": "^1.12.2",
     "bbcode-to-react": "^0.2.9",
