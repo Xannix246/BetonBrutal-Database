@@ -9,6 +9,7 @@ import clsx from "clsx";
 import MapTile from "../../entities/MapTile";
 import { navigate } from "vike/client/router";
 import { handleEnterSearch, handleSearch } from "../../features/SearchManager";
+import Background from "../../widgets/Background/Background";
 // import { CircleStackIcon } from "@heroicons/react/24/outline";
 
 const Main = () => {
@@ -39,7 +40,8 @@ const Main = () => {
 
 
   return (
-    <div className="w-full h-full bg-[url(/assets/img/bg.jpg)] bg-center bg-fixed bg-no-repeat bg-cover bg-black">
+    <div className="w-full h-full">
+      <Background/>
       <div
         className={clsx(
           isSticky ?
@@ -60,14 +62,14 @@ const Main = () => {
 
             <div className="flex drop-shadow-md">
               <Input
-                className="text-4xl w-4xl"
+                className="text-4xl w-4xl bg-white/10"
                 placeholder="Search by name, author, id or url"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => handleEnterSearch(search, e)}
               />
               <Button 
-                className="text-4xl"
+                className="text-4xl bg-white/10"
                 onClick={() => handleSearch(search)}
               >SEARCH</Button>
             </div>

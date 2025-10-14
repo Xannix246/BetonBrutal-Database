@@ -31,7 +31,7 @@ const Header = ({ isAbsolute }: { isAbsolute?: boolean }) => {
 
   return (
     <header className="bg-black/80 w-full h-16 border-b-1 border-amber-200 flex p-2 justify-between">
-      <div className="h-full text-white text-shadow-lg text-4xl flex gap-10 place-items-center">
+      <div className="h-full text-white text-shadow-lg text-4xl flex gap-10 place-items-center pl-8">
         <Link className="hover:text-pink transition duration-150" href="/">HOME</Link>
         <Link className="hover:text-pink transition duration-150" href="/workshop">MAPS</Link>
         <Link className="hover:text-pink transition duration-150" href="/rankings">RANKINGS</Link>
@@ -61,7 +61,7 @@ const Header = ({ isAbsolute }: { isAbsolute?: boolean }) => {
           <div className="flex gap-4 place-items-center">
             <span className="whitespace-pre-wrap text-white font-xl tracking-wider">{user.name.toUpperCase().replaceAll(" ", "\n")}</span>
             <Dropdown 
-              button={<img src={user.image || ""} className="min-w-12 h-12 cursor-pointer"/>}
+              button={<img src={user.image || ""} alt="avatar" className="min-w-12 h-12 cursor-pointer"/>}
               menu={menu}
               className="m-0 p-0"
             />

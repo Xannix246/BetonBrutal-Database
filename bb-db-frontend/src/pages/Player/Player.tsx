@@ -4,6 +4,7 @@ import Header from "../../widgets/Header/Header";
 import Container from "../../shared/Containter/Container";
 import { getPlayer, getPlayerMaps } from "./requests";
 import MapTile from "../../entities/MapTile";
+import Background from "../../widgets/Background/Background";
 
 const PlayerPage = ({ id }: { id: string }) => {
   const [player, setPlayer] = useState<Player>();
@@ -22,7 +23,8 @@ const PlayerPage = ({ id }: { id: string }) => {
   }, []);
 
   return (
-    <div className="w-full min-h-screen h-full bg-[url(/assets/img/bg.jpg)] bg-center bg-fixed bg-no-repeat bg-cover bg-black">
+    <div className="w-full min-h-screen h-full">
+      <Background/>
       <div className="fixed left-0 w-full z-50">
         <Header isAbsolute={true} />
       </div>

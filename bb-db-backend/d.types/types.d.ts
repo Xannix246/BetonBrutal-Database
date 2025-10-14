@@ -41,3 +41,12 @@ declare type Replay = {
   score: number;
   date: Date | null;
 }
+
+declare type UserComment = {
+  id: string;
+  mapId: string;
+  userId: string;
+  username: string;
+  data: string;
+  createdAt: Date;
+}

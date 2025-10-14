@@ -4,6 +4,7 @@ import Container from "../../shared/Containter/Container";
 import MapTile from "../../entities/MapTile";
 import { getSearchData } from "../../store/store";
 import { useEffect } from "react";
+import Background from "../../widgets/Background/Background";
 
 const Search = () => {
   const searchData = getSearchData();
@@ -13,7 +14,8 @@ const Search = () => {
   }, []);
 
   return (
-    <div className="w-full min-h-screen h-full bg-[url(/assets/img/bg.jpg)] bg-center bg-fixed bg-no-repeat bg-cover bg-black">
+    <div className="w-full min-h-screen h-full">
+      <Background/>
       <div className="fixed left-0 w-full z-50">
         <Header isAbsolute={true} />
       </div>

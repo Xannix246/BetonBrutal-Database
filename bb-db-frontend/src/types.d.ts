@@ -28,5 +28,15 @@ declare type User = {
   email: string;
   emailVerified: boolean;
   name: string;
+  role?: string;
   image?: string | null | undefined;
 };
+
+declare type UserComment = {
+  id: string;
+  mapId: string;
+  userId: string;
+  username: string;
+  data: string;
+  createdAt: Date;
+}

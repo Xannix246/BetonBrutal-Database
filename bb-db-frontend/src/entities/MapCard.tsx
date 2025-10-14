@@ -23,9 +23,11 @@ const MapCard = ({ id, title, preview, previews}: Props) => {
     <div
       className="group bg-black/70 w-[28%] h-232 hover:w-[30%] transform duration-300 relative flex overflow-hidden cursor-pointer"
       onClick={() => navigate(`/workshop/${id}`)}
+      onPointerDown={(e) => e.button === 1 && window.open(`/workshop/${id}`, "_blank")}
     >
       <img
         src={previews && previews.length > 0 ? previews[previewId] : preview}
+        alt={title}
         className="absolute h-full w-full object-cover transform duration-500 group-hover:scale-102"
       />
       <div className="w-full h-full flex place-items-center relative z-10">

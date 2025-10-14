@@ -6,6 +6,7 @@ import { Button } from "@headlessui/react";
 import clsx from "clsx";
 import { getMaps } from "./requests";
 import MapTile from "../../entities/MapTile";
+import Background from "../../widgets/Background/Background";
 
 const Workshop = () => {
   const [loaded, setLoaded] = useState(false);
@@ -59,7 +60,8 @@ const Workshop = () => {
   }, [activeSort, hasMore]);
 
   return (
-    <div className="w-full min-h-screen h-full bg-[url(/assets/img/bg.jpg)] bg-center bg-fixed bg-no-repeat bg-cover bg-black">
+    <div className="w-full min-h-screen h-full bg-center bg-fixed bg-no-repeat bg-cover">
+      <Background/>
       <div className="fixed left-0 w-full z-50">
         <Header isAbsolute={true} />
       </div>

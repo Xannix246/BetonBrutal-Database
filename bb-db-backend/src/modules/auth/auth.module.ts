@@ -18,6 +18,12 @@ export const auth = betterAuth({
   },
   user: {
     modelName: 'User',
+    additionalFields: {
+      role: {
+        type: 'string',
+        defaultValue: 'User',
+      },
+    },
   },
   verification: {
     modelName: 'Verification',
