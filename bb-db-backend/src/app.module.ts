@@ -5,7 +5,7 @@ import { PrismaModule } from './modules/prisma/prisma.module';
 import { DataRequesterModule } from './modules/data-requester/data-requester.module';
 import { OptionalAuth } from '@thallesp/nestjs-better-auth';
 import { ScheduleModule } from '@nestjs/schedule';
-//import { BAuthModule } from './modules/auth/auth.module';
+import { BAuthModule } from './modules/auth/auth.module';
 
 @Controller()
 class AppController {
@@ -18,7 +18,7 @@ class AppController {
 
 @Module({
   imports: [
-    /*BAuthModule*/
+    BAuthModule,
     ScheduleModule.forRoot(),
     WorkshopModule,
     UsersModule,

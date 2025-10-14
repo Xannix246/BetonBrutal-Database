@@ -54,6 +54,7 @@ export class WorkshopController {
   }
 
   @Get('search')
+  @OptionalAuth()
   async search(@Query('q') query: string) {
     return this.workshopService.searchWorkshopItems(query);
   }

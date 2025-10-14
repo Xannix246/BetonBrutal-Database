@@ -1,7 +1,8 @@
 import axios from "axios";
+import { config } from "../../../config/config";
 
 export const getMap = async (
   id: string
 ): Promise<WorkshopItem>  => {
-  return (await axios.get(`http://26.220.176.177:3000/workshop/${id}`)).data;
+  return (await axios.get(`${config.serverUri}/workshop/${id}`)).data;
 }

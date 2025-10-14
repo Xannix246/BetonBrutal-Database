@@ -1,4 +1,5 @@
 import axios from "axios";
+import { config } from "../../../config/config";
 
 export const getFollowedMaps = async (
   sortBy: SortBy = "newest", 
@@ -6,5 +7,5 @@ export const getFollowedMaps = async (
   sendPreviews: boolean = false,
   timeRange?: 'day' | 'week' | 'month' | 'year'
 ): Promise<WorkshopItem[]>  => {
-  return (await axios.get(`http://26.220.176.177:3000/workshop/get-list?sortBy=${sortBy}&quantity=${quantity}&sendPreviews=${sendPreviews}${timeRange && "&timeRange=" + timeRange}`)).data;
+  return (await axios.get(`${config.serverUri}/workshop/get-list?sortBy=${sortBy}&quantity=${quantity}&sendPreviews=${sendPreviews}${timeRange && "&timeRange=" + timeRange}`)).data;
 }

@@ -43,13 +43,13 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                 <a target="_blank" href={`https://steamcommunity.com/sharedfiles/filedetails/?id=${mapData?.id}`} rel="noreferrer">{mapData?.title.toUpperCase()}</a>
               </Container>
               <Container className="text-gray-300 text-4xl w-full text-center flex justify-between">
-                <a 
-                  href={`/workshop/player/${mapData?.creatorId}`} 
+                <a
+                  href={`/workshop/player/${mapData?.creatorId}`}
                   className="hover:text-white hover:underline"
                 >BY {mapData?.creator.toUpperCase()}</a>
-                <a 
-                  target="_blank" 
-                  href={`https://josiahshields.com/beton/leaderboard/?lb=${mapData?.id}`} 
+                <a
+                  target="_blank"
+                  href={`https://josiahshields.com/beton/leaderboard/?lb=${mapData?.id}`}
                   rel="noreferrer"
                   className="hover:text-white hover:underline"
                 >MAP ON BBLB</a>

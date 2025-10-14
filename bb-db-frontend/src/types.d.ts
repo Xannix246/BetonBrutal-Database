@@ -1,4 +1,4 @@
-declare type SortBy = 'mostPopular' | 'newest' | 'oldest' | 'mostPlayed';
+declare type SortBy = "mostPopular" | "newest" | "oldest" | "mostPlayed";
 
 declare type WorkshopItem = {
   id: string;
@@ -12,11 +12,21 @@ declare type WorkshopItem = {
   createDate: Date;
   previewUrl: string;
   previews: string[];
-}
+};
 
 declare type Player = {
   id: string;
   username: string;
   items: string[];
   replays: string[];
-}
+};
+
+declare type User = {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  email: string;
+  emailVerified: boolean;
+  name: string;
+  image?: string | null | undefined;
+};

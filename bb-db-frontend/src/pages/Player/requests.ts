@@ -1,7 +1,8 @@
 import axios from "axios";
+import { config } from "../../../config/config";
 
 export const getPlayer = async (id: string): Promise<Player> => {
-  return (await axios.get(`http://26.220.176.177:3000/workshop/player/${id}`))
+  return (await axios.get(`${config.serverUri}/workshop/player/${id}`))
     .data;
 };
 
@@ -10,7 +11,7 @@ export const getPlayerMaps = async (
 ): Promise<WorkshopItem[]> => {
   console.log(ids);
   return (
-    await axios.post(`http://26.220.176.177:3000/workshop/get-query-list`, {
+    await axios.post(`${config.serverUri}/workshop/get-query-list`, {
       ids: ids
     })
   ).data;

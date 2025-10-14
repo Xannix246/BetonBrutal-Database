@@ -1,46 +1,56 @@
-import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
-import clsx from "clsx";
 import { JSX, useEffect, useState } from "react";
+import clsx from "clsx";
 
 type item = {
   icon?: JSX.Element;
   name: string;
   onClick?: () => void;
-}
+};
 
 interface Props {
   button: JSX.Element;
-  className: string;
+  className?: string;
   menu: item[];
 }
 
 const Dropdown = ({ button, className, menu }: Props) => {
+  const [open, setOpen] = useState(false);
   const [hasIcon, setHasIcon] = useState(false);
 
   useEffect(() => {
-    if(menu.some(item => item.icon)) setHasIcon(true);
-  }, []);
+    if (menu.some((item) => item.icon)) setHasIcon(true);
+  }, [menu]);
 
   return (
-    <Menu>
-      <MenuButton>{button}</MenuButton>
-      <MenuItems anchor="bottom" className={clsx(className, "")}>
-        {menu.map((item, i) => (
-          <MenuItem key={i}>
-            <button 
-              className=""
-              onClick={item.onClick}
+    <div className="relative inline-block">
+      <button onClick={() => setOpen((v) => !v)} className="m-0 p-0">
+        {button}
+      </button>
+
+      {open && (
+        <div
+          className={clsx(
+            className,
+            "absolute right-0 mt-3 w-52 bg-black/70 text-white text-xl shadow-lg z-50"
+          )}
+        >
+          {menu.map((item, i) => (
+            <button
+              key={i}
+              className="flex w-full justify-start items-center gap-4 px-3 py-1.5 hover:bg-white/10"
+              onClick={() => {
+                item.onClick?.();
+                setOpen(false);
+              }}
             >
-              {hasIcon && <div className="w-4 h-4">
-                {item.icon}
-              </div>}
+              {hasIcon && <div className="w-6 h-6">{item.icon}</div>}
               {item.name}
             </button>
-          </MenuItem>
-        ))}
-      </MenuItems>
-    </Menu>
+          ))}
+        </div>
+      )}
+    </div>
   );
-}
+};
 
 export default Dropdown;

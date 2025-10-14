@@ -8,41 +8,41 @@ generator client {
 }
 
 model SteamUser {
-    id       String         @id @default(auto()) @map("_id") @db.ObjectId
-    steamId  String         @unique
+    id       String   @id @default(auto()) @map("_id") @db.ObjectId
+    steamId  String   @unique
     username String
     items    String[]
     replays  String[]
 }
 
 model WorkshopItem {
-    id         String    @id @default(auto()) @map("_id") @db.ObjectId
+    id         String   @id @default(auto()) @map("_id") @db.ObjectId
     title      String
-    steamId    String    @unique
+    steamId    String   @unique
     creator    String
     creatorId  String
-    createDate DateTime  @default(now())
-    ratingUp   Int       @default(0)
-    ratingDown Int       @default(0)
+    createDate DateTime @default(now())
+    ratingUp   Int      @default(0)
+    ratingDown Int      @default(0)
     previewUrl String
     previews   String[]
 }
 
 model LeaderboardEntry {
-    id        String    @id @default(auto()) @map("_id") @db.ObjectId
-    mapId     String
-    steamId   String
-    username  String
-    score     Int
-    date      DateTime?
+    id       String    @id @default(auto()) @map("_id") @db.ObjectId
+    mapId    String
+    steamId  String
+    username String
+    score    Int
+    date     DateTime?
 
     @@unique([mapId, steamId])
 }
 
 model Leaderboard {
-    id        String    @id @default(auto()) @map("_id") @db.ObjectId
-    mapId     String    @unique
-    enteries  String[] //LeaderboardEntry id's
+    id       String   @id @default(auto()) @map("_id") @db.ObjectId
+    mapId    String   @unique
+    enteries String[] //LeaderboardEntry id's
 }
 
 // model Replay {
@@ -59,4 +59,66 @@ model Comment {
     userId    String
     data      String
     createdAt DateTime @default(now())
+}
+
+// Better Auth models
+
+model User {
+    id            String    @id @map("_id")
+    name          String
+    email         String
+    emailVerified Boolean   @default(false)
+    image         String?
+    createdAt     DateTime  @default(now())
+    updatedAt     DateTime  @default(now()) @updatedAt
+    sessions      Session[]
+    accounts      Account[]
+
+    @@unique([email])
+    @@map("user")
+}
+
+model Session {
+    id        String   @id @map("_id")
+    expiresAt DateTime
+    token     String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    ipAddress String?
+    userAgent String?
+    userId    String
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([token])
+    @@map("session")
+}
+
+model Account {
+    id                    String    @id @map("_id")
+    accountId             String
+    providerId            String
+    userId                String
+    user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    accessToken           String?
+    refreshToken          String?
+    idToken               String?
+    accessTokenExpiresAt  DateTime?
+    refreshTokenExpiresAt DateTime?
+    scope                 String?
+    password              String?
+    createdAt             DateTime  @default(now())
+    updatedAt             DateTime  @updatedAt
+
+    @@map("account")
+}
+
+model Verification {
+    id         String   @id @map("_id")
+    identifier String
+    value      String
+    expiresAt  DateTime
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @default(now()) @updatedAt
+
+    @@map("verification")
 }

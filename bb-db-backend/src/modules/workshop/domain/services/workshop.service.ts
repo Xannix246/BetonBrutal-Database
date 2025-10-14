@@ -125,6 +125,7 @@ export class WorkshopService {
   async getQueryItems(ids: string[]): Promise<WorkshopItemHeader[]> {
     const items = await this.prisma.workshopItem.findMany({
       where: { steamId: { in: ids } },
+      orderBy: { createDate: 'desc' },
     });
 
     const returnItems: WorkshopItemHeader[] = [];
