@@ -49,6 +49,17 @@ declare type Replay = {
   date: Date | null;
 };
 
+declare type User = {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  email: string;
+  emailVerified: boolean;
+  name: string;
+  role?: string;
+  image?: string | null | undefined;
+};
+
 declare type UserComment = {
   id: string;
   mapId: string;

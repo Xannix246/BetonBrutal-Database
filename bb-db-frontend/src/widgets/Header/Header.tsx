@@ -7,6 +7,7 @@ import { handleEnterSearch, handleSearch } from "../../features/SearchManager";
 import { authClient, logOut, signIn } from "../../features/Auth";
 import Dropdown from "../../shared/Dropdown/Dropdown";
 import { ArrowLeftEndOnRectangleIcon, StarIcon } from "@heroicons/react/24/outline";
+import { navigate } from "vike/client/router";
 
 const Header = ({ isAbsolute }: { isAbsolute?: boolean }) => {
   const [search, setSearch] = useState("");
@@ -29,7 +30,8 @@ const Header = ({ isAbsolute }: { isAbsolute?: boolean }) => {
     },
     {
       name: "FAVORITES",
-      icon: <StarIcon width={24}/>
+      icon: <StarIcon width={24}/>,
+      onClick: () => navigate(`/user/${user?.id}/favorites`)
     }
   ];
 

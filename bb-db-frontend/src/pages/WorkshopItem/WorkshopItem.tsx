@@ -9,8 +9,11 @@ import { authClient } from "../../features/Auth";
 import Input from "../../shared/Input/Input";
 import Comment from "../../entities/Comment/Comment";
 import LeaderboardTable from "../../widgets/LeaderboardTable/LeaderboardTable";
-import { $prevLink } from "../../store/store";
+import { $prevLink, getFavorites } from "../../store/store";
 import { navigate } from "vike/client/router";
+import Button from "../../shared/Button/Button";
+import { addFavorites, removeFavorites } from "../../features/FavoriteManager";
+import clsx from "clsx";
 
 const WorkshopItemPage = ({ id }: { id: string }) => {
   const [mapData, setMapData] = useState<WorkshopItem>();
@@ -19,6 +22,7 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
   const [comments, setComments] = useState<UserComment[]>([]);
   const [replays, setReplays] = useState<Replay[]>([]);
   const [value, setValue] = useState("");
+  const favorites = getFavorites();
 
   useEffect(() => {
     (async () => {
@@ -81,6 +85,13 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                     onClick={() => $prevLink.set("mapCreator")}
                     className="hover:text-white hover:underline"
                   >BY {mapData?.creator.toUpperCase()}</a>
+                  <Button
+                    onClick={() => favorites.includes(id) ? removeFavorites(id) : addFavorites(id)}
+                    className={clsx(
+                      "bg-transparent p-1 transition duration-300 text-xl text-white",
+                      favorites.includes(id) ? "hover:bg-red/40" : "hover:bg-green/40"
+                    )}
+                  >{favorites.includes(id) ? "REMOVE FROM FAVORITES" : "ADD TO FAVORITES"}</Button>
                   <a
                     target="_blank"
                     href={`https://josiahshields.com/beton/leaderboard/?lb=${mapData?.id}`}
