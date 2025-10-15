@@ -7,6 +7,7 @@ import { RefreshDatabaseUseCase } from './application/use-cases/refresh-database
 import { GetNewMapsScheduler } from './infrastructure/schedulers/get-new-maps.schedule';
 import { FetchBBLBUseCase } from './application/use-cases/fetch-bblb.usecase';
 import { BBLBApiService } from './application/adapters/bblb-api';
+import { FetchBBLBReplaysScheduler } from './infrastructure/schedulers/fetch-bblb-replays.schedule';
 
 @Module({
   imports: [PrismaModule],
@@ -17,6 +18,7 @@ import { BBLBApiService } from './application/adapters/bblb-api';
     SyncUserMapsUseCase,
     RefreshDatabaseUseCase,
     GetNewMapsScheduler,
+    FetchBBLBReplaysScheduler,
     FetchItemUseCase,
     FetchBBLBUseCase,
   ],
