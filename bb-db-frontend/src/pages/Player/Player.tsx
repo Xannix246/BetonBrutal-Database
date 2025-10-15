@@ -64,10 +64,15 @@ const PlayerPage = ({ id }: { id: string }) => {
               </Container>
               <div className="px-4">
                 {page === "mapCreator" ?
-                  <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[300px] gap-6 p-6 w-full">
-                    {mapData.map(m => (
-                      <MapTile key={m.id} {...m} />
-                    ))}
+                  <div className="flex w-full justify-center">
+                    {mapData.length > 0 && <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[300px] gap-6 p-6 w-full">
+                      {mapData.map(m => (
+                        <MapTile key={m.id} {...m} />
+                      ))}
+                    </div>}
+                    {mapData.length === 0 && <Container className="w-5xl mt-16">
+                      <h2 className="text-[#f1e4c7] tracking-wider text-xl text-center">THIS PLAYER DIDN&apos;T POSTED ANY MAPS YET...</h2>
+                    </Container>}
                   </div>
                   :
                   <div className="flex w-full justify-center">

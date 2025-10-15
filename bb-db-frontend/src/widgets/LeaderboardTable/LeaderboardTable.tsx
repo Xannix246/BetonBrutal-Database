@@ -5,11 +5,15 @@ import clsx from "clsx";
 
 type Props = {
   replays: Replay[];
+  comment?: string;
 };
 
 type SortKey = "score" | "creator" | "date";
 
-const LeaderboardTable = ({ replays }: Props) => {
+const LeaderboardTable = ({
+  replays,
+  comment = "NO ONE HAS COMPLETED THIS MAP YET..."
+}: Props) => {
   const [sortKey, setSortKey] = useState<SortKey>("score");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [useMap, setUseMap] = useState(false);
@@ -81,6 +85,10 @@ const LeaderboardTable = ({ replays }: Props) => {
           replay={replay}
         />
       ))}
+
+      {replays.length === 0 && <Container className="mx-2">
+        <h2 className="text-[#f1e4c7] tracking-wider text-xl text-center">{comment}</h2>
+      </Container>}
     </div>
   );
 };

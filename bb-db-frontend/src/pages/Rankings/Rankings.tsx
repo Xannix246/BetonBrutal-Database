@@ -84,7 +84,10 @@ const Rankings = () => {
               onChange={(e) => setSearchText(e.target.value)}
             />
             <div className="w-5xl">
-              <LeaderboardTable replays={result} />
+              <LeaderboardTable
+                replays={result}
+                comment="NO PLAYERS FOUND"
+              />
             </div>
           </div>
         </div>
