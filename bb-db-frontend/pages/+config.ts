@@ -8,6 +8,7 @@ import { LayoutDefault as Layout } from "../layouts/LayoutDefault";
 export default {
   // https://vike.dev/Layout
   Layout,
+  port: 3001,
 
   // https://vike.dev/head-tags
   title: "BETON BRUTAL Database",

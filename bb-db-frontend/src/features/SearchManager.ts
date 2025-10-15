@@ -1,11 +1,12 @@
 import { $searchData } from "../store/store";
 import { navigate } from "vike/client/router";
 import { api } from "./Auth";
+import { config } from "../../config/config";
 
 export const handleSearch = async (searchQuery: string) => {
   const result: WorkshopItem[] = (
     await api.get(
-      `http://26.220.176.177:3000/workshop/search?q=${encodeURIComponent(
+      `${config.serverUri}/workshop/search?q=${encodeURIComponent(
         searchQuery
       )}`
     )
