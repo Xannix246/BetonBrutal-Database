@@ -1,4 +1,4 @@
-import { JSX, useEffect, useState } from "react";
+import { JSX, useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 
 type item = {
@@ -16,13 +16,30 @@ interface Props {
 const Dropdown = ({ button, className, menu }: Props) => {
   const [open, setOpen] = useState(false);
   const [hasIcon, setHasIcon] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+
+  const handleClickOutside = (e: MouseEvent) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      setOpen(false);
+    }
+  };
 
   useEffect(() => {
     if (menu.some((item) => item.icon)) setHasIcon(true);
   }, [menu]);
 
+  useEffect(() => {
+    if (open) {
+      document.addEventListener("click", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [open]);
+
   return (
-    <div className="relative inline-block">
+    <div className="relative inline-block" ref={dropdownRef}>
       <button onClick={() => setOpen((v) => !v)} className="m-0 p-0">
         {button}
       </button>
