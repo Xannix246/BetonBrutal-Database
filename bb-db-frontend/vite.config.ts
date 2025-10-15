@@ -9,8 +9,8 @@ export default defineConfig({
     target: "es2022",
   },
   server: {
-    allowedHosts: ["localhost", "26.220.176.177"],
-    host: "localhost",
+    allowedHosts: ["localhost", "26.220.176.177", "db.betonbrutal.com"],
+    host: "db.betonbrutal.com",
     port: 3001
   }
 });
