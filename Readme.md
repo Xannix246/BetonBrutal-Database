@@ -17,7 +17,7 @@ Make sure you have installed:
 
 ---
 
-## 🐳 Server Setup (NestJS + Prisma + MongoDB)
+## Server Setup (NestJS + Prisma + MongoDB)
 
 ### 1. Start the containers
 ```bash
