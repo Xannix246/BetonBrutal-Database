@@ -58,7 +58,7 @@ const LeaderboardTable = ({
       </Container>
 
       <Container className="mx-2 px-6 text-white font-semibold">
-        <div className="flex items-center justify-between text-lg gap-4">
+        <div className="flex items-center justify-between text-xl gap-4">
           <span
             className={clsx("w-[120px] transition duration-300 cursor-pointer", sortKey === "score" && "text-green")}
             onClick={() => handleSort("score")}

@@ -3,6 +3,7 @@ import { AuthModule } from '@thallesp/nestjs-better-auth';
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { PrismaClient } from '@prisma/client';
+import { env } from 'process';
 
 const prisma = new PrismaClient();
 
@@ -34,7 +35,7 @@ export const auth = betterAuth({
   session: {
     modelName: 'Session',
   },
-  trustedOrigins: ['http://26.220.176.177:3001'],
+  trustedOrigins: [env.CLIENT_URL || 'db.betonbrutal.com'],
 });
 
 @Module({

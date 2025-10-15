@@ -4,6 +4,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as bodyParser from 'body-parser';
+import { env } from 'process';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -17,8 +18,8 @@ async function bootstrap() {
   });
 
   app.enableCors({
-    origin: ['http://26.220.176.177:3001', 'http://localhost:3001'],
-    credentials: true, // важно для передачи cookie / session
+    origin: [env.CLIENT_URL],
+    credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   });
