@@ -24,16 +24,31 @@ function formatTime(score: number): string {
 }
 
 const LeaderboardEntry = ({ place, replay }: Props) => {
+  const [position, setPosition] = useState(0);
   const [useMap, setUseMap] = useState(false);
+
+  const isOfficialMap = () => {
+    switch (replay.mapId) {
+      case "TimeMS":
+        return "BETON BRUTAL";
+      case "TimeDLC1":
+        return "BETON BATH";
+      case "TimeBirthday":
+        return "BETON B-DAY";
+      default:
+        return "";
+    }
+  }
 
   useEffect(() => {
     if (window.location.pathname.includes("player")) setUseMap(true);
+    setPosition(place);
   }, []);
   
   return (
     <Container className="mx-2 tracking-wider hover:bg-[#1f1f1f] transition">
       <div className="flex items-center justify-between text-[#f1e4c7] gap-4">
-        <h3 className="text-xl text-center w-[40px] shrink-0">{place}</h3>
+        <h3 className="text-xl text-center w-[40px] shrink-0">{position}</h3>
         <h3
           className="flex-grow text-xl truncate text-ellipsis whitespace-nowrap font-semibold max-w-[50%] hover:underline cursor-pointer hover:text-white transition duration-300"
           onClick={() => {
@@ -48,7 +63,7 @@ const LeaderboardEntry = ({ place, replay }: Props) => {
             fontSize: "clamp(0.75rem, 1.5vw, 1.25rem)",
           }}
         >
-          {(useMap ? replay.map || "unknown map" : replay.creator).toUpperCase()}
+          {(useMap ? (isOfficialMap().length > 0 ? isOfficialMap() : replay.map || "unknown map" ) : replay.creator).toUpperCase()}
         </h3>
         <h3 className="text-xl text-right w-[100px] shrink-0">
           {formatTime(replay.score)}

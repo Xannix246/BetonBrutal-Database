@@ -72,6 +72,9 @@ importers:
       '@types/bbcode-to-react':
         specifier: ^0.2.4
         version: 0.2.4
+      '@types/fuzzy-search':
+        specifier: ^2.1.5
+        version: 2.1.5
       '@types/react':
         specifier: ^19.1.12
         version: 19.2.2
@@ -820,6 +823,9 @@ packages:
 
   '@types/estree@1.0.8':
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
+
+  '@types/fuzzy-search@2.1.5':
+    resolution: {integrity: sha512-Yw8OsjhVKbKw83LMDOZ9RXc+N+um48DmZYMrz7QChpHkQuygsc5O40oCL7SfvWgpaaviCx2TbNXYUBwhMtBH5w==}
 
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
@@ -2922,6 +2928,8 @@ snapshots:
       '@types/react': 19.2.2
 
   '@types/estree@1.0.8': {}
+
+  '@types/fuzzy-search@2.1.5': {}
 
   '@types/json-schema@7.0.15': {}
 

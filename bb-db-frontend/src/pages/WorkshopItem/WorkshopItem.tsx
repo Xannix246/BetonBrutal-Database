@@ -10,6 +10,7 @@ import Input from "../../shared/Input/Input";
 import Comment from "../../entities/Comment/Comment";
 import LeaderboardTable from "../../widgets/LeaderboardTable/LeaderboardTable";
 import { $prevLink } from "../../store/store";
+import { navigate } from "vike/client/router";
 
 const WorkshopItemPage = ({ id }: { id: string }) => {
   const [mapData, setMapData] = useState<WorkshopItem>();
@@ -21,6 +22,9 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
 
   useEffect(() => {
     (async () => {
+      if (["TimeMS", "TimeDLC1", "TimeBirthday"].includes(id)) {
+        return navigate("/");
+      }
       const map = await getMap(id);
       const replays = (await getReplays(id)).sort(
         (a, b) => a.score - b.score

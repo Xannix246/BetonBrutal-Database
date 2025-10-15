@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { handleEnterSearch, handleSearch } from "../../features/SearchManager";
 import { authClient, logOut, signIn } from "../../features/Auth";
 import Dropdown from "../../shared/Dropdown/Dropdown";
-import { ArrowLeftEndOnRectangleIcon } from "@heroicons/react/24/outline";
+import { ArrowLeftEndOnRectangleIcon, StarIcon } from "@heroicons/react/24/outline";
 
 const Header = ({ isAbsolute }: { isAbsolute?: boolean }) => {
   const [search, setSearch] = useState("");
@@ -26,6 +26,10 @@ const Header = ({ isAbsolute }: { isAbsolute?: boolean }) => {
         logOut();
         setUser(undefined);
       }
+    },
+    {
+      name: "FAVORITES",
+      icon: <StarIcon width={24}/>
     }
   ];
 

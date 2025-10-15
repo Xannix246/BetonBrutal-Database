@@ -16,6 +16,7 @@ const Input = ({ className, placeholder, leftIcon, rightIcon, ...props }: Props)
       <HeadlessInput
         className={"outline-none text-white w-full"}
         placeholder={placeholder}
+        autoComplete="off"
         {...props}
       />
       {rightIcon}
