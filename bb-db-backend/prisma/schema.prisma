@@ -62,6 +62,12 @@ model Comment {
     createdAt DateTime @default(now())
 }
 
+model Favorites {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    userId    String @unique
+    mapsId    String[]
+}
+
 // Better Auth models
 
 enum Role {

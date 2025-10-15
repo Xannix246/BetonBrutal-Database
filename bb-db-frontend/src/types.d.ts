@@ -14,6 +14,16 @@ declare type WorkshopItem = {
   previews: string[];
 };
 
+declare type Replay = {
+  id: string;
+  creator: string;
+  creatorId: string;
+  mapId: string;
+  map?: string;
+  score: number;
+  date: Date | null;
+};
+
 declare type Player = {
   id: string;
   username: string;

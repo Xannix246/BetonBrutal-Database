@@ -13,7 +13,7 @@ declare type WorkshopItem = {
   createDate: Date;
   previewUrl: string;
   previews: string[];
-}
+};
 
 declare type WorkshopItemHeader = {
   id: string;
@@ -24,23 +24,30 @@ declare type WorkshopItemHeader = {
   ratingUp: number;
   ratingDown: number;
   previews?: string[];
-}
+};
 
 declare type Player = {
   id: string;
   username: string;
   items: string[];
   replays: string[];
-}
+};
+
+declare type Leaderboard = {
+  id: string;
+  mapId: string;
+  enteries: string[];
+};
 
 declare type Replay = {
   id: string;
   creator: string;
   creatorId: string;
   mapId: string;
+  map?: string;
   score: number;
   date: Date | null;
-}
+};
 
 declare type UserComment = {
   id: string;
@@ -49,4 +56,4 @@ declare type UserComment = {
   username: string;
   data: string;
   createdAt: Date;
-}
+};

@@ -15,11 +15,12 @@ export class FetchBBLBUseCase {
     const { entries } = await this.bblbApi.getRawData();
 
     for (const entry of entries) {
-      const leaderboardEntry = this.prisma.leaderboardEntry.upsert({
+      const leaderboardEntry = await this.prisma.leaderboardEntry.upsert({
         where: {
           mapId_steamId: { mapId: entry.mapId, steamId: entry.steamId },
         },
         update: {
+          username: entry.username,
           score: entry.score,
           date: entry.date,
         },
@@ -36,18 +37,39 @@ export class FetchBBLBUseCase {
         where: { mapId: entry.mapId },
       });
 
-      const existingEntries = existingLeaderboard?.enteries ?? [];
-
       await this.prisma.leaderboard.upsert({
         where: { mapId: entry.mapId },
         update: {
           enteries: [
-            ...new Set([...existingEntries, (await leaderboardEntry).id]),
+            ...new Set([
+              ...(existingLeaderboard?.enteries || []),
+              leaderboardEntry.id,
+            ]),
           ],
         },
         create: {
           mapId: entry.mapId,
-          enteries: [(await leaderboardEntry).id],
+          enteries: [leaderboardEntry.id],
+        },
+      });
+
+      const user = await this.prisma.steamUser.findUnique({
+        where: { steamId: entry.steamId },
+      });
+
+      await this.prisma.steamUser.upsert({
+        where: { steamId: entry.steamId },
+        update: {
+          username: entry.username,
+          replays: [
+            ...new Set([...(user?.replays || []), leaderboardEntry.id]),
+          ],
+        },
+        create: {
+          steamId: entry.steamId,
+          username: entry.username,
+          items: [],
+          replays: [leaderboardEntry.id],
         },
       });
     }

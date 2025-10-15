@@ -53,6 +53,14 @@ export class WorkshopController {
     return this.workshopService.getQueryItems(body.ids);
   }
 
+  @Post('get-query-replays')
+  @OptionalAuth()
+  async getReplaysByQuery(
+    @Body() body: { ids: string[]; requestMapNames?: boolean },
+  ) {
+    return this.workshopService.getQueryReplays(body.ids, body.requestMapNames);
+  }
+
   @Get('search')
   @OptionalAuth()
   async search(@Query('q') query: string) {
@@ -66,7 +74,7 @@ export class WorkshopController {
       return res.status(HttpStatus.FORBIDDEN).send();
     }
 
-    // void (await this.refreshDb.execute());
+    void (await this.refreshDb.execute());
     void (await this.fetchBblb.execute());
     return res.status(HttpStatus.OK).json({ message: 'done' }).send();
   }
@@ -83,9 +91,14 @@ export class WorkshopController {
     return this.workshopService.getItem(id);
   }
 
-  // @Get(':id/replays')
-  // @OptionalAuth()
-  // async getReplays(@Param('id') id: string): Promise<Replay[]> {
+  @Get(':id/replays')
+  @OptionalAuth()
+  async getReplays(@Param('id') id: string): Promise<Replay[]> {
+    const leaderboard = await this.workshopService.getLeaderboard(id);
+    const replays = this.workshopService.getQueryReplays(
+      leaderboard?.enteries || [],
+    );
 
-  // }
+    return replays;
+  }
 }

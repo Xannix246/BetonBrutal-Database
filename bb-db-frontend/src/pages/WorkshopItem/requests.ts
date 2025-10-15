@@ -7,6 +7,12 @@ export const getMap = async (
   return (await api.get(`${config.serverUri}/workshop/${id}`)).data;
 }
 
+export const getReplays = async (
+  id: string
+): Promise<Replay[]>  => {
+  return (await api.get(`${config.serverUri}/workshop/${id}/replays`)).data;
+}
+
 export const getComments = async (mapId: string): Promise<UserComment[]> => {
   return (await api.get(`${config.serverUri}/comments?id=${mapId}`)).data;
 }

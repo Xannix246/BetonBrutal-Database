@@ -2,14 +2,20 @@ import { useEffect, useState } from "react";
 import Footer from "../../widgets/Footer/Footer";
 import Header from "../../widgets/Header/Header";
 import Container from "../../shared/Containter/Container";
-import { getPlayer, getPlayerMaps } from "./requests";
+import { getPlayer, getPlayerMaps, getPlayerReplays } from "./requests";
 import MapTile from "../../entities/MapTile";
 import Background from "../../widgets/Background/Background";
+import { getPrevLink } from "../../store/store";
+import clsx from "clsx";
+import LeaderboardTable from "../../widgets/LeaderboardTable/LeaderboardTable";
 
 const PlayerPage = ({ id }: { id: string }) => {
   const [player, setPlayer] = useState<Player>();
   const [mapData, setMapData] = useState<WorkshopItem[]>([]);
+  const [replays, setReplays] = useState<Replay[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const source = getPrevLink();
+  const [page, setPage] = useState<"mapCreator" | "run">(source);
 
   useEffect(() => {
     (async () => {
@@ -17,6 +23,7 @@ const PlayerPage = ({ id }: { id: string }) => {
       setPlayer(player);
 
       setMapData(await getPlayerMaps(player.items));
+      setReplays(await getPlayerReplays(player.replays));
 
       setLoaded(true);
     })();
@@ -24,7 +31,7 @@ const PlayerPage = ({ id }: { id: string }) => {
 
   return (
     <div className="w-full min-h-screen h-full">
-      <Background/>
+      <Background />
       <div className="fixed left-0 w-full z-50">
         <Header isAbsolute={true} />
       </div>
@@ -35,7 +42,18 @@ const PlayerPage = ({ id }: { id: string }) => {
             <div className="flex flex-col gap-2 w-full text-gray-300">
               <Container className="flex justify-center gap-10 text-4xl tracking-wide place-items-center">
                 <div className="flex gap-3">
-                  <span>MAPS BY</span>
+                  <div className="flex gap-3">
+                    <span
+                      className={clsx("transition duration-300 cursor-pointer hover:text-pink", page === "mapCreator" && "text-green")}
+                      onClick={() => setPage("mapCreator")}
+                    >MAPS</span>
+                    |
+                    <span
+                      className={clsx("transition duration-300 cursor-pointer hover:text-pink", page === "run" && "text-green")}
+                      onClick={() => setPage("run")}
+                    >RUNS</span>
+                    <span>BY</span>
+                  </div>
                   <a
                     target="_blank"
                     href={`https://steamcommunity.com/profiles/${player?.id}`}
@@ -45,11 +63,19 @@ const PlayerPage = ({ id }: { id: string }) => {
                 </div>
               </Container>
               <div className="px-4">
-                <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[300px] gap-6 p-6 w-full">
-                  {mapData.map(m => (
-                    <MapTile key={m.id} {...m} />
-                  ))}
-                </div>
+                {page === "mapCreator" ?
+                  <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[300px] gap-6 p-6 w-full">
+                    {mapData.map(m => (
+                      <MapTile key={m.id} {...m} />
+                    ))}
+                  </div>
+                  :
+                  <div className="flex w-full justify-center">
+                    <div className="w-5xl">
+                      <LeaderboardTable replays={replays} />
+                    </div>
+                  </div>
+                }
               </div>
             </div>
           </div>

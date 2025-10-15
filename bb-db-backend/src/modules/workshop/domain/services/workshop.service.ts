@@ -166,29 +166,57 @@ export class WorkshopService {
     }
   }
 
-  // async getReplays(workshopItemId: string): Promise<Replay[]> {
-  //   const replays = await this.prisma.replay.findMany({
-  //     where: { mapId: workshopItemId },
-  //     orderBy: { score: 'desc' },
-  //   });
+  async getQueryReplays(
+    ids: string[],
+    requestMapNames: boolean = false,
+  ): Promise<Replay[]> {
+    const replays = await this.prisma.leaderboardEntry.findMany({
+      where: { id: { in: ids } },
+      orderBy: { score: 'desc' },
+    });
 
-  //   const returnReplays: Replay[] = [];
+    const returnReplays: Replay[] = [];
 
-  //   for (const replay of replays) {
-  //     returnReplays.push({
-  //       id: replay.id,
-  //       creator: (await this.prisma.steamUser.findUnique({
-  //         where: { steamId: replay.creatorId },
-  //       }))!.username,
-  //       creatorId: replay.creatorId,
-  //       mapId: replay.mapId,
-  //       score: replay.score,
-  //       date: replay.date,
-  //     });
-  //   }
+    for (const replay of replays) {
+      let mapName = '';
+      if (requestMapNames) {
+        mapName =
+          (
+            await this.prisma.workshopItem.findUnique({
+              where: { steamId: replay.mapId },
+            })
+          )?.title || 'unknown';
+      }
 
-  //   return returnReplays;
-  // }
+      returnReplays.push({
+        id: replay.id,
+        creator: replay.username,
+        creatorId: replay.steamId,
+        mapId: replay.mapId,
+        map: mapName,
+        score: replay.score,
+        date: replay.date,
+      });
+    }
+
+    return returnReplays;
+  }
+
+  async getLeaderboard(
+    workshopItemId: string,
+  ): Promise<Leaderboard | undefined> {
+    const leaderboard = await this.prisma.leaderboard.findUnique({
+      where: { mapId: workshopItemId },
+    });
+
+    if (leaderboard) {
+      return {
+        id: leaderboard?.id,
+        mapId: leaderboard?.mapId,
+        enteries: leaderboard?.enteries,
+      };
+    }
+  }
 
   async searchWorkshopItems(input: string) {
     const parsed = parseSearchInput(input);

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import axios from 'axios';
 
@@ -28,8 +29,8 @@ export class BBLBApiService {
         creator: mapData.owner,
         creatorId: mapData.owner,
         createDate: this.convertSteamDate(mapData.date),
-        ratingUp: parseInt(mapData.votes.up, 10),
-        ratingDown: parseInt(mapData.votes.down, 10),
+        ratingUp: parseInt(mapData.votes?.up, 10) || 0,
+        ratingDown: parseInt(mapData.votes?.down, 10) || 0,
         previewUrl: mapData.img,
       };
 
@@ -52,10 +53,19 @@ export class BBLBApiService {
   };
 
   async getRawData() {
-    const data: RawLeaderboardResponse = (
-      await axios.get(`https://josiahshields.com/beton/data.json`)
-    ).data;
+    const { data } = await axios.get(
+      'https://josiahshields.com/beton/data.json',
+      {
+        responseType: 'arraybuffer',
+        // proxy: {
+        //   host: '127.0.0.1',
+        //   port: 8000,
+        // },
+      },
+    );
+    const text = Buffer.from(data).toString('utf8');
+    const json = JSON.parse(text);
 
-    return this.parseLeaderboardData(data);
+    return this.parseLeaderboardData(json);
   }
 }

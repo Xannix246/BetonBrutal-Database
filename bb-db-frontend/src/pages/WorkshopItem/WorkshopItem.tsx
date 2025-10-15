@@ -1,25 +1,32 @@
 import { useEffect, useState } from "react";
 import Footer from "../../widgets/Footer/Footer";
 import Header from "../../widgets/Header/Header";
-import { getComments, getMap, postComment } from "./requests";
+import { getComments, getMap, getReplays, postComment } from "./requests";
 import Container from "../../shared/Containter/Container";
 import DescriptionFormatter from "../../features/DescriptionFormatter";
 import Background from "../../widgets/Background/Background";
 import { authClient } from "../../features/Auth";
 import Input from "../../shared/Input/Input";
 import Comment from "../../entities/Comment/Comment";
+import LeaderboardTable from "../../widgets/LeaderboardTable/LeaderboardTable";
+import { $prevLink } from "../../store/store";
 
 const WorkshopItemPage = ({ id }: { id: string }) => {
   const [mapData, setMapData] = useState<WorkshopItem>();
   const [loaded, setLoaded] = useState(false);
   const [user, setUser] = useState<User>();
   const [comments, setComments] = useState<UserComment[]>([]);
+  const [replays, setReplays] = useState<Replay[]>([]);
   const [value, setValue] = useState("");
 
   useEffect(() => {
     (async () => {
       const map = await getMap(id);
+      const replays = (await getReplays(id)).sort(
+        (a, b) => a.score - b.score
+      );
       setMapData(map);
+      setReplays(replays);
 
       setUser((await authClient.getSession()).data?.user);
       setComments((await getComments(id)).sort(
@@ -67,6 +74,7 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                 <Container className="text-gray-300 text-4xl w-full text-center flex justify-between">
                   <a
                     href={`/workshop/player/${mapData?.creatorId}`}
+                    onClick={() => $prevLink.set("mapCreator")}
                     className="hover:text-white hover:underline"
                   >BY {mapData?.creator.toUpperCase()}</a>
                   <a
@@ -104,14 +112,7 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                   <h2 className="text-[#f1e4c7] tracking-wider text-xl text-center">SEEMS LIKE STILL NO ONE HAS LEFT A COMMENT HERE... DO YOU WANT TO BE FIRST?</h2>
                 </Container>}
               </div>
-              <div className="flex flex-col gap-2 w-full">
-                <Container>
-                  <h2 className="text-white tracking-wider text-xl">LEADERBOARD</h2>
-                </Container>
-                <Container className="mx-2">
-                  <h2 className="text-[#f1e4c7] tracking-wider text-xl text-center">WE&apos;RE WORKING ON IT...</h2>
-                </Container>
-              </div>
+              <LeaderboardTable replays={replays}/>
             </div>
           </div>
           :
