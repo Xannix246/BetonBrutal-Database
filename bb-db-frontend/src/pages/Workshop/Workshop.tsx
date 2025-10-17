@@ -66,7 +66,7 @@ const Workshop = () => {
         <Header isAbsolute={true} />
       </div>
       <div className="flex flex-col min-h-screen justify-between pt-32">
-        <Container className="flex justify-center gap-10 text-4xl tracking-wide place-items-center">
+        <Container className="flex justify-center gap-10 text-2xl md:text-4xl tracking-wide place-items-center">
           <h1 className="text-white">SORT BY:</h1>
           <div className="flex gap-5">
             {["newest", "oldest", "mostPopular"].map(sortOption => (
@@ -85,7 +85,7 @@ const Workshop = () => {
 
         {loaded ? (
           <div className="flex gap-2 w-full px-4">
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[300px] gap-6 p-6 w-full">
+            <div className="grid sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[200px] lg:auto-rows-[300px] gap-6 p-6 w-full">
               {items.map(m => (
                 <MapTile key={m.id} {...m} />
               ))}

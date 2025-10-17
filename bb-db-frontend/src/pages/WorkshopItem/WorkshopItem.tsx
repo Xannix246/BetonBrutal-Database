@@ -59,15 +59,15 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
         <Header isAbsolute={true} />
       </div>
 
-      <div className="flex flex-col h-full justify-between">
+      <div className="h-full justify-between">
         {loaded ?
           <div className="flex flex-col gap-2 pt-32 px-4 min-h-screen w-full">
-            <div className="flex gap-2">
+            <div className="flex flex-col md:flex-row gap-2">
               <div className="flex flex-col gap-2">
-                <div className="group relative min-w-128 h-128 bg-black/70">
-                  <img src={mapData?.previewUrl} className="absolute w-128 h-128 object-cover bottom-0 right-0 group-hover:-bottom-5 group-hover:-right-5 transition-all duration-300" />
+                <div className="group relative w-full h-64 md:w-96 md:h-96 lg:w-128 lg:h-128 bg-black/70">
+                  <img src={mapData?.previewUrl} className="absolute w-full h-64 md:w-96 md:h-96 lg:w-128 lg:h-128 object-cover bottom-0 right-0 group-hover:-bottom-5 group-hover:-right-5 transition-all duration-300" />
                 </div>
-                <Container className="text-white flex gap-16 text-4xl justify-center">
+                <Container className="text-white flex gap-16 text-2xl sm:text-4xl justify-center mb-8 md:mb-0">
                   <h2 className="text-green">{mapData && mapData?.ratingUp > 0 && "+"} {mapData?.ratingUp}</h2>
                   |
                   {mapData && <h2>{mapData.ratingUp - mapData.ratingDown}</h2>}
@@ -76,10 +76,10 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                 </Container>
               </div>
               <div className="flex flex-col w-full gap-2">
-                <Container className="text-white text-8xl w-full text-center">
+                <Container className="text-white text-5xl lg:text-8xl w-full text-center">
                   <a target="_blank" href={`https://steamcommunity.com/sharedfiles/filedetails/?id=${mapData?.id}`} rel="noreferrer">{mapData?.title.toUpperCase()}</a>
                 </Container>
-                <Container className="text-gray-300 text-4xl w-full text-center flex justify-between">
+                <Container className="text-gray-300 text-2xl lg:text-4xl w-full text-center flex justify-between place-items-center">
                   <a
                     href={`/workshop/player/${mapData?.creatorId}`}
                     onClick={() => $prevLink.set("mapCreator")}
@@ -88,7 +88,7 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                   <Button
                     onClick={() => favorites.includes(id) ? removeFavorites(id) : addFavorites(id)}
                     className={clsx(
-                      "bg-transparent p-1 transition duration-300 text-xl text-white",
+                      "bg-transparent p-1 text-2xl lg:text-4xl transition duration-300 text-white",
                       favorites.includes(id) ? "hover:bg-red/40" : "hover:bg-green/40"
                     )}
                   >{favorites.includes(id) ? "REMOVE FROM FAVORITES" : "ADD TO FAVORITES"}</Button>
@@ -104,26 +104,26 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                 </Container>
               </div>
             </div>
-            <div className="flex gap-2 w-full">
+            <div className="flex flex-col-reverse gap-16 mt-16 md:mt-0 md:flex-row md:gap-2 w-full">
               <div className="flex flex-col gap-2 w-full">
                 <Container>
                   <h2 className="text-white tracking-wider text-xl">COMMENTS</h2>
                 </Container>
                 {user ?
                   <Input
-                    className="text-xl mx-2 p-3 bg-white/10"
+                    className="text-xl md:mx-2 p-3 bg-white/10"
                     placeholder="Type your comment here..."
                     value={value}
                     onChange={(e) => { setValue(e.target.value) }}
                     onKeyDown={handleSendComment}
                   />
                   :
-                  <Container className="text-white text-xl mx-2">You need to be logged in to leave comments</Container>
+                  <Container className="text-white text-xl md:mx-2">You need to be logged in to leave comments</Container>
                 }
                 {comments.map(comment => (
                   <Comment comment={comment} key={comment.id} />
                 ))}
-                {comments.length === 0 && <Container className="mx-2">
+                {comments.length === 0 && <Container className="md:mx-2">
                   <h2 className="text-[#f1e4c7] tracking-wider text-xl text-center">SEEMS LIKE STILL NO ONE HAS LEFT A COMMENT HERE... DO YOU WANT TO BE FIRST?</h2>
                 </Container>}
               </div>

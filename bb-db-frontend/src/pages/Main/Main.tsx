@@ -53,23 +53,23 @@ const Main = () => {
       </div>
       <div className="flex flex-col gap-32 justify-center">
         <div className="flex flex-col">
-          <div className="bg-black/80 w-full h-64 flex flex-col place-items-center p-8 gap-8">
+          <div className="bg-black/80 w-full h-64 flex flex-col place-items-center px-4 py-8 md:p-8 gap-8">
             <div className="relative">
-              <h1 className="text-[#ffd884] text-6xl tracking-wider text-shadow-lg/30">
+              <h1 className="text-[#ffd884] text-6xl tracking-wider text-shadow-lg/30 text-center">
                 BETON BRUTAL DATABASE
               </h1>
             </div>
 
-            <div className="flex drop-shadow-md">
+            <div className="flex w-full drop-shadow-md justify-center">
               <Input
-                className="text-4xl w-4xl bg-white/10"
+                className="text-2xl w-full sm:text-4xl md:w-2xl lg:w-4xl bg-white/10"
                 placeholder="Search by name, author, id or url"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => handleEnterSearch(search, e)}
               />
               <Button 
-                className="text-4xl bg-white/10"
+                className="text-3xl sm:text-4xl bg-white/10"
                 onClick={() => handleSearch(search)}
               >SEARCH</Button>
             </div>
@@ -78,11 +78,11 @@ const Main = () => {
 
         <div className="flex flex-col gap-4 place-items-center w-full mt-16">
           <div className="p-4 bg-black/70">
-            <h1 className="w-fit text-7xl text-[#ffd884] tracking-wider text-shadow-md">
+            <h1 className="w-fit text-center text-7xl text-[#ffd884] tracking-wider text-shadow-md">
               MAPS OF THE YEAR
             </h1>
           </div>
-          <div className="flex justify-center gap-8 w-full h-232 overflow-clip">
+          <div className="flex flex-col lg:flex-row justify-center gap-8 w-full overflow-clip">
             {followedMaps.map((map) => (
               <MapCard
                 id={map.id}
@@ -97,12 +97,12 @@ const Main = () => {
 
         <div className="flex flex-col gap-4 place-items-center w-full mt-32">
           <div className="p-4 bg-black/70">
-            <h1 className="w-fit text-4xl text-[#ffd884] tracking-wider text-shadow-md">
+            <h1 className="w-fit text-center lg:text-left text-4xl text-[#ffd884] tracking-wider text-shadow-md">
               Want to see some other maps? Here are a couple of new maps
             </h1>
           </div>
           <div className="flex justify-center w-full">
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[300px] gap-6 p-6 w-full">
+            <div className="grid sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[200px] lg:auto-rows-[300px] gap-6 p-6 w-full">
               {lastestMaps.map(m => (
                 <MapTile key={m.id} {...m} />
               ))}

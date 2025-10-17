@@ -2,7 +2,7 @@ import Link from "../../shared/Link/Link";
 
 const Footer = () => {
   return (
-    <footer className="w-full mt-12 py-6 bg-black/80 text-[#f1e4c7] text-center text-2xl flex flex-col items-center gap-2 border-t border-[#f1e4c733]">
+    <footer className="w-full mt-12 py-6 px-2 bg-black/80 text-[#f1e4c7] text-center text-2xl flex flex-col items-center gap-2 border-t border-[#f1e4c733]">
       <p className="tracking-wide">
         © {new Date().getFullYear()} Beton Brutal Database | Paradise Co. | dot-Proxe Technologies
       </p>
@@ -10,9 +10,7 @@ const Footer = () => {
         Powered by <span className="font-semibold tracking-wider">React, Vike and TailwindCSS</span>
       </p>
       <div className="flex gap-6 place-items-center">
-        <p className="text-xl opacity-50">
-          Some footer 🧱
-        </p>
+        <Link className="text-green opacity-50 hover:opacity-100 hover:underline" href="">Privacy Policy</Link>
         |
         <Link className="text-blue opacity-50 hover:opacity-100 hover:underline" href="https://discord.com/invite/DqKwJyugGv">BETON BRUTAL Discord server</Link>
         |

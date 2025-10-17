@@ -21,7 +21,7 @@ const MapCard = ({ id, title, preview, previews}: Props) => {
 
   return (
     <div
-      className="group bg-black/70 w-[28%] h-232 hover:w-[30%] transform duration-300 relative flex overflow-hidden cursor-pointer"
+      className="group bg-black/70 w-full h-156 lg:w-[28%] lg:h-232 lg:hover:w-[30%] transform duration-300 relative flex overflow-hidden cursor-pointer"
       onClick={() => navigate(`/workshop/${id}`)}
       onPointerDown={(e) => e.button === 1 && window.open(`/workshop/${id}`, "_blank")}
     >
@@ -34,7 +34,7 @@ const MapCard = ({ id, title, preview, previews}: Props) => {
         <span
           className="flex min-h-36 w-full justify-center place-items-center p-4 bg-black/70 text-[#f1e4c7] text-5xl text-center whitespace-pre-line"
         >
-          {title.toUpperCase().replaceAll(" ", "\n")}
+          {title?.toUpperCase().replaceAll(" ", "\n")}
         </span>
       </div>
     </div>

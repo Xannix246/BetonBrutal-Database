@@ -65,7 +65,7 @@ const PlayerPage = ({ id }: { id: string }) => {
               <div className="px-4">
                 {page === "mapCreator" ?
                   <div className="flex w-full justify-center">
-                    {mapData.length > 0 && <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[300px] gap-6 p-6 w-full">
+                    {mapData.length > 0 && <div className="grid sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[200px] lg:auto-rows-[300px] gap-6 p-6 w-full">
                       {mapData.map(m => (
                         <MapTile key={m.id} {...m} />
                       ))}
@@ -76,7 +76,7 @@ const PlayerPage = ({ id }: { id: string }) => {
                   </div>
                   :
                   <div className="flex w-full justify-center">
-                    <div className="w-5xl">
+                    <div className="w-full md:w-5xl">
                       <LeaderboardTable replays={replays} />
                     </div>
                   </div>

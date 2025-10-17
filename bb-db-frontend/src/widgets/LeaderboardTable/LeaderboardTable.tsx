@@ -57,7 +57,7 @@ const LeaderboardTable = ({
         <h2 className="text-white tracking-wider text-xl">LEADERBOARD</h2>
       </Container>
 
-      <Container className="mx-2 px-6 text-white font-semibold">
+      <Container className="sm:mx-2 px-6 text-white font-semibold">
         <div className="flex items-center justify-between text-xl gap-4">
           <span
             className={clsx("w-[120px] transition duration-300 cursor-pointer", sortKey === "score" && "text-green")}
@@ -86,7 +86,7 @@ const LeaderboardTable = ({
         />
       ))}
 
-      {replays.length === 0 && <Container className="mx-2">
+      {replays.length === 0 && <Container className="sm:mx-2">
         <h2 className="text-[#f1e4c7] tracking-wider text-xl text-center">{comment}</h2>
       </Container>}
     </div>

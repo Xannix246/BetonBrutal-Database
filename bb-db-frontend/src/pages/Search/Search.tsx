@@ -29,7 +29,7 @@ const Search = () => {
             </Container>
             <div className="px-4">
               {searchData.length > 0 ?
-                <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[300px] gap-6 p-6 w-full">
+                <div className="grid sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[200px] lg:auto-rows-[300px] gap-6 p-6 w-full">
                   {searchData.map(m => (
                     <MapTile key={m.id} {...m} />
                   ))}

@@ -32,7 +32,7 @@ const Favorites = ({ id }: { id: string }) => {
         {loaded ?
           <div className="flex gap-2 pt-32 min-h-screen w-full">
             <div className="flex flex-col w-full text-gray-300">
-              <Container className="flex justify-center gap-10 text-6xl tracking-wider place-items-center text-white">
+              <Container className="flex justify-center text-center gap-10 text-4xl md:text-6xl tracking-wider place-items-center text-white">
                 <span>{user?.name.toUpperCase()}&apos;S FAVORITES</span>
               </Container>
               <Container className="flex justify-center gap-10 text-2xl tracking-wider place-items-center">
@@ -42,7 +42,7 @@ const Favorites = ({ id }: { id: string }) => {
                 >LINK</a> is public, so you can share it with anyone. Just click on &quot;link&quot;)</span>
               </Container>
               <div className="px-4">
-                <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[300px] gap-6 p-6 w-full">
+                <div className="grid sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[200px] lg:auto-rows-[300px] gap-6 p-6 w-full">
                   {mapData.map(m => (
                     <MapTile key={m.id} {...m} />
                   ))}

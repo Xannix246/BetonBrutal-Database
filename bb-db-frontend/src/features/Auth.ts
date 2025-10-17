@@ -3,7 +3,8 @@ import { config } from "../../config/config";
 import axios from "axios";
 
 export const authClient = createAuthClient({
-  baseURL: config.serverUri
+  baseURL: config.baseAuthUrl,
+  basePath: 'api/auth'
 });
 
 export const signIn = async (callbackURL: string = "/") => {

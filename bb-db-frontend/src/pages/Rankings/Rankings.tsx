@@ -66,7 +66,7 @@ const Rankings = () => {
                 >BETON B-DAY</span>
               </div>
             </Container>
-            <Container className="my-16 text-8xl">
+            <Container className="my-16 text-5xl md:text-8xl">
               {
                 page === "TimeMS" && "BETON BRUTAL REPLAYS" ||
                 page === "TimeDLC1" && "BETON BATH REPLAYS" ||
@@ -79,11 +79,11 @@ const Rankings = () => {
           <div className="flex flex-col w-full place-items-center">
             <Input
               placeholder="Search by name"
-              className="bg-white/10 text-xl w-5xl mb-5"
+              className="bg-white/10 text-xl w-full md:w-5xl mb-5"
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
             />
-            <div className="w-5xl">
+            <div className="w-full md:w-5xl">
               <LeaderboardTable
                 replays={result}
                 comment="NO PLAYERS FOUND"

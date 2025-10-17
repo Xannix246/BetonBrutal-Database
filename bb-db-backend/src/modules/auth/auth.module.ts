@@ -11,6 +11,7 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: 'mongodb',
   }),
+  // basePath: 'auth',
   socialProviders: {
     discord: {
       clientId: process.env.DISCORD_CLIENT_ID as string,
@@ -40,6 +41,6 @@ export const auth = betterAuth({
 
 @Module({
   imports: [AuthModule.forRoot({ auth })],
-  exports: [AuthModule.forRoot({ auth })],
+  exports: [AuthModule],
 })
 export class BAuthModule {}
