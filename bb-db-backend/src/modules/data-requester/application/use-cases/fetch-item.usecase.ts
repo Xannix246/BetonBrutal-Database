@@ -11,8 +11,11 @@ export class FetchItemUseCase {
     private readonly syncMapsCreator: SyncUserMapsUseCase,
   ) {}
 
-  async execute(steamId: string): Promise<WorkshopItem> {
+  async execute(steamId: string): Promise<WorkshopItem | null> {
     const itemData = await this.steamApi.getItem(steamId);
+
+    if (!itemData) return null;
+
     const steamUser = await this.prisma.steamUser.findUnique({
       where: { steamId: itemData.creatorId },
     });

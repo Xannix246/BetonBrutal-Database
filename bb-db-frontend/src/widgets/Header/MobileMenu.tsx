@@ -7,7 +7,7 @@ import { JSX, useEffect } from "react";
 type Props = {
   open: boolean;
   setOpen: (value: boolean) => void;
-  user?: User;
+  user: User | null;
   menu: {
     name: string;
     icon?: JSX.Element;

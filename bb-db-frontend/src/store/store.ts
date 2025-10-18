@@ -12,3 +12,7 @@ export const getPrevLink = () => useStore($prevLink);
 export const $favorites = atom<string[]>([]);
 export const setFavorites = (list: string[]) => $favorites.set(list);
 export const getFavorites = () => useStore($favorites);
+
+export const $user = atom<User | null>(null);
+export const setUser = (user: User | null) => $user.set(user);
+export const getUser = () => useStore($user);

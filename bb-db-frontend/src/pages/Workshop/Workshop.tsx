@@ -93,7 +93,7 @@ const Workshop = () => {
           </div>
         ) : (
           <div className="flex gap-2 w-full px-4">
-            <div className="w-full text-white text-center">
+            <div className="w-full text-white text-center mt-64 mb-256">
               <Container className="text-6xl w-full">
                 CHECKING WHAT&apos;S NEW...
               </Container>

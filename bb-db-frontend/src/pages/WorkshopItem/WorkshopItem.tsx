@@ -5,20 +5,19 @@ import { getComments, getMap, getReplays, postComment } from "./requests";
 import Container from "../../shared/Containter/Container";
 import DescriptionFormatter from "../../features/DescriptionFormatter";
 import Background from "../../widgets/Background/Background";
-import { authClient } from "../../features/Auth";
 import Input from "../../shared/Input/Input";
 import Comment from "../../entities/Comment/Comment";
 import LeaderboardTable from "../../widgets/LeaderboardTable/LeaderboardTable";
-import { $prevLink, getFavorites } from "../../store/store";
+import { $prevLink, getFavorites, getUser } from "../../store/store";
 import { navigate } from "vike/client/router";
 import Button from "../../shared/Button/Button";
 import { addFavorites, removeFavorites } from "../../features/FavoriteManager";
 import clsx from "clsx";
 
 const WorkshopItemPage = ({ id }: { id: string }) => {
-  const [mapData, setMapData] = useState<WorkshopItem>();
+  const [mapData, setMapData] = useState<WorkshopItem | null>();
   const [loaded, setLoaded] = useState(false);
-  const [user, setUser] = useState<User>();
+  const user = getUser();
   const [comments, setComments] = useState<UserComment[]>([]);
   const [replays, setReplays] = useState<Replay[]>([]);
   const [value, setValue] = useState("");
@@ -33,14 +32,17 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
       const replays = (await getReplays(id)).sort(
         (a, b) => a.score - b.score
       );
-      setMapData(map);
-      setReplays(replays);
+      if (map) {
+        setMapData(map);
+        setReplays(replays);
 
-      setUser((await authClient.getSession()).data?.user);
-      setComments((await getComments(id)).sort(
-        (a, b) => new Date(b.createdAt).valueOf() - new Date(a.createdAt).valueOf()
-      ));
-      setLoaded(true);
+        setComments((await getComments(id)).sort(
+          (a, b) => new Date(b.createdAt).valueOf() - new Date(a.createdAt).valueOf()
+        ));
+        setLoaded(true);
+      } else {
+        setMapData(null);
+      }
     })();
   }, []);
 
@@ -68,11 +70,11 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                   <img src={mapData?.previewUrl} className="absolute w-full h-64 md:w-96 md:h-96 lg:w-128 lg:h-128 object-cover bottom-0 right-0 group-hover:-bottom-5 group-hover:-right-5 transition-all duration-300" />
                 </div>
                 <Container className="text-white flex gap-16 text-2xl sm:text-4xl justify-center mb-8 md:mb-0">
-                  <h2 className="text-green">{mapData && mapData?.ratingUp > 0 && "+"} {mapData?.ratingUp}</h2>
+                  <h2 className="text-green">{mapData && mapData.ratingUp > 0 && "+"} {mapData?.ratingUp}</h2>
                   |
                   {mapData && <h2>{mapData.ratingUp - mapData.ratingDown}</h2>}
                   |
-                  <h2 className="text-red">{mapData && mapData?.ratingDown > 0 && "-"} {mapData?.ratingDown}</h2>
+                  <h2 className="text-red">{mapData && mapData.ratingDown > 0 && "-"} {mapData?.ratingDown}</h2>
                 </Container>
               </div>
               <div className="flex flex-col w-full gap-2">
@@ -85,13 +87,13 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                     onClick={() => $prevLink.set("mapCreator")}
                     className="hover:text-white hover:underline"
                   >BY {mapData?.creator.toUpperCase()}</a>
-                  <Button
+                  {user && <Button
                     onClick={() => favorites.includes(id) ? removeFavorites(id) : addFavorites(id)}
                     className={clsx(
                       "bg-transparent p-1 text-2xl lg:text-4xl transition duration-300 text-white",
                       favorites.includes(id) ? "hover:bg-red/40" : "hover:bg-green/40"
                     )}
-                  >{favorites.includes(id) ? "REMOVE FROM FAVORITES" : "ADD TO FAVORITES"}</Button>
+                  >{favorites.includes(id) ? "REMOVE FROM FAVORITES" : "ADD TO FAVORITES"}</Button>}
                   <a
                     target="_blank"
                     href={`https://josiahshields.com/beton/leaderboard/?lb=${mapData?.id}`}
@@ -127,14 +129,14 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                   <h2 className="text-[#f1e4c7] tracking-wider text-xl text-center">SEEMS LIKE STILL NO ONE HAS LEFT A COMMENT HERE... DO YOU WANT TO BE FIRST?</h2>
                 </Container>}
               </div>
-              <LeaderboardTable replays={replays}/>
+              <LeaderboardTable replays={replays} />
             </div>
           </div>
           :
           <div className="flex gap-2 pt-32 px-4 h-screen w-full">
             <div className="w-full text-white text-center">
               <Container className="text-6xl w-full">
-                CHECKING WHAT&apos;S NEW...
+                {mapData === null ? "MAP NOT FOUND" : "CHECKING WHAT'S NEW..."}
               </Container>
             </div>
           </div>

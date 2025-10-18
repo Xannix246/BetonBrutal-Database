@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   Body,
   Controller,
@@ -16,6 +15,7 @@ import {
 } from '@thallesp/nestjs-better-auth';
 import { type Response } from 'express';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
+import { PostCommentDto } from './comments.dto';
 
 @Controller('comments')
 export class CommentsController {
@@ -23,7 +23,7 @@ export class CommentsController {
   @Post('post')
   async commentMap(
     @Session() session: UserSession,
-    @Body() body: { message: string; mapId: string },
+    @Body() body: PostCommentDto,
   ): Promise<UserComment> {
     const comment = await this.prisma.comment.create({
       data: {

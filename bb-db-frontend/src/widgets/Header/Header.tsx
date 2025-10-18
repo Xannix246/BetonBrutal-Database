@@ -4,23 +4,18 @@ import Input from "../../shared/Input/Input";
 import Link from "../../shared/Link/Link";
 import { useEffect, useState } from "react";
 import { handleEnterSearch, handleSearch } from "../../features/SearchManager";
-import { authClient, logOut, signIn } from "../../features/Auth";
+import { logOut, signIn } from "../../features/Auth";
 import Dropdown from "../../shared/Dropdown/Dropdown";
 import { ArrowLeftEndOnRectangleIcon, StarIcon, Bars3Icon } from "@heroicons/react/24/outline";
 import { navigate } from "vike/client/router";
 import MobileMenu from "./MobileMenu";
+import { getUser, setUser } from "../../store/store";
 
 const Header = ({ isAbsolute }: { isAbsolute?: boolean }) => {
   const [search, setSearch] = useState("");
-  const [user, setUser] = useState<User>();
+  const user = getUser();
   const [width, setWidth] = useState(0)
   const [mobileMenu, setMobileMenu] = useState(false);
-
-  useEffect(() => {
-    (async () => {
-      setUser((await authClient.getSession()).data?.user);
-    })();
-  }, []);
 
   useEffect(() => {
     setWidth(window.innerWidth);
@@ -32,7 +27,7 @@ const Header = ({ isAbsolute }: { isAbsolute?: boolean }) => {
       icon: <ArrowLeftEndOnRectangleIcon width={24} />,
       onClick: () => {
         logOut();
-        setUser(undefined);
+        setUser(null);
       }
     },
     {

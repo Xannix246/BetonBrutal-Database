@@ -16,36 +16,35 @@ export class SteamApiService {
   }
 
   async getItem(steamId: string) {
-    // const response = await fetch('https://api.steampowered.com/IPublishedFileService/QueryFiles/v1/', {
-    //   method: 'Get',
-    //   body: new URLSearchParams({ itemcount: '1', publishedfileids: steamId }),
-    // });
+    try {
+      const response = await axios.get(
+        `https://api.steampowered.com/IPublishedFileService/GetDetails/v1/?key=${env.STEAM_WEB_API_KEY}&publishedfileids%5B0%5D=${steamId}&includeadditionalpreviews=true&includekvtags=true&includevotes=true&includemetadata=true&appid=2330500`,
+      );
+      const data: SteamApiResponse = await response.data;
+      const user = await this.getUsername(
+        data.response.publishedfiledetails[0].creator,
+      );
 
-    const response = await axios.get(
-      `https://api.steampowered.com/IPublishedFileService/GetDetails/v1/?key=${env.STEAM_WEB_API_KEY}&publishedfileids%5B0%5D=${steamId}&includeadditionalpreviews=true&includekvtags=true&includevotes=true&includemetadata=true&appid=2330500`,
-    );
-    const data: SteamApiResponse = await response.data;
-    const user = await this.getUsername(
-      data.response.publishedfiledetails[0].creator,
-    );
-
-    return {
-      steamId,
-      title: data.response.publishedfiledetails[0].title,
-      description: data.response.publishedfiledetails[0].file_description,
-      creatorId: data.response.publishedfiledetails[0].creator,
-      creatorName: user,
-      votesUp: data.response.publishedfiledetails[0].vote_data.votes_up,
-      votesDown: data.response.publishedfiledetails[0].vote_data.votes_down,
-      createDate: new Date(
-        data.response.publishedfiledetails[0].time_created * 1000,
-      ),
-      previewUrl: data.response.publishedfiledetails[0].preview_url,
-      previews:
-        data.response.publishedfiledetails[0].previews
-          ?.filter((preview) => preview?.url)
-          .map((preview) => preview.url) || [],
-    };
+      return {
+        steamId,
+        title: data.response.publishedfiledetails[0].title,
+        description: data.response.publishedfiledetails[0].file_description,
+        creatorId: data.response.publishedfiledetails[0].creator,
+        creatorName: user,
+        votesUp: data.response.publishedfiledetails[0].vote_data.votes_up,
+        votesDown: data.response.publishedfiledetails[0].vote_data.votes_down,
+        createDate: new Date(
+          data.response.publishedfiledetails[0].time_created * 1000,
+        ),
+        previewUrl: data.response.publishedfiledetails[0].preview_url,
+        previews:
+          data.response.publishedfiledetails[0].previews
+            ?.filter((preview) => preview?.url)
+            .map((preview) => preview.url) || [],
+      };
+    } catch {
+      return null;
+    }
   }
 
   async getTotal(): Promise<number> {

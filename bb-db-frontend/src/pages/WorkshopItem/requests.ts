@@ -3,7 +3,7 @@ import { api } from "../../features/Auth";
 
 export const getMap = async (
   id: string
-): Promise<WorkshopItem>  => {
+): Promise<WorkshopItem | null>  => {
   return (await api.get(`${config.serverUri}/workshop/${id}`)).data;
 }
 

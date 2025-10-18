@@ -3,15 +3,10 @@ import Header from "../../widgets/Header/Header";
 import Container from "../../shared/Containter/Container";
 import MapTile from "../../entities/MapTile";
 import { getSearchData } from "../../store/store";
-import { useEffect } from "react";
 import Background from "../../widgets/Background/Background";
 
 const Search = () => {
   const searchData = getSearchData();
-
-  useEffect(() => {
-    console.log(searchData);
-  }, []);
 
   return (
     <div className="w-full min-h-screen h-full">

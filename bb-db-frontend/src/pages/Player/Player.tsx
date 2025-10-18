@@ -71,7 +71,7 @@ const PlayerPage = ({ id }: { id: string }) => {
                       ))}
                     </div>}
                     {mapData.length === 0 && <Container className="w-5xl mt-16">
-                      <h2 className="text-[#f1e4c7] tracking-wider text-xl text-center">THIS PLAYER DIDN&apos;T POSTED ANY MAPS YET...</h2>
+                      <h2 className="text-[#f1e4c7] tracking-wider text-xl text-center">THIS PLAYER DIDN&apos;T POST ANY MAPS YET...</h2>
                     </Container>}
                   </div>
                   :

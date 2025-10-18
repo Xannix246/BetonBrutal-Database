@@ -1,14 +1,12 @@
-import { $favorites } from "../store/store";
-import { api, authClient } from "./Auth";
+import { $favorites, $user } from "../store/store";
+import { api } from "./Auth";
 import { config } from "../../config/config";
 
 export const getFavorites = async () => {
   const result: string[] = (
     await api.get(
       `${config.serverUri}/user/${
-        (
-          await authClient.getSession()
-        ).data?.user.id
+        $user.get()?.id
       }/favorites`
     )
   ).data;
@@ -21,7 +19,7 @@ export const addFavorites = async (id: string) => {
   ).data;
   $favorites.set(result);
 
-  console.log($favorites.get());
+  // console.log($favorites.get());
 };
 
 export const removeFavorites = async (id: string) => {
@@ -30,5 +28,5 @@ export const removeFavorites = async (id: string) => {
   ).data;
   $favorites.set(result);
 
-  console.log($favorites.get());
+  // console.log($favorites.get());
 };

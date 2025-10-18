@@ -26,8 +26,6 @@ const Rankings = () => {
   useEffect(() => {
     (async () => {
       setBrutalReplays((await getBrutalReplays()).sort((a, b) => a.score - b.score));
-      setBathReplays((await getBathReplays()).sort((a, b) => a.score - b.score));
-      setBdayReplays((await getBdayReplays()).sort((a, b) => a.score - b.score));
     })();
   }, []);
 
@@ -45,22 +43,25 @@ const Rankings = () => {
               <div className="flex gap-10">
                 <span
                   className={clsx("transition duration-300 cursor-pointer hover:text-pink", page === "TimeMS" && "text-green")}
-                  onClick={() => {
+                  onClick={async () => {
                     setSearchText("");
+                    if (brutalReplays.length === 0) setBrutalReplays((await getBrutalReplays()).sort((a, b) => a.score - b.score));
                     setPage("TimeMS");
                   }}
                 >BETON BRUTAL</span>
                 <span
                   className={clsx("transition duration-300 cursor-pointer hover:text-pink", page === "TimeDLC1" && "text-green")}
-                  onClick={() => {
+                  onClick={async () => {
                     setSearchText("");
+                    if (bathReplays.length === 0) setBathReplays((await getBathReplays()).sort((a, b) => a.score - b.score));
                     setPage("TimeDLC1");
                   }}
                 >BETON BATH</span>
                 <span
                   className={clsx("transition duration-300 cursor-pointer hover:text-pink", page === "TimeBirthday" && "text-green")}
-                  onClick={() => {
+                  onClick={async () => {
                     setSearchText("");
+                    if (bdayReplays.length === 0) setBdayReplays((await getBdayReplays()).sort((a, b) => a.score - b.score));
                     setPage("TimeBirthday");
                   }}
                 >BETON B-DAY</span>
@@ -83,7 +84,7 @@ const Rankings = () => {
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
             />
-            <div className="w-full md:w-5xl">
+            <div className="w-full md:w-5xl mb-64">
               <LeaderboardTable
                 replays={result}
                 comment="NO PLAYERS FOUND"

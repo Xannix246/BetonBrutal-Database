@@ -94,7 +94,7 @@ export class WorkshopService {
     return returnItems;
   }
 
-  async getItem(id: string): Promise<WorkshopItem> {
+  async getItem(id: string): Promise<WorkshopItem | null> {
     let item = await this.prisma.workshopItem.findUnique({
       where: { steamId: id },
     });
@@ -103,23 +103,27 @@ export class WorkshopService {
       item = await this.fetchItems.execute(id);
     }
 
-    return {
-      id: item.steamId,
-      title: item.title,
-      description: (await this.fetchItems.execute(item.steamId)).description,
-      steamId: item.steamId,
-      creator: (
-        await this.prisma.steamUser.findUnique({
-          where: { steamId: item.creatorId },
-        })
-      )?.username as string,
-      creatorId: item.creatorId,
-      createDate: item.createDate,
-      ratingUp: item.ratingUp,
-      ratingDown: item.ratingDown,
-      previewUrl: item.previewUrl,
-      previews: item.previews,
-    };
+    if (item) {
+      return {
+        id: item.steamId,
+        title: item.title,
+        description: (await this.fetchItems.execute(item.steamId))!.description,
+        steamId: item.steamId,
+        creator: (
+          await this.prisma.steamUser.findUnique({
+            where: { steamId: item.creatorId },
+          })
+        )?.username as string,
+        creatorId: item.creatorId,
+        createDate: item.createDate,
+        ratingUp: item.ratingUp,
+        ratingDown: item.ratingDown,
+        previewUrl: item.previewUrl,
+        previews: item.previews,
+      };
+    } else {
+      return null;
+    }
   }
 
   async getQueryItems(ids: string[]): Promise<WorkshopItemHeader[]> {
@@ -202,9 +206,7 @@ export class WorkshopService {
     return returnReplays;
   }
 
-  async getLeaderboard(
-    workshopItemId: string,
-  ): Promise<Leaderboard | undefined> {
+  async getLeaderboard(workshopItemId: string): Promise<Leaderboard | null> {
     const leaderboard = await this.prisma.leaderboard.findUnique({
       where: { mapId: workshopItemId },
     });
@@ -215,6 +217,8 @@ export class WorkshopService {
         mapId: leaderboard?.mapId,
         enteries: leaderboard?.enteries,
       };
+    } else {
+      return null;
     }
   }
 

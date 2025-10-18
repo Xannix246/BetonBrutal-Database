@@ -46,11 +46,11 @@ const LeaderboardEntry = ({ place, replay }: Props) => {
   }, []);
   
   return (
-    <Container className="mx-2 tracking-wider hover:bg-[#1f1f1f] transition">
+    <Container className="sm:mx-2 tracking-wider hover:bg-[#1f1f1f] transition">
       <div className="flex items-center justify-between text-[#f1e4c7] gap-4">
-        <h3 className="text-xl text-center w-[40px] shrink-0">{position}</h3>
+        <h3 className="text-sm md:text-xl text-center md:w-[40px] shrink-0">{position}</h3>
         <h3
-          className="flex-grow text-xl truncate text-ellipsis whitespace-nowrap font-semibold max-w-[50%] hover:underline cursor-pointer hover:text-white transition duration-300"
+          className="flex-grow w-full text-sm md:text-xl truncate text-ellipsis whitespace-nowrap font-semibold max-w-[50%] hover:underline cursor-pointer hover:text-white transition duration-300"
           onClick={() => {
             $prevLink.set("run");
             if (useMap) {
@@ -65,7 +65,7 @@ const LeaderboardEntry = ({ place, replay }: Props) => {
         >
           {(useMap ? (isOfficialMap().length > 0 ? isOfficialMap() : replay.map || "unknown map" ) : replay.creator).toUpperCase()}
         </h3>
-        <h3 className="text-xl text-right w-[100px] shrink-0">
+        <h3 className="text-sm md:text-xl text-right md:w-[100px] shrink-0">
           {formatTime(replay.score)}
         </h3>
         {replay.date && new Date(replay.date).getFullYear() >= 2023 ? (

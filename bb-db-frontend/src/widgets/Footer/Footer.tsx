@@ -9,12 +9,15 @@ const Footer = () => {
       <p className="opacity-70">
         Powered by <span className="font-semibold tracking-wider">React, Vike and TailwindCSS</span>
       </p>
-      <div className="flex gap-6 place-items-center">
-        <Link className="text-green opacity-50 hover:opacity-100 hover:underline" href="">Privacy Policy</Link>
+      <div className="flex gap-1 sm:gap-6 place-items-center">
+        <Link className="text-green opacity-50 hover:opacity-100 hover:underline" href="/privacy-policy">Privacy Policy</Link>
         |
         <Link className="text-blue opacity-50 hover:opacity-100 hover:underline" href="https://discord.com/invite/DqKwJyugGv">BETON BRUTAL Discord server</Link>
         |
         <Link className="text-yellow opacity-50 hover:opacity-100 hover:underline" href="https://josiahshields.com/beton/">BBLB</Link>
+      </div>
+      <div>
+        <Link className="opacity-50 hover:opacity-100 hover:underline" href="/api/docs">BBDB Api</Link>
       </div>
     </footer>
   );
