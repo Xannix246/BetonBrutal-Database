@@ -8,57 +8,53 @@ export class WebsocketService {
   constructor(private readonly prisma: PrismaService) {}
 
   async saveReplays(data: wsMessagesDto.RecieveReplay) {
-    await this.prisma.$transaction(async (tx) => {
-      const existingLeaderboard = await tx.leaderboard.findUnique({
-        where: { mapId: data.mapId },
+    const existingLeaderboard = await this.prisma.leaderboard.findUnique({
+      where: { mapId: data.mapId },
+    });
+
+    const enteries = [...(existingLeaderboard?.enteries || [])];
+
+    for (const entry of data.entries) {
+      const replay = await this.prisma.leaderboardEntry.upsert({
+        where: { mapId_steamId: { mapId: data.mapId, steamId: entry.userId } },
+        update: {
+          username: entry.userName,
+          date: new Date(entry.date),
+          score: entry.score,
+        },
+        create: {
+          mapId: data.mapId,
+          steamId: entry.userId,
+          username: entry.userName,
+          date: new Date(entry.date),
+          score: entry.score,
+        },
       });
 
-      const enteries = [...(existingLeaderboard?.enteries || [])];
+      await this.prisma.leaderboard.upsert({
+        where: { mapId: entry.mapId },
+        update: { enteries: [...new Set([...enteries, replay.id])] },
+        create: { mapId: entry.mapId, enteries: [replay.id] },
+      });
+      enteries.push(replay.id);
+      const user = await this.prisma.steamUser.findUnique({
+        where: { steamId: entry.userId },
+      });
 
-      for (const entry of data.entries) {
-        const replay = await tx.leaderboardEntry.upsert({
-          where: {
-            mapId_steamId: { mapId: data.mapId, steamId: entry.userId },
-          },
-          update: {
-            username: entry.userName,
-            date: new Date(entry.date),
-            score: entry.score,
-          },
-          create: {
-            mapId: data.mapId,
-            steamId: entry.userId,
-            username: entry.userName,
-            date: new Date(entry.date),
-            score: entry.score,
-          },
-        });
-
-        enteries.push(replay.id);
-
-        await tx.leaderboard.upsert({
-          where: { mapId: entry.mapId },
-          update: { enteries: [...new Set(enteries)] },
-          create: { mapId: entry.mapId, enteries: [replay.id] },
-        });
-
-        await tx.steamUser.upsert({
-          where: { steamId: entry.userId },
-          update: {
-            username: entry.userName,
-            replays: [
-              ...new Set([...(existingLeaderboard?.enteries || []), replay.id]),
-            ],
-          },
-          create: {
-            steamId: entry.userId,
-            username: entry.userName,
-            items: [],
-            replays: [replay.id],
-          },
-        });
-      }
-    });
+      await this.prisma.steamUser.upsert({
+        where: { steamId: entry.userId },
+        update: {
+          username: entry.userName,
+          replays: [...new Set([...(user?.replays || []), replay.id])],
+        },
+        create: {
+          steamId: entry.userId,
+          username: entry.userName,
+          items: [],
+          replays: [replay.id],
+        },
+      });
+    }
   }
 
   async sendReplays(id: string, client: Socket) {
