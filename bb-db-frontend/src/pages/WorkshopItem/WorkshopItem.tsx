@@ -49,7 +49,7 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
   }, []);
 
   useEffect(() => {
-    const socket = io(config.baseAuthUrl + '/auth');
+    const socket = io(config.baseAuthUrl);
 
     socket.on("connect", () => {
       console.log("Connected to server");
