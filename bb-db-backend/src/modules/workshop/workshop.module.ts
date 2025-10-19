@@ -8,9 +8,10 @@ import { RefreshDatabaseUseCase } from '../data-requester/application/use-cases/
 import { SyncUserMapsUseCase } from '../data-requester/application/use-cases/sync-user-maps.usecase';
 import { FetchBBLBUseCase } from '../data-requester/application/use-cases/fetch-bblb.usecase';
 import { BBLBApiService } from '../data-requester/application/adapters/bblb-api';
+import { WebsocketModule } from '../websocket/websocket.module';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, WebsocketModule],
   controllers: [WorkshopController],
   providers: [
     WorkshopService,

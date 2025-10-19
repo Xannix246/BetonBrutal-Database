@@ -7,9 +7,10 @@ import { WorkshopService } from '../workshop/domain/services/workshop.service';
 import { SteamApiService } from '../data-requester/application/adapters/http-steam-api';
 import { FetchItemUseCase } from '../data-requester/application/use-cases/fetch-item.usecase';
 import { SyncUserMapsUseCase } from '../data-requester/application/use-cases/sync-user-maps.usecase';
+import { WebsocketModule } from '../websocket/websocket.module';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, WebsocketModule],
   controllers: [CommentsController, UsersController],
   providers: [
     UserService,

@@ -8,6 +8,5 @@ export const getFollowedMaps = async (
   timeRange?: 'day' | 'week' | 'month' | 'year'
 ): Promise<WorkshopItem[]>  => {
   const data = (await api.get(`${config.serverUri}/workshop/get-list?sortBy=${sortBy}&quantity=${quantity}&sendPreviews=${sendPreviews}${timeRange && "&timeRange=" + timeRange}`)).data;
-  console.log(data);
   return data;
 }

@@ -13,6 +13,8 @@ import { navigate } from "vike/client/router";
 import Button from "../../shared/Button/Button";
 import { addFavorites, removeFavorites } from "../../features/FavoriteManager";
 import clsx from "clsx";
+import { io } from "socket.io-client";
+import { config } from "../../../config/config";
 
 const WorkshopItemPage = ({ id }: { id: string }) => {
   const [mapData, setMapData] = useState<WorkshopItem | null>();
@@ -45,6 +47,21 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
       }
     })();
   }, []);
+
+  useEffect(() => {
+    const socket = io(config.baseAuthUrl);
+
+    socket.on("connect", () => {
+      console.log("Connected to server");
+      socket.emit("request_leaderboard", id);
+    });
+
+    socket.on("request_leaderboard", (data: Replay[]) => {
+      setReplays(data);
+      socket.disconnect();
+    });
+  }, []);
+
 
   const handleSendComment = async (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter" && value.length > 0) {

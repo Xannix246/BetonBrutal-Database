@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { SteamApiService } from 'src/modules/data-requester/application/adapters/http-steam-api';
 import { FetchItemUseCase } from 'src/modules/data-requester/application/use-cases/fetch-item.usecase';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
+import { WebsocketGateway } from 'src/modules/websocket/presentation/websocket.gateway';
 import { parseSearchInput } from 'src/shared/parseSearchUriData';
 
 @Injectable()
@@ -11,6 +12,7 @@ export class WorkshopService {
     private readonly prisma: PrismaService,
     private readonly fetchItems: FetchItemUseCase,
     private readonly steamApi: SteamApiService,
+    private readonly websocket: WebsocketGateway,
   ) {}
 
   async getTotal(): Promise<number> {
@@ -104,6 +106,11 @@ export class WorkshopService {
     }
 
     if (item) {
+      await this.websocket.sendRequest({
+        type: 'fetch_by_id',
+        mapId: item.steamId,
+      });
+
       return {
         id: item.steamId,
         title: item.title,

@@ -12,7 +12,7 @@ async function bootstrap() {
     bodyParser: false,
   });
 
-  app.setGlobalPrefix('/api');
+  app.setGlobalPrefix('api');
 
   app.use((req, res, next) => {
     if (req.url.startsWith('/auth')) return next();

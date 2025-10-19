@@ -1,0 +1,87 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
+/* eslint-disable @typescript-eslint/require-await */
+import { Injectable, Logger } from '@nestjs/common';
+import {
+  WebSocketGateway,
+  WebSocketServer,
+  SubscribeMessage,
+  MessageBody,
+  OnGatewayInit,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  ConnectedSocket,
+} from '@nestjs/websockets';
+import { Server, Socket } from 'socket.io';
+import * as wsMessagesDto from './../dto/ws-messages.dto';
+import { WebsocketService } from '../services/websocket.service';
+
+@Injectable()
+@WebSocketGateway({
+  cors: {
+    origin: '*',
+  },
+})
+export class WebsocketGateway
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
+{
+  @WebSocketServer()
+  server: Server;
+
+  constructor(private readonly service: WebsocketService) {}
+
+  private readonly logger = new Logger(WebsocketGateway.name);
+  private readonly clients: Socket[] = [];
+  private saveStatus = new Map<string, Promise<void>>();
+
+  private async enqueueSave(mapId: string, task: () => Promise<void>) {
+    const prev = this.saveStatus.get(mapId) ?? Promise.resolve();
+    const next = prev.finally(task);
+    this.saveStatus.set(mapId, next);
+    await next;
+    this.saveStatus.delete(mapId);
+  }
+
+  afterInit() {
+    this.logger.log('WebSocket gateway initialized.');
+  }
+
+  async handleConnection(client: Socket) {
+    this.logger.log(`Client connected: ${client.id}`);
+
+    this.clients.push(client);
+
+    client.emit('server_message', { type: 'welcome', text: 'Connected!' });
+  }
+
+  handleDisconnect(client: Socket) {
+    this.logger.log(`Client disconnected: ${client.id}`);
+  }
+
+  async sendRequest(request: wsMessagesDto.SendRequest) {
+    for (const client of this.clients) {
+      if (request.type === 'fetch_by_id') {
+        client.emit(request.type, request.mapId);
+      }
+    }
+  }
+
+  @SubscribeMessage('leaderboard_update')
+  async getReplays(@MessageBody() data: wsMessagesDto.RecieveReplay) {
+    await this.enqueueSave(data.mapId, async () => {
+      await this.service.saveReplays(data);
+    });
+  }
+
+  @SubscribeMessage('request_leaderboard')
+  async sendReplaysToClient(
+    @MessageBody() body: string,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const existingPromise = this.saveStatus.get(body);
+    if (existingPromise) {
+      await existingPromise;
+    }
+
+    await this.service.sendReplays(body, client);
+  }
+}
