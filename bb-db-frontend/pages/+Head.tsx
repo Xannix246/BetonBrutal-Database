@@ -18,7 +18,7 @@ export function Head() {
       {/* <script type="text/javascript" src="https://example.com/some-script.js"></script> */}
 
       {/* Image shown when sharing on social sites (Twitter, WhatsApp, ...) */}
-      <meta property="og:image" content={favicon} />
+      {/* <meta property="og:image" content={favicon} /> */}
       {/* More Open Graph tags */}
       <meta property="og:type" content="website" />
       {/* <meta property="article:author" content="https://example.com/author" /> */}
