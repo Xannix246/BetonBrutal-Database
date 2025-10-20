@@ -2,9 +2,9 @@ import { useData } from 'vike-react/useData';
 import PlayerPage from '../../../../src/pages/Player/Player';
 
 function Page() {
-  const data = useData<string>();
+  const { id } = useData<{ id: string, player: Player }>();
 
-  return <PlayerPage id={data}/>;
+  return <PlayerPage id={id}/>;
 }
 
 export { Page };

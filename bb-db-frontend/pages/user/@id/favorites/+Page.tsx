@@ -2,9 +2,9 @@ import { useData } from 'vike-react/useData';
 import Favorites from '../../../../src/pages/Favorites/Favorites';
 
 function Page() {
-  const data = useData<string>();
+  const { id } = useData<{ id: string, user: User }>();
 
-  return <Favorites id={data}/>;
+  return <Favorites id={id}/>;
 }
 
 export { Page };
