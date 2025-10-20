@@ -2,6 +2,6 @@ import icon from '../../assets/icons/favicon.png'
 
 export default {
   title: 'BETON BRUTAL Database',
-  description: 'Discover maps or players stats!',
+  description: 'BETON BRUTAL Database search page',
   image: icon
 }
