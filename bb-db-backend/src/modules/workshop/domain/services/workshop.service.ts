@@ -201,6 +201,7 @@ export class WorkshopService {
 
       returnReplays.push({
         id: replay.id,
+        place: replay.place,
         creator: replay.username,
         creatorId: replay.steamId,
         mapId: replay.mapId,

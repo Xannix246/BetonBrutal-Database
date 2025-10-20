@@ -7,9 +7,11 @@ export type RecieveReplay = {
   mapId: string;
   entries: {
     userName: string;
+    place: number;
     userId: string;
     mapId: string;
     score: number;
+    replayId?: string;
     date: Date;
   }[];
 };

@@ -67,8 +67,8 @@ export class WebsocketGateway
 
   @SubscribeMessage('leaderboard_update')
   async getReplays(@MessageBody() data: wsMessagesDto.RecieveReplay) {
-    console.log('got replays for: ' + data.mapId);
-    console.log(data.entries);
+    // console.log('got replays for: ' + data.mapId);
+    // console.log(data.entries);
     await this.enqueueSave(data.mapId, async () => {
       await this.service.saveReplays(data);
       console.log('data saved');
@@ -80,16 +80,16 @@ export class WebsocketGateway
     @MessageBody() body: string,
     @ConnectedSocket() client: Socket,
   ) {
-    console.log('got request for replays: ' + body);
+    // console.log('got request for replays: ' + body);
 
     const existingPromise = this.saveStatus.get(body);
     if (existingPromise) {
-      console.log('waiting for save data');
+      // console.log('waiting for save data');
       await existingPromise;
     }
 
-    console.log('sending replays');
+    // console.log('sending replays');
     await this.service.sendReplays(body, client);
-    console.log('done');
+    // console.log('done');
   }
 }

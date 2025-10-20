@@ -4,7 +4,6 @@ import { $prevLink } from "../store/store";
 import { useEffect, useState } from "react";
 
 type Props = {
-  place: number;
   replay: Replay;
 };
 
@@ -23,8 +22,7 @@ function formatTime(score: number): string {
   }
 }
 
-const LeaderboardEntry = ({ place, replay }: Props) => {
-  const [position, setPosition] = useState(0);
+const LeaderboardEntry = ({ replay }: Props) => {
   const [useMap, setUseMap] = useState(false);
 
   const isOfficialMap = () => {
@@ -42,13 +40,13 @@ const LeaderboardEntry = ({ place, replay }: Props) => {
 
   useEffect(() => {
     if (window.location.pathname.includes("player")) setUseMap(true);
-    setPosition(place);
+    // setPosition(place);
   }, []);
   
   return (
     <Container className="sm:mx-2 tracking-wider hover:bg-[#1f1f1f] transition">
       <div className="flex items-center justify-between text-[#f1e4c7] gap-4">
-        <h3 className="text-sm md:text-xl text-center md:w-[40px] shrink-0">{position}</h3>
+        <h3 className="text-sm md:text-xl text-center md:w-[40px] shrink-0">{replay.place}</h3>
         <h3
           className="flex-grow w-full text-sm md:text-xl truncate text-ellipsis whitespace-nowrap font-semibold max-w-[50%] hover:underline cursor-pointer hover:text-white transition duration-300"
           onClick={() => {

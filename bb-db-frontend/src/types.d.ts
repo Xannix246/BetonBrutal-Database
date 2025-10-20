@@ -16,6 +16,7 @@ declare type WorkshopItem = {
 
 declare type Replay = {
   id: string;
+  place: number;
   creator: string;
   creatorId: string;
   mapId: string;

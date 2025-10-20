@@ -55,6 +55,43 @@ export class SteamApiService {
     return response.data.response.total;
   }
 
+  async getQueryItems(ids: string[]): Promise<WorkshopItem[]> {
+    if (ids.length === 0) return [];
+
+    const params = new URLSearchParams();
+    ids.forEach((id, index) => params.append(`publishedfileids[${index}]`, id));
+
+    const response = (
+      await axios.get(
+        `https://api.steampowered.com/IPublishedFileService/GetDetails/v1/?key=${process.env.STEAM_WEB_API_KEY}&creator_appid=2330500&appid=2330500&requiredtags=CustomMaps&filetype=0&return_vote_data=true&return_tags=true&return_kv_tags=true&return_previews=true&return_metadata=true&return_details=true&${params.toString()}`,
+      )
+    ).data;
+
+    const returnedItems: WorkshopItem[] = [];
+
+    for (const map of response.response
+      .publishedfiledetails as SteamPublishedFile[]) {
+      returnedItems.push({
+        id: map.publishedfileid,
+        steamId: map.publishedfileid,
+        title: map.title,
+        description: map.file_description || '',
+        creator: 'unknown',
+        createDate: new Date(map.time_created * 1000),
+        creatorId: map.creator,
+        ratingUp: map.vote_data?.votes_up || 0,
+        ratingDown: map.vote_data?.votes_down || 0,
+        previewUrl: map.preview_url || '',
+        previews:
+          map.previews
+            ?.filter((preview) => preview?.url)
+            .map((preview) => preview.url) || [],
+      });
+    }
+
+    return returnedItems;
+  }
+
   async getItems(
     page: number,
     itemsPerPage: number = 50,

@@ -1,11 +1,16 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 import * as wsMessagesDto from './../dto/ws-messages.dto';
 import { Socket } from 'socket.io';
+import { SteamApiService } from 'src/modules/data-requester/application/adapters/http-steam-api';
 
 @Injectable()
 export class WebsocketService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly steam: SteamApiService,
+  ) {}
 
   async saveReplays(data: wsMessagesDto.RecieveReplay) {
     const existingLeaderboard = await this.prisma.leaderboard.findUnique({
@@ -14,19 +19,35 @@ export class WebsocketService {
 
     const enteries = [...(existingLeaderboard?.enteries || [])];
 
+    const replays = await this.steam.getQueryItems(
+      data.entries
+        .map((entry) => entry.replayId || '')
+        .filter((entry) => entry !== ''),
+    );
+
+    const ReplayRecord = new Map<string, Date>();
+
+    for (const item of replays) {
+      if (item.id && item.createDate && item.title) {
+        ReplayRecord.set(item.id, new Date(item.createDate));
+      }
+    }
+
     for (const entry of data.entries) {
       const replay = await this.prisma.leaderboardEntry.upsert({
         where: { mapId_steamId: { mapId: data.mapId, steamId: entry.userId } },
         update: {
+          place: entry.place,
           username: entry.userName,
-          date: new Date(entry.date),
+          date: entry.replayId ? ReplayRecord.get(entry.replayId) : new Date(0),
           score: entry.score,
         },
         create: {
           mapId: data.mapId,
+          place: entry.place,
           steamId: entry.userId,
           username: entry.userName,
-          date: new Date(entry.date),
+          date: entry.replayId ? ReplayRecord.get(entry.replayId) : new Date(0),
           score: entry.score,
         },
       });
@@ -78,6 +99,7 @@ export class WebsocketService {
           mapId: replay.mapId,
           score: replay.score,
           date: replay.date,
+          place: replay.place,
         });
       }
 

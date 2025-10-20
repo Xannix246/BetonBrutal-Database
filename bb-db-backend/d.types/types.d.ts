@@ -41,10 +41,12 @@ declare type Leaderboard = {
 
 declare type Replay = {
   id: string;
+  place: number;
   creator: string;
   creatorId: string;
   mapId: string;
   map?: string;
+  replayId?: string;
   score: number;
   date: Date | null;
 };

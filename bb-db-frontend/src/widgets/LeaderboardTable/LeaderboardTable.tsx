@@ -8,13 +8,13 @@ type Props = {
   comment?: string;
 };
 
-type SortKey = "score" | "creator" | "date";
+type SortKey = "score" | "creator" | "date" | "place";
 
 const LeaderboardTable = ({
   replays,
   comment = "NO ONE HAS COMPLETED THIS MAP YET..."
 }: Props) => {
-  const [sortKey, setSortKey] = useState<SortKey>("score");
+  const [sortKey, setSortKey] = useState<SortKey>("place");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [useMap, setUseMap] = useState(false);
 
@@ -29,6 +29,8 @@ const LeaderboardTable = ({
           return a.creator.localeCompare(b.creator);
         case "date":
           return new Date(a.date ?? 0).getTime() - new Date(b.date ?? 0).getTime();
+        case "place":
+          return a.place - b.place;
         case "score":
         default:
           return a.score - b.score;
@@ -36,11 +38,6 @@ const LeaderboardTable = ({
     });
     return sortOrder === "asc" ? sorted : sorted.reverse();
   }, [replays, sortKey, sortOrder]);
-
-  const ranks = useMemo(() => {
-    const sortedByScore = [...replays].sort((a, b) => a.score - b.score);
-    return new Map(sortedByScore.map((r, i) => [r.id, i + 1]));
-  }, [replays]);
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
@@ -60,8 +57,8 @@ const LeaderboardTable = ({
       <Container className="sm:mx-2 px-6 text-white font-semibold">
         <div className="flex items-center justify-between text-xl gap-4">
           <span
-            className={clsx("w-[120px] transition duration-300 cursor-pointer", sortKey === "score" && "text-green")}
-            onClick={() => handleSort("score")}
+            className={clsx("w-[120px] transition duration-300 cursor-pointer", sortKey === "place" && "text-green")}
+            onClick={() => handleSort("place")}
           >#</span>
           <span
             className={clsx("w-full transition duration-300 cursor-pointer", sortKey === "creator" && "text-green")}
@@ -81,7 +78,6 @@ const LeaderboardTable = ({
       {sortedReplays.map((replay) => (
         <LeaderboardEntry
           key={replay.id}
-          place={ranks.get(replay.id) ?? 0}
           replay={replay}
         />
       ))}

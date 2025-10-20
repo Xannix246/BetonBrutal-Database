@@ -39,6 +39,7 @@ declare type ParsedWorkshopItem = {
 }
 
 declare type ParsedLeaderboardEntry = {
+  place: number;
   mapId: string;
   steamId: string;
   username: string;

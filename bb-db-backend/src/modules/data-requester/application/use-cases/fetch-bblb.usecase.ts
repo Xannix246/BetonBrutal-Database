@@ -20,11 +20,13 @@ export class FetchBBLBUseCase {
           mapId_steamId: { mapId: entry.mapId, steamId: entry.steamId },
         },
         update: {
+          place: entry.place,
           username: entry.username,
           score: entry.score,
           date: entry.date,
         },
         create: {
+          place: entry.place,
           mapId: entry.mapId,
           steamId: entry.steamId,
           username: entry.username,

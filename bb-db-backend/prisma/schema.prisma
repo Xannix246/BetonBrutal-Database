@@ -30,10 +30,12 @@ model WorkshopItem {
 
 model LeaderboardEntry {
     id       String    @id @default(auto()) @map("_id") @db.ObjectId
+    place    Int
     mapId    String
     steamId  String
     username String
     score    Int
+    replayId String?
     date     DateTime?
 
     @@unique([mapId, steamId])
