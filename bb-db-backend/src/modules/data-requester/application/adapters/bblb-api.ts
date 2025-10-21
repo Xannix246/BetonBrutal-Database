@@ -38,6 +38,7 @@ export class BBLBApiService {
 
       for (const lb of mapData.lb) {
         const entry: ParsedLeaderboardEntry = {
+          place: lb.place,
           mapId,
           steamId: lb.id,
           username: lb.name,
