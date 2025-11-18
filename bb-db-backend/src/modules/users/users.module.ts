@@ -8,11 +8,14 @@ import { SteamApiService } from '../data-requester/application/adapters/http-ste
 import { FetchItemUseCase } from '../data-requester/application/use-cases/fetch-item.usecase';
 import { SyncUserMapsUseCase } from '../data-requester/application/use-cases/sync-user-maps.usecase';
 import { WebsocketModule } from '../websocket/websocket.module';
+import { UserModService } from './application/users-mod.service';
+import { ModController } from './presentation/controllers/mod.controller';
 
 @Module({
   imports: [PrismaModule, WebsocketModule],
-  controllers: [CommentsController, UsersController],
+  controllers: [CommentsController, UsersController, ModController],
   providers: [
+    UserModService,
     UserService,
     WorkshopService,
     SteamApiService,

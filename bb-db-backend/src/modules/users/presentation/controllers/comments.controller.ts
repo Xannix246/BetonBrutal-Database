@@ -15,7 +15,8 @@ import {
 } from '@thallesp/nestjs-better-auth';
 import { type Response } from 'express';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
-import { PostCommentDto } from './comments.dto';
+import { PostCommentDto } from './dto/comments.dto';
+import { type UserRoleSession } from 'src/modules/auth/auth.module';
 
 @Controller('comments')
 export class CommentsController {
@@ -74,15 +75,15 @@ export class CommentsController {
 
   @Delete()
   async deleteComment(
-    @Session() session: UserSession,
+    @Session() session: UserRoleSession,
     @Query('id') id: string,
     @Res() res: Response,
   ) {
     const comment = await this.prisma.comment.findUnique({ where: { id: id } });
 
     if (
-      session.user.id === comment?.userId
-      // ['moderator', 'admin'].includes(session.user.role)
+      session.user.id === comment?.userId &&
+      ['moderator', 'admin'].includes(session.user.role as string)
     ) {
       return await this.prisma.comment.delete({ where: { id: id } });
     } else {

@@ -2,7 +2,7 @@ import clsx from "clsx";
 import Button from "../../shared/Button/Button";
 import Input from "../../shared/Input/Input";
 import Link from "../../shared/Link/Link";
-import { useEffect, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import { handleEnterSearch, handleSearch } from "../../features/SearchManager";
 import { logOut, signIn } from "../../features/Auth";
 import Dropdown from "../../shared/Dropdown/Dropdown";
@@ -11,7 +11,7 @@ import { navigate } from "vike/client/router";
 import MobileMenu from "./MobileMenu";
 import { getUser, setUser } from "../../store/store";
 
-const Header = ({ isAbsolute }: { isAbsolute?: boolean }) => {
+const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: boolean, hideSearch?: boolean, additionalComponent?: JSX.Element }) => {
   const [search, setSearch] = useState("");
   const user = getUser();
   const [width, setWidth] = useState(0)
@@ -27,7 +27,7 @@ const Header = ({ isAbsolute }: { isAbsolute?: boolean }) => {
       icon: <ArrowLeftEndOnRectangleIcon width={24} />,
       onClick: () => {
         logOut();
-        setUser(null);
+        setUser(undefined);
       }
     },
     {
@@ -40,12 +40,13 @@ const Header = ({ isAbsolute }: { isAbsolute?: boolean }) => {
   return (
     <header className="bg-black/80 w-full h-16 border-b-1 border-amber-200 flex p-2 justify-between">
       <MobileMenu open={mobileMenu} setOpen={setMobileMenu} user={user} menu={menu} />
-      {width > 768 && <div className="h-full text-white text-shadow-lg text-4xl flex gap-10 place-items-center pl-8">
+      {width > 1115 && <div className="h-full text-white text-shadow-lg text-4xl flex gap-10 place-items-center pl-8">
         <Link className="hover:text-pink transition duration-150" href="/">HOME</Link>
         <Link className="hover:text-pink transition duration-150" href="/workshop">MAPS</Link>
         <Link className="hover:text-pink transition duration-150" href="/rankings">RANKINGS</Link>
+        <Link className="hover:text-pink transition duration-150" href="/articles">ARTICLES</Link>
       </div>}
-      {width < 768 && <div className="w-12 flex place-items-center justify-baseline">
+      {width < 1115 && <div className="w-12 flex place-items-center justify-baseline">
         <Bars3Icon
           className="text-white active:text-gray-300"
           width={40}
@@ -53,9 +54,9 @@ const Header = ({ isAbsolute }: { isAbsolute?: boolean }) => {
           onClick={() => setMobileMenu(true)}
         />
       </div>}
-      <div
+      {!hideSearch && <div
         className={clsx(
-          "flex items-center w-full md:mx-16 drop-shadow-md transition-all duration-500 overflow-hidden",
+          "flex items-center w-full md:mx-16 drop-shadow-md transition-all duration-500 ease-in-out overflow-hidden",
           isAbsolute
             ? "opacity-100 translate-y-0 max-w-[1000px]"
             : "opacity-0 translate-y-[-10px] max-w-0"
@@ -72,8 +73,9 @@ const Header = ({ isAbsolute }: { isAbsolute?: boolean }) => {
           className="text-2xl bg-white/10"
           onClick={() => handleSearch(search)}
         >SEARCH</Button>
-      </div>
-      {width > 768 && <div className="flex">
+      </div>}
+      {additionalComponent}
+      {width > 1115 && <div className="flex">
         {user ?
           <div className="flex gap-4 place-items-center">
             <span className="whitespace-pre-wrap text-white font-xl tracking-wider">{user.name.toUpperCase().replaceAll(" ", "\n")}</span>

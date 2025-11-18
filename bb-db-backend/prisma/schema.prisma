@@ -47,15 +47,6 @@ model Leaderboard {
     enteries String[] //LeaderboardEntry id's
 }
 
-// model Replay {
-//     id        String    @id @default(auto()) @map("_id") @db.ObjectId
-//     creator   String
-//     creatorId String
-//     mapId     String    @unique
-//     score     Int
-//     date      DateTime? @default(now())
-// }
-
 model Comment {
     id        String   @id @default(auto()) @map("_id") @db.ObjectId
     mapId     String
@@ -65,17 +56,18 @@ model Comment {
 }
 
 model Favorites {
-    id        String   @id @default(auto()) @map("_id") @db.ObjectId
-    userId    String @unique
-    mapsId    String[]
+    id     String   @id @default(auto()) @map("_id") @db.ObjectId
+    userId String   @unique
+    mapsId String[]
 }
 
 // Better Auth models
 
 enum Role {
-    User
-    Admin
-    Moderator
+    user
+    admin
+    moderator
+    writer
 }
 
 model User {
@@ -86,9 +78,13 @@ model User {
     image         String?
     createdAt     DateTime  @default(now())
     updatedAt     DateTime  @default(now()) @updatedAt
-    role          Role      @default(User)
+    role          Role      @default(user)
     sessions      Session[]
     accounts      Account[]
+
+    banned     Boolean?  @default(false)
+    banReason  String?
+    banExpires DateTime?
 
     @@unique([email])
     @@map("user")
@@ -104,6 +100,8 @@ model Session {
     userAgent String?
     userId    String
     user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    impersonatedBy String?
 
     @@unique([token])
     @@map("session")
@@ -137,4 +135,39 @@ model Verification {
     updatedAt  DateTime @default(now()) @updatedAt
 
     @@map("verification")
+}
+
+// internal data like news/articles and nominees
+
+model Nominees {
+    id            String   @id @default(auto()) @map("_id") @db.ObjectId
+    name          String
+    internal_name String?  @unique
+    description   String?
+    maps          String[]
+}
+
+type AttachmentHeader {
+    name String
+    url  String
+}
+
+model Article {
+    id          String             @id @default(auto()) @map("_id") @db.ObjectId
+    authorId    String
+    title       String
+    description String?
+    content     String
+    date        DateTime
+    tags        String[]
+    preview     String? // attachment id
+    attachments AttachmentHeader[] // attachment ids
+}
+
+model Attachment {
+    id       String @id @default(auto()) @map("_id") @db.ObjectId
+    name     String
+    fileId   String // id from gridfs
+    mimeType String
+    size     Int?
 }

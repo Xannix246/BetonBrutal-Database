@@ -19,7 +19,7 @@ const Rankings = () => {
   const searcher = new FuzzySearch(
     page === "TimeMS" && brutalReplays ||
     page === "TimeDLC1" && bathReplays ||
-    bdayReplays, ['creator'], {});
+    bdayReplays, ['place', 'creator'], {});
 
   const result = searcher.search(searchText);
 

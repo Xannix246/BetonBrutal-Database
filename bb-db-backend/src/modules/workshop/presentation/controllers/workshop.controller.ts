@@ -2,6 +2,8 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
+  ForbiddenException,
   Get,
   HttpStatus,
   Param,
@@ -60,6 +62,12 @@ export class WorkshopController {
       timeRange,
       Number(page),
     );
+  }
+
+  @Get('get-random-item')
+  @OptionalAuth()
+  async getRandomItem(): Promise<string> {
+    return await this.workshopService.getRandomItem();
   }
 
   @Post('get-query-list')
@@ -125,5 +133,18 @@ export class WorkshopController {
     );
 
     return replays;
+  }
+
+  @Delete(':id/delete')
+  @OptionalAuth()
+  async deleteItem(
+    @Param('id') id: string,
+    @Body() body: { secret: string },
+  ): Promise<void> {
+    if (body.secret !== env.FORCE_UPDATE_SECRET) {
+      throw new ForbiddenException('Invalid secret');
+    }
+
+    return await this.workshopService.deleteItem(id);
   }
 }

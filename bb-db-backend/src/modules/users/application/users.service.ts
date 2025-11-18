@@ -1,9 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { Injectable } from '@nestjs/common';
+import { auth, UserRoleSession } from 'src/modules/auth/auth.module';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { WorkshopService } from 'src/modules/workshop/domain/services/workshop.service';
 
@@ -85,5 +81,26 @@ export class UserService {
     });
 
     return returnFav.mapsId;
+  }
+
+  async deleteProfile(userId: string, client: UserRoleSession) {
+    // delete all user data like favorites/comments and articles
+
+    void (await this.prisma.favorites.delete({ where: { userId: userId } }));
+    void (await this.prisma.comment.deleteMany({ where: { userId: userId } }));
+    return await auth.api.deleteUser({
+      body: {
+        token: client.session.token,
+      },
+    });
+  }
+
+  async banUser(userId: string, banReason?: string) {
+    return await auth.api.banUser({
+      body: {
+        userId,
+        banReason,
+      },
+    });
   }
 }

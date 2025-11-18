@@ -13,6 +13,14 @@ export const $favorites = atom<string[]>([]);
 export const setFavorites = (list: string[]) => $favorites.set(list);
 export const getFavorites = () => useStore($favorites);
 
-export const $user = atom<User | null>(null);
-export const setUser = (user: User | null) => $user.set(user);
+export const $user = atom<User | undefined>(undefined);
+export const setUser = (user: User | undefined) => $user.set(user);
 export const getUser = () => useStore($user);
+
+export const $files = atom<File[]>([]);
+export const setFiles = (files: File[]) => $files.set(files);
+export const getFiles = () => useStore($files);
+
+export const $doc = atom<string>("# Type *here* something");
+export const setDoc = (doc: string) => $doc.set(doc);
+export const getDoc = () => useStore($doc);

@@ -39,7 +39,7 @@ declare type User = {
   email: string;
   emailVerified: boolean;
   name: string;
-  role?: string;
+  role?: string | null;
   image?: string | null | undefined;
 };
 
@@ -50,4 +50,17 @@ declare type UserComment = {
   username: string;
   data: string;
   createdAt: Date;
+}
+
+declare type Article = {
+  id: string;
+  title: string;
+  description?: string;
+  content: string;
+  date: Date;
+  tags: string[];
+  previewUrl?: string;
+  attachments: Attachment[];
+  authorId: string;
+  author: string;
 }

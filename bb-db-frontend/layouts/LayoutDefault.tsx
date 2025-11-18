@@ -9,7 +9,7 @@ export const LayoutDefault = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     (async () => {
-      setUser((await authClient.getSession()).data?.user || null);
+      setUser((await authClient.getSession()).data?.user || undefined);
       await getFavorites();
     })();
   }, []);

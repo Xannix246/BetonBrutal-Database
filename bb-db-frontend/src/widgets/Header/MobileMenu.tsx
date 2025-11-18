@@ -7,7 +7,7 @@ import { JSX, useEffect } from "react";
 type Props = {
   open: boolean;
   setOpen: (value: boolean) => void;
-  user: User | null;
+  user: User | undefined;
   menu: {
     name: string;
     icon?: JSX.Element;
@@ -53,6 +53,7 @@ const MobileMenu = ({ open, setOpen, user, menu }: Props) => {
           <Link className="w-fit" href="/">HOME</Link>
           <Link className="w-fit" href="/workshop">MAPS</Link>
           <Link className="w-fit" href="/rankings">RANKINGS</Link>
+          <Link className="w-fit" href="/articles">ARTICLES</Link>
         </div>
 
         {user ?

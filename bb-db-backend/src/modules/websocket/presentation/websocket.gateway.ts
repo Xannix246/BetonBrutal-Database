@@ -89,7 +89,7 @@ export class WebsocketGateway
     }
 
     // console.log('sending replays');
-    await this.service.sendReplays(body, client);
+    setTimeout(async () => await this.service.sendReplays(body, client), 5000);
     // console.log('done');
   }
 }

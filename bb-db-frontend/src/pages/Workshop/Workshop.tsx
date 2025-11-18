@@ -4,15 +4,17 @@ import Header from "../../widgets/Header/Header";
 import Container from "../../shared/Containter/Container";
 import { Button } from "@headlessui/react";
 import clsx from "clsx";
-import { getMaps } from "./requests";
+import { getMaps, getRandomMap } from "./requests";
 import MapTile from "../../entities/MapTile";
 import Background from "../../widgets/Background/Background";
+import { navigate } from "vike/client/router";
 
 const Workshop = () => {
   const [loaded, setLoaded] = useState(false);
   const [items, setItems] = useState<WorkshopItem[]>([]);
   const [activeSort, setActiveSort] = useState<SortBy>("newest");
   const [page, setPage] = useState(1);
+  const [width, setWidth] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const isLoadingMore = useRef(false);
   const pageRef = useRef(page);
@@ -36,6 +38,7 @@ const Workshop = () => {
   useEffect(() => {
     setPage(1);
     setHasMore(true);
+    setWidth(window.innerWidth);
     setItems([]);
     loadMaps(activeSort, 1, false);
   }, [activeSort]);
@@ -81,10 +84,17 @@ const Workshop = () => {
               </Button>
             ))}
           </div>
+          {width > 768 && <h1 className="text-white"> |</h1>}
+          {width > 768 && <Button
+            className="bg-transparent p-0"
+            onClick={async () => navigate(`/workshop/${await getRandomMap()}`)}
+          >
+            RANDOM MAP
+          </Button>}
         </Container>
 
         {loaded ? (
-          <div className="flex gap-2 w-full px-4">
+          <div className="flex gap-2 w-full">
             <div className="grid sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[200px] lg:auto-rows-[300px] gap-6 p-6 w-full">
               {items.map(m => (
                 <MapTile key={m.id} {...m} />

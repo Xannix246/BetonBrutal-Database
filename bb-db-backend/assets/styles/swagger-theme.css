@@ -1,0 +1,168 @@
+@font-face {
+  font-family: "BebasNeue";
+  src: url(/assets/fonts/BebasNeue.ttf);
+}
+
+* {
+  font-family: "BebasNeue", sans-serif !important;
+  outline: none !important;
+}
+
+body {
+  background: url('/assets/img/bg.jpg') center center fixed no-repeat;
+  background-size: cover;
+  background-color: #535353;
+  font-family: 'BebasNeue', sans-serif;
+}
+
+.swagger-ui .topbar {
+  background-color: #000000cc;
+  border-bottom: 2px solid #ffbd2f;
+}
+
+.swagger-ui .topbar .download-url-wrapper {
+  display: none !important;
+}
+
+.swagger-ui .topbar-wrapper img {
+  content: url('/assets/icons/favicon.png');
+  height: 40px;
+  width: 40px;
+}
+
+.swagger-ui .topbar .link span {
+  color: #ffbd2f !important;
+  font-size: 26px !important;
+  letter-spacing: 2px;
+}
+
+.swagger-ui .scheme-container {
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid #ffbd2f;
+}
+
+.swagger-ui .opblock {
+  background-color: rgba(0, 0, 0, 0.8) !important;
+  padding: 8px;
+  margin-bottom: 15px;
+}
+
+.opblock-tag {
+  font-size: 56px !important;
+}
+
+.opblock-summary-get {
+  background: transparent;
+}
+
+/* .swagger-ui .opblock .opblock-summary {
+  background: rgba(0, 0, 0, 0.8);
+  padding: 8px;
+} */
+
+.swagger-ui .opblock-summary-method {
+  font-weight: bold;
+}
+
+.swagger-ui .opblock-summary-path {
+  font-size: 26px !important;
+  color: #ffefba !important;
+  outline: none !important;
+}
+
+.swagger-ui .opblock-summary-description {
+  color: #dcdcdc;
+}
+
+.swagger-ui .opblock-tag {
+  color: #ffefba;
+  font-size: 24px;
+  text-shadow: 0 0 8px #000;
+}
+
+.opblock-control-arrow {
+  color: #fff !important;
+}
+
+.swagger-ui .response-col_description__inner {
+  color: #ddd;
+}
+
+/* Buttons */
+.swagger-ui .btn {
+  background-color: rgba(0, 0, 0, 0.8) !important;
+  font-size: 27px !important;
+  border-radius: 0 !important;
+  padding: 16px !important;
+  color: #ffefba;
+  transition: 0.2s;
+}
+
+.swagger-ui .btn:hover {
+  color: #d78d7c;
+}
+
+/* Input fields */
+.swagger-ui input,
+.swagger-ui select,
+.swagger-ui textarea {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffefba;
+  border: 1px solid #ffbd2f;
+}
+
+.swagger-ui input::placeholder {
+  color: #aaa;
+}
+
+/* Links */
+.swagger-ui a {
+  color: #d78d7c;
+  transition: color 0.2s;
+}
+
+.swagger-ui a:hover {
+  color: #ffbd2f;
+}
+
+th, 
+td, 
+tr, 
+i, 
+.parameter__name,
+.parameter__type,
+.opblock-description-wrapper {
+  color: white !important;
+}
+
+.models {
+  background-color: rgba(0, 0, 0, 0.8) !important;
+}
+
+.model-title,
+.brace-close,
+.brace-open,
+.model-toggle,
+.property,
+.renderedMarkdown {
+  color: white !important;
+  font-size: 20px !important;
+}
+
+.description {
+  font-size: 20px !important;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 20px;
+  background-color: #0000004d;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #ffefba;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #0000004d;
+}

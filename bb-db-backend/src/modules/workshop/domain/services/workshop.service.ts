@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable } from '@nestjs/common';
+import { ObjectId } from 'mongodb';
 import { SteamApiService } from 'src/modules/data-requester/application/adapters/http-steam-api';
 import { FetchItemUseCase } from 'src/modules/data-requester/application/use-cases/fetch-item.usecase';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
@@ -94,6 +95,19 @@ export class WorkshopService {
     }
 
     return returnItems;
+  }
+
+  async getRandomItem(): Promise<string> {
+    const max = await this.getTotal();
+    const pos = Math.floor(Math.random() * max);
+
+    const ids = await this.prisma.workshopItem.findMany({
+      select: {
+        steamId: true,
+      },
+    });
+
+    return ids[pos].steamId;
   }
 
   async getItem(id: string): Promise<WorkshopItem | null> {
@@ -253,5 +267,19 @@ export class WorkshopService {
       },
       take: 50,
     });
+  }
+
+  async deleteItem(id: string): Promise<void> {
+    const isIdObject = ObjectId.isValid(id);
+
+    if (isIdObject) {
+      await this.prisma.workshopItem.delete({
+        where: { id },
+      });
+    } else {
+      await this.prisma.workshopItem.delete({
+        where: { steamId: id },
+      });
+    }
   }
 }

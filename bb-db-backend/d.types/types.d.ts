@@ -70,3 +70,40 @@ declare type UserComment = {
   data: string;
   createdAt: Date;
 };
+
+declare type Attachment = {
+  name: string;
+  url: string;
+};
+
+declare type Article = {
+  id: string;
+  title: string;
+  description?: string;
+  content: string;
+  date: Date;
+  tags: string[];
+  previewUrl?: string;
+  attachments: Attachment[];
+  authorId: string;
+  author: string;
+};
+
+declare type ArticleHeader = {
+  id: string;
+  title: string;
+  description?: string;
+  date: Date;
+  tags: string[];
+  author: string;
+  previewUrl?: string;
+};
+
+type ArticleFile = {
+  fieldname: string;
+  originalname: string;
+  encoding: string;
+  mimetype: string;
+  buffer: Buffer;
+  size: number;
+};
