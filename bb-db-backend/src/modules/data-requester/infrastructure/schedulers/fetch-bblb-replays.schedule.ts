@@ -6,97 +6,140 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 @Injectable()
 export class FetchBBLBReplaysScheduler {
   private readonly logger = new Logger(FetchBBLBReplaysScheduler.name);
+  private readonly DB_UPDATE_BATCH_SIZE = 500;
 
   constructor(
     private readonly prisma: PrismaService,
     private readonly bblbApi: BBLBApiService,
   ) {}
 
-  @Cron(CronExpression.EVERY_HOUR)
+  @Cron(CronExpression.EVERY_30_MINUTES)
   async handleCron() {
     this.logger.log('Taking new replays from BBLB...');
 
-    const lastReplay = await this.prisma.leaderboardEntry.findFirst({
-      orderBy: { date: 'desc' },
+    const existingEntries = await this.prisma.leaderboardEntry.findMany({
+      select: {
+        id: true,
+        mapId: true,
+        steamId: true,
+        username: true,
+        place: true,
+        score: true,
+        date: true,
+      },
     });
-
-    if (!lastReplay) return;
 
     const { entries } = await this.bblbApi.getRawData();
 
-    const newEntries = lastReplay
-      ? entries.filter(
-          (e) =>
-            new Date(e.date) >
-            new Date(lastReplay.date || Date.now() - 5 * 24 * 60 * 60 * 1000),
-        )
-      : entries;
+    const entryMap = new Map<string, (typeof existingEntries)[0]>();
 
-    if (newEntries.length === 0) {
-      this.logger.log('No new replays.');
-      return;
+    for (const entry of existingEntries) {
+      entryMap.set(`${entry.mapId}:${entry.steamId}`, entry);
     }
 
-    this.logger.log(`Found ${newEntries.length} new replays.`);
+    const toCreate: ParsedLeaderboardEntry[] = [];
+    const toUpdate: Array<{
+      id: string;
+      data: ParsedLeaderboardEntry;
+    }> = [];
 
-    for (const entry of newEntries) {
-      const leaderboardEntry = await this.prisma.leaderboardEntry.upsert({
-        where: {
-          mapId_steamId: { mapId: entry.mapId, steamId: entry.steamId },
-        },
-        update: {
-          place: entry.place,
-          username: entry.username,
-          score: entry.score,
-          date: entry.date,
-        },
-        create: {
+    for (const entry of entries) {
+      const key = `${entry.mapId}:${entry.steamId}`;
+      const existingEntry = entryMap.get(key);
+
+      if (!existingEntry) {
+        toCreate.push(entry);
+        continue;
+      }
+
+      const isChanged =
+        existingEntry.place !== entry.place ||
+        existingEntry.username !== entry.username ||
+        existingEntry.score > entry.score ||
+        existingEntry?.date?.getTime() !== entry?.date?.getTime();
+
+      if (isChanged) {
+        toUpdate.push({ id: existingEntry.id, data: entry });
+      }
+    }
+
+    if (toCreate.length === 0 && toUpdate.length === 0) {
+      this.logger.log('Nothing to update.');
+      return;
+    } else {
+      this.logger.log(
+        `Found ${toCreate.length} new replays and ${toUpdate.length} replays to update.`,
+      );
+    }
+
+    if (toCreate.length > 0) {
+      this.logger.log('Uploading replays...');
+
+      await this.prisma.leaderboardEntry.createMany({
+        data: toCreate.map((entry) => ({
           place: entry.place,
           mapId: entry.mapId,
           steamId: entry.steamId,
           username: entry.username,
           score: entry.score,
           date: entry.date,
-        },
+        })),
       });
+    }
 
-      const existingLeaderboard = await this.prisma.leaderboard.findUnique({
-        where: { mapId: entry.mapId },
-      });
+    for (let i = 0; i < toUpdate.length; i += this.DB_UPDATE_BATCH_SIZE) {
+      const batch = toUpdate.slice(i, i + this.DB_UPDATE_BATCH_SIZE);
 
+      await Promise.all(
+        batch.map((update) =>
+          this.prisma.leaderboardEntry.updateMany({
+            where: { id: update.id },
+            data: update.data,
+          }),
+        ),
+      );
+    }
+
+    const newEntryIds = await this.prisma.leaderboardEntry.findMany({
+      where: {
+        OR: toCreate.map((entry) => ({
+          mapId: entry.mapId,
+          steamId: entry.steamId,
+        })),
+      },
+      select: { id: true, mapId: true, steamId: true, username: true },
+    });
+
+    if (newEntryIds.length > 0)
+      this.logger.log('Updating leaderboard and user data...');
+
+    for (const entry of newEntryIds) {
       await this.prisma.leaderboard.upsert({
         where: { mapId: entry.mapId },
         update: {
-          enteries: [
-            ...new Set([
-              ...(existingLeaderboard?.enteries || []),
-              leaderboardEntry.id,
-            ]),
-          ],
+          enteries: {
+            push: entry.id,
+          },
         },
         create: {
           mapId: entry.mapId,
-          enteries: [leaderboardEntry.id],
+          enteries: [entry.id],
         },
-      });
-
-      const user = await this.prisma.steamUser.findUnique({
-        where: { steamId: entry.steamId },
       });
 
       await this.prisma.steamUser.upsert({
         where: { steamId: entry.steamId },
         update: {
           username: entry.username,
-          replays: [
-            ...new Set([...(user?.replays || []), leaderboardEntry.id]),
-          ],
+          replays: {
+            push: entry.id,
+          },
         },
         create: {
           steamId: entry.steamId,
           username: entry.username,
           items: [],
-          replays: [leaderboardEntry.id],
+          replays: [entry.id],
         },
       });
     }
