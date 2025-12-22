@@ -1,4 +1,3 @@
-import { navigate } from "vike/client/router";
 import Container from "../shared/Containter/Container";
 import { $prevLink } from "../store/store";
 import { useEffect, useState } from "react";
@@ -47,22 +46,17 @@ const LeaderboardEntry = ({ replay }: Props) => {
     <Container className="sm:mx-2 tracking-wider hover:bg-[#1f1f1f] transition">
       <div className="flex items-center justify-between text-[#f1e4c7] gap-4">
         <h3 className="text-sm md:text-xl text-center md:w-[40px] shrink-0">{replay.place}</h3>
-        <h3
+        <a
           className="flex-grow w-full text-sm md:text-xl truncate text-ellipsis whitespace-nowrap font-semibold max-w-[50%] hover:underline cursor-pointer hover:text-white transition duration-300"
-          onClick={() => {
-            $prevLink.set("run");
-            if (useMap) {
-              navigate(`/workshop/${replay.mapId}`)
-            } else {
-              navigate(`/workshop/player/${replay.creatorId}`)
-            }
-          }}
+          onClick={() => $prevLink.set("run")}
+          onPointerDown={() => $prevLink.set("run")}
+          href={useMap ? `/workshop/${replay.mapId}` : `/workshop/player/${replay.creatorId}`}
           style={{
             fontSize: "clamp(0.75rem, 1.5vw, 1.25rem)",
           }}
         >
           {(useMap ? (isOfficialMap().length > 0 ? isOfficialMap() : replay.map || "unknown map" ) : replay.creator).toUpperCase()}
-        </h3>
+        </a>
         <h3 className="text-sm md:text-xl text-right md:w-[100px] shrink-0">
           {formatTime(replay.score)}
         </h3>

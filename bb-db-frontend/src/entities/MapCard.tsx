@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { navigate } from "vike/client/router";
 
 type Props = {
   id: string;
@@ -20,10 +19,9 @@ const MapCard = ({ id, title, preview, previews}: Props) => {
   }, []);
 
   return (
-    <div
+    <a
       className="group bg-black/70 w-full h-156 lg:w-[28%] lg:h-232 lg:hover:w-[30%] transform duration-300 relative flex overflow-hidden cursor-pointer"
-      onClick={() => navigate(`/workshop/${id}`)}
-      onPointerDown={(e) => e.button === 1 && window.open(`/workshop/${id}`, "_blank")}
+      href={`/workshop/${id}`}
     >
       <img
         src={previews && previews.length > 0 ? previews[previewId] : preview}
@@ -37,7 +35,7 @@ const MapCard = ({ id, title, preview, previews}: Props) => {
           {title?.toUpperCase().replaceAll(" ", "\n")}
         </span>
       </div>
-    </div>
+    </a>
   );
 }
 

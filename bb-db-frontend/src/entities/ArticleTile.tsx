@@ -1,14 +1,13 @@
 import clsx from "clsx";
-import { navigate } from "vike/client/router";
 import Link from "../shared/Link/Link";
 
 const ArticleTile = ({ article }: { article: Article }) => {
 
   return (
     <div className="h-64 relative hover:z-5 z-0 transition-all transform duration-300">
-      <div
+      <a
         className="w-full group absolute"
-        onClick={() => navigate(`/articles/${article.id}`)}
+        href={`/articles/${article.id}`}
       >
         <div className="bg-black group">
           <div className="relative h-64 w-full">
@@ -37,7 +36,7 @@ const ArticleTile = ({ article }: { article: Article }) => {
             </div>
           </div>
         </div>
-      </div>
+      </a>
     </div>
   );
 }

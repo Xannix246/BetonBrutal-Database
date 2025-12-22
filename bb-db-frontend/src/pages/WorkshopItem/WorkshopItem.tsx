@@ -102,6 +102,7 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                   <a
                     href={`/workshop/player/${mapData?.creatorId}`}
                     onClick={() => $prevLink.set("mapCreator")}
+                    onPointerDown={() => $prevLink.set("mapCreator")}
                     className="hover:text-white hover:underline"
                   >BY {mapData?.creator.toUpperCase()}</a>
                   {user && <Button
