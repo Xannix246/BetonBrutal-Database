@@ -23,6 +23,7 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
   const [comments, setComments] = useState<UserComment[]>([]);
   const [replays, setReplays] = useState<Replay[]>([]);
   const [value, setValue] = useState("");
+  const [preivewId, setPreviewId] = useState<number | null>(null);
   const favorites = getFavorites();
 
   useEffect(() => {
@@ -37,6 +38,8 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
       if (map) {
         setMapData(map);
         setReplays(replays);
+
+        if (map.previews.length > 0) setPreviewId(Math.floor(Math.random() * map.previews.length));
 
         setComments((await getComments(id)).sort(
           (a, b) => new Date(b.createdAt).valueOf() - new Date(a.createdAt).valueOf()
@@ -73,7 +76,8 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
 
   return (
     <div className="w-full min-h-screen h-full">
-      <Background />
+      {preivewId !== null && mapData ? <img src={mapData.previews[preivewId]} className="fixed inset-0 -z-10 w-full h-full object-cover blur-md" /> : <Background />}
+
       <div className="fixed left-0 w-full z-50">
         <Header isAbsolute={true} />
       </div>

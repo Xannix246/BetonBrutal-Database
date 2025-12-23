@@ -107,3 +107,12 @@ type ArticleFile = {
   buffer: Buffer;
   size: number;
 };
+
+declare type Collection = {
+  id: string;
+  title: string;
+  description: string | null;
+  mapsId: string[];
+  showOnMain: boolean;
+  descColor: $Enums.Color;
+}

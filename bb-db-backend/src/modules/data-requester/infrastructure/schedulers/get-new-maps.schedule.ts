@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { SteamApiService } from '../../application/adapters/http-steam-api';
 
@@ -12,7 +12,7 @@ export class GetNewMapsScheduler {
     private readonly steamApi: SteamApiService,
   ) {}
 
-  @Cron('0 */10 * * * *')
+  @Cron(CronExpression.EVERY_10_MINUTES)
   async handleCron() {
     this.logger.log('Checking for new maps in Steam Workshop...');
 

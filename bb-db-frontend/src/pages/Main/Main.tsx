@@ -98,7 +98,7 @@ const Main = () => {
         <div className="flex flex-col gap-4 place-items-center w-full mt-32">
           <div className="p-4 bg-black/70">
             <h1 className="w-fit text-center lg:text-left text-4xl text-[#ffd884] tracking-wider text-shadow-md">
-              Want to see some other maps? Here are a couple of new maps
+              Want to see some other maps? Here are a couple of them
             </h1>
           </div>
           <div className="flex justify-center w-full">

@@ -61,6 +61,24 @@ model Favorites {
     mapsId String[]
 }
 
+enum Color {
+    white
+    black
+    red
+    blue
+    green
+    yellow
+}
+
+model Collection {
+    id          String   @id @default(auto()) @map("_id") @db.ObjectId
+    title       String
+    description String?
+    mapsId      String[]
+    showOnMain  Boolean  @default(false)
+    descColor   Color    @default(black)
+}
+
 // Better Auth models
 
 enum Role {
