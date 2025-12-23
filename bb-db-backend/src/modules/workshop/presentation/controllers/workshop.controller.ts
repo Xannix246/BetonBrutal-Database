@@ -73,13 +73,14 @@ export class WorkshopController {
   @Post('get-query-list')
   @OptionalAuth()
   async getQueryList(
+    @Query('sendPreviews') sendPreviews: boolean = false,
     @Body() body: GetQueryListDto,
   ): Promise<WorkshopItemHeader[]> {
     if (!body.ids) {
       throw new BadRequestException('Quantity is required');
     }
 
-    return this.workshopService.getQueryItems(body.ids);
+    return this.workshopService.getQueryItems(body.ids, sendPreviews);
   }
 
   @Post('get-query-replays')

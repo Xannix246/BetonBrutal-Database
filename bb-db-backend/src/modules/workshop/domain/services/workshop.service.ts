@@ -147,7 +147,10 @@ export class WorkshopService {
     }
   }
 
-  async getQueryItems(ids: string[]): Promise<WorkshopItemHeader[]> {
+  async getQueryItems(
+    ids: string[],
+    sendPreviews: boolean = false,
+  ): Promise<WorkshopItemHeader[]> {
     const items = await this.prisma.workshopItem.findMany({
       where: { steamId: { in: ids } },
       orderBy: { createDate: 'desc' },
@@ -168,6 +171,7 @@ export class WorkshopService {
         ratingUp: item.ratingUp,
         ratingDown: item.ratingDown,
         previewUrl: item.previewUrl,
+        previews: sendPreviews ? item.previews : [],
       });
     }
 

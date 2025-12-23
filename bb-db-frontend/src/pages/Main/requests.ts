@@ -10,3 +10,7 @@ export const getFollowedMaps = async (
   const data = (await api.get(`${config.serverUri}/workshop/get-list?sortBy=${sortBy}&quantity=${quantity}&sendPreviews=${sendPreviews}${timeRange && "&timeRange=" + timeRange}`)).data;
   return data;
 }
+
+export const getCollections = async (): Promise<Collection[]> => {
+  return (await api.get(`/collections/get?forMain=true`)).data; 
+}

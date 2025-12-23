@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Button from "../../shared/Button/Button";
 import Input from "../../shared/Input/Input";
 import Header from "../../widgets/Header/Header";
-import { getFollowedMaps } from "./requests";
+import { getCollections, getFollowedMaps } from "./requests";
 import MapCard from "../../entities/MapCard";
 import Footer from "../../widgets/Footer/Footer";
 import clsx from "clsx";
@@ -10,16 +10,20 @@ import MapTile from "../../entities/MapTile";
 import { navigate } from "vike/client/router";
 import { handleEnterSearch, handleSearch } from "../../features/SearchManager";
 import Background from "../../widgets/Background/Background";
+import CollectionContainer from "../../features/CollectionContainer/CollectionContainer";
 // import { CircleStackIcon } from "@heroicons/react/24/outline";
 
 const Main = () => {
   const [followedMaps, setFollowedMaps] = useState<WorkshopItem[]>([]);
   const [lastestMaps, setLastestMaps] = useState<WorkshopItem[]>([]);
+  const [collections, setCollections] = useState<Collection[]>([]);
   const [isSticky, setIsSticky] = useState(false);
   const [search, setSearch] = useState("");
 
   useEffect(() => {
     (async () => {
+      setCollections(await getCollections());
+
       const folMaps = await getFollowedMaps("mostPopular", 3, true, "year");
       setFollowedMaps(folMaps);
 
@@ -41,7 +45,7 @@ const Main = () => {
 
   return (
     <div className="w-full h-full">
-      <Background/>
+      <Background />
       <div
         className={clsx(
           isSticky ?
@@ -68,7 +72,7 @@ const Main = () => {
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => handleEnterSearch(search, e)}
               />
-              <Button 
+              <Button
                 className="text-3xl sm:text-4xl bg-white/10"
                 onClick={() => handleSearch(search)}
               >SEARCH</Button>
@@ -77,12 +81,17 @@ const Main = () => {
         </div>
 
         <div className="flex flex-col gap-4 place-items-center w-full mt-16">
+          <div className="w-full h-full mb-32">
+            {collections.map((collection, i) => (
+              <CollectionContainer collection={collection} key={i} />
+            ))}
+          </div>
           <div className="p-4 bg-black/70">
             <h1 className="w-fit text-center text-7xl text-[#ffd884] tracking-wider text-shadow-md">
               MAPS OF THE YEAR
             </h1>
           </div>
-          <div className="flex flex-col lg:flex-row justify-center gap-8 w-full overflow-clip">
+          <div className="flex flex-col lg:flex-row justify-center gap-8 w-full h-500 lg:h-232 overflow-clip">
             {followedMaps.map((map) => (
               <MapCard
                 id={map.id}

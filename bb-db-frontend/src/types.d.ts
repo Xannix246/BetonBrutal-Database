@@ -64,3 +64,12 @@ declare type Article = {
   authorId: string;
   author: string;
 }
+
+declare type Collection = {
+  id: string;
+  title: string;
+  description: string | null;
+  mapsId: string[];
+  showOnMain: boolean;
+  descColor: "white" | "black" | "red" | "blue" | "green" | "yellow";
+}

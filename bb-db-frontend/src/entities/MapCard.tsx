@@ -20,11 +20,11 @@ const MapCard = ({ id, title, preview, previews}: Props) => {
 
   return (
     <a
-      className="group bg-black/70 w-full h-156 lg:w-[28%] lg:h-232 lg:hover:w-[30%] transform duration-300 relative flex overflow-hidden cursor-pointer"
+      className="group bg-black/70 w-full lg:w-[28%] lg:hover:w-[30%] transform duration-300 min-h-156 relative flex overflow-hidden cursor-pointer"
       href={`/workshop/${id}`}
     >
       <img
-        src={previews && previews.length > 0 ? previews[previewId] : preview}
+        src={previews && previews.length > 1 ? previews[previewId] : preview}
         alt={title}
         className="absolute h-full w-full object-cover transform duration-500 group-hover:scale-102"
       />
