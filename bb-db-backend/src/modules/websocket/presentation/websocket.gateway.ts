@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 import { Injectable, Logger } from '@nestjs/common';
 import {
   WebSocketGateway,
@@ -33,7 +34,7 @@ export class WebsocketGateway
 
   private async enqueueSave(mapId: string, task: () => Promise<void>) {
     const prev = this.saveStatus.get(mapId) ?? Promise.resolve();
-    const next = prev.finally(void task);
+    const next = prev.finally(task);
     this.saveStatus.set(mapId, next);
     await next;
     this.saveStatus.delete(mapId);
@@ -87,7 +88,7 @@ export class WebsocketGateway
     }
 
     // console.log('sending replays');
-    setTimeout(() => void this.service.sendReplays(body, client), 5000);
+    setTimeout(async () => await this.service.sendReplays(body, client), 5000);
     // console.log('done');
   }
 }
