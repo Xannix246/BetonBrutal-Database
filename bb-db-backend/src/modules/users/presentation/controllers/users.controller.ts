@@ -32,8 +32,8 @@ export class UsersController {
   }
 
   @Delete('me/delete')
-  async deleteProfile(@Session() session: UserRoleSession) {
-    return await this.userSevice.deleteProfile(session.user.id, session);
+  async deleteData(@Session() session: UserRoleSession) {
+    return await this.userSevice.deleteData(session.user.id);
   }
 
   @Get('favorites/add')

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { auth, UserRoleSession } from 'src/modules/auth/auth.module';
+import { auth } from 'src/modules/auth/auth.module';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { WorkshopService } from 'src/modules/workshop/domain/services/workshop.service';
 
@@ -83,16 +83,16 @@ export class UserService {
     return returnFav.mapsId;
   }
 
-  async deleteProfile(userId: string, client: UserRoleSession) {
+  async deleteData(userId: string) {
     // delete all user data like favorites/comments and articles
 
-    void (await this.prisma.favorites.delete({ where: { userId: userId } }));
+    void (await this.prisma.favorites.deleteMany({
+      where: { userId: userId },
+    }));
     void (await this.prisma.comment.deleteMany({ where: { userId: userId } }));
-    return await auth.api.deleteUser({
-      body: {
-        token: client.session.token,
-      },
-    });
+    void (await this.prisma.article.deleteMany({
+      where: { authorId: userId },
+    }));
   }
 
   async banUser(userId: string, banReason?: string) {

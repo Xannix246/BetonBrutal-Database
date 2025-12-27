@@ -2,8 +2,9 @@ import { JSX, useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 
 type item = {
-  icon?: JSX.Element;
   name: string;
+  icon?: JSX.Element;
+  className?: string;
   onClick?: () => void;
 };
 
@@ -54,7 +55,7 @@ const Dropdown = ({ button, className, menu }: Props) => {
           {menu.map((item, i) => (
             <button
               key={i}
-              className="flex w-full justify-start items-center gap-4 px-3 py-1.5 hover:bg-white/10"
+              className={clsx(item.className, "flex w-full justify-start items-center gap-4 px-3 py-1.5 hover:bg-white/10")}
               onClick={() => {
                 item.onClick?.();
                 setOpen(false);
