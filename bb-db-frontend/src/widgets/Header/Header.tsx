@@ -47,6 +47,7 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
 
   return (
     <header className="bg-black/80 w-full h-16 border-b-1 border-amber-200 flex p-2 justify-between">
+      <DeleteModal open={deleteModal} setOpen={setDeleteModal} />
       <MobileMenu open={mobileMenu} setOpen={setMobileMenu} user={user} menu={menu} />
       {width > 1115 && <div className="h-full text-white text-shadow-lg text-4xl flex gap-10 place-items-center pl-8">
         <Link className="hover:text-pink transition duration-150" href="/">HOME</Link>
@@ -87,7 +88,6 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
         {user ?
           <div className="flex gap-4 place-items-center">
             <span className="whitespace-pre-wrap text-white font-xl tracking-wider">{user.name.toUpperCase().replaceAll(" ", "\n")}</span>
-            <DeleteModal open={deleteModal} setOpen={setDeleteModal} />
             <Dropdown
               button={<img src={user.image || ""} alt="avatar" className="min-w-12 h-12 cursor-pointer" />}
               menu={menu}

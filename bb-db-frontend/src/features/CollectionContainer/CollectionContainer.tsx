@@ -50,7 +50,7 @@ const CollectionContainer = ({ collection }: { collection: Collection }) => {
         maps.length > 6 && "grid sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[200px] lg:auto-rows-[300px]"
       )}>
         {maps.map((map) => (
-          maps.length < 6 ?
+          maps.length <= 6 ?
             <MapCard
               id={map.id}
               title={map.title}

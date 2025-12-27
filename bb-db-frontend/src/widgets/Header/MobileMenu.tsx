@@ -10,6 +10,7 @@ type Props = {
   user: User | undefined;
   menu: {
     name: string;
+    className?: string;
     icon?: JSX.Element;
     onClick?: () => void;
   }[]
