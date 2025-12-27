@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable } from '@nestjs/common';
 import { ObjectId } from 'mongodb';
 import { SteamApiService } from 'src/modules/data-requester/application/adapters/http-steam-api';
@@ -27,7 +26,10 @@ export class WorkshopService {
     timeRange?: 'day' | 'week' | 'month' | 'year',
     page: number = 1,
   ): Promise<WorkshopItemHeader[]> {
-    let orderBy;
+    let orderBy: {
+      ratingUp?: 'asc' | 'desc';
+      createDate?: 'asc' | 'desc';
+    };
 
     switch (sortBy) {
       case 'mostPopular':
@@ -120,15 +122,20 @@ export class WorkshopService {
     }
 
     if (item) {
-      await this.websocket.sendRequest({
+      this.websocket.sendRequest({
         type: 'fetch_by_id',
         mapId: item.steamId,
       });
 
+      const fetchedItem = await this.fetchItems.execute(item.steamId);
+      const description = fetchedItem
+        ? fetchedItem.description
+        : 'Seems like steam workshop service is down...';
+
       return {
         id: item.steamId,
         title: item.title,
-        description: (await this.fetchItems.execute(item.steamId))!.description,
+        description: description,
         steamId: item.steamId,
         creator: (
           await this.prisma.steamUser.findUnique({

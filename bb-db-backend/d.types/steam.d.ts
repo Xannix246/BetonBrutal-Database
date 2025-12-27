@@ -2,6 +2,7 @@
 declare type SteamApiResponse = {
   response: {
     publishedfiledetails: SteamPublishedFile[];
+    total: number;
   };
 }
 
@@ -84,3 +85,11 @@ declare type SteamVoteData = {
   votes_up: number;
   votes_down: number;
 }
+
+declare type AxiosUsernameType = {
+  response: {
+    players: {
+      personaname: string;
+    }[];
+  };
+};

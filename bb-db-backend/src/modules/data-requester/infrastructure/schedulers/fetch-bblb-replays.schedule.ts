@@ -29,7 +29,9 @@ export class FetchBBLBReplaysScheduler {
       },
     });
 
-    const { entries } = await this.bblbApi.getRawData();
+    const entries = (await this.bblbApi.getRawData())?.entries;
+
+    if (!entries) return;
 
     const entryMap = new Map<string, (typeof existingEntries)[0]>();
 

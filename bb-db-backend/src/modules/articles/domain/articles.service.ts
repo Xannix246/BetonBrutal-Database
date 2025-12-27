@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   ForbiddenException,
   Injectable,
@@ -25,7 +24,9 @@ export class ArticlesService {
     strictComparison?: boolean, // for tags
     searchText?: string,
   ): Promise<ArticleHeader[]> {
-    let orderBy;
+    let orderBy: {
+      date: 'desc' | 'asc';
+    };
 
     switch (sortBy) {
       case 'newest':

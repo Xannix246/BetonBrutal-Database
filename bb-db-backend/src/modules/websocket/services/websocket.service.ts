@@ -77,7 +77,7 @@ export class WebsocketService {
     }
   }
 
-  async sendReplays(id: string, client: Socket) {
+  async sendReplays(id: string, client: Socket): Promise<void> {
     const existingLeaderboard = await this.prisma.leaderboard.findUnique({
       where: { mapId: id },
     });
@@ -104,5 +104,7 @@ export class WebsocketService {
 
       client.emit('request_leaderboard', returnReplays);
     }
+
+    return;
   }
 }

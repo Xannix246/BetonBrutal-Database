@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
-/* eslint-disable @typescript-eslint/require-await */
 import { Injectable, Logger } from '@nestjs/common';
 import {
   WebSocketGateway,
@@ -35,7 +33,7 @@ export class WebsocketGateway
 
   private async enqueueSave(mapId: string, task: () => Promise<void>) {
     const prev = this.saveStatus.get(mapId) ?? Promise.resolve();
-    const next = prev.finally(task);
+    const next = prev.finally(void task);
     this.saveStatus.set(mapId, next);
     await next;
     this.saveStatus.delete(mapId);
@@ -45,7 +43,7 @@ export class WebsocketGateway
     this.logger.log('WebSocket gateway initialized.');
   }
 
-  async handleConnection(client: Socket) {
+  handleConnection(client: Socket) {
     this.logger.log(`Client connected: ${client.id}`);
 
     this.clients.push(client);
@@ -57,7 +55,7 @@ export class WebsocketGateway
     this.logger.log(`Client disconnected: ${client.id}`);
   }
 
-  async sendRequest(request: wsMessagesDto.SendRequest) {
+  sendRequest(request: wsMessagesDto.SendRequest) {
     for (const client of this.clients) {
       if (request.type === 'fetch_by_id') {
         client.emit(request.type, request.mapId);
@@ -89,7 +87,7 @@ export class WebsocketGateway
     }
 
     // console.log('sending replays');
-    setTimeout(async () => await this.service.sendReplays(body, client), 5000);
+    setTimeout(() => void this.service.sendReplays(body, client), 5000);
     // console.log('done');
   }
 }

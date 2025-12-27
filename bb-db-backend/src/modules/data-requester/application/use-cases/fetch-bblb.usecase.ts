@@ -12,7 +12,9 @@ export class FetchBBLBUseCase {
 
   async execute() {
     this.logger.log('Starting leaderboard refresh from BBLB...');
-    const { entries } = await this.bblbApi.getRawData();
+    const entries = (await this.bblbApi.getRawData())?.entries;
+
+    if (!entries) return;
 
     for (const entry of entries) {
       const leaderboardEntry = await this.prisma.leaderboardEntry.upsert({

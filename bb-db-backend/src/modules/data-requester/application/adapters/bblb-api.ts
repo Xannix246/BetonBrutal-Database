@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import axios from 'axios';
+import { safeGet } from 'src/shared/axiosRequests';
 
 export class BBLBApiService {
   private convertSteamDate = (steamDate: string): Date => {
@@ -53,9 +51,13 @@ export class BBLBApiService {
     return { maps, entries };
   };
 
-  async getRawData() {
-    const { data } = await axios.get(
+  async getRawData(): Promise<{
+    maps: ParsedWorkshopItem[];
+    entries: ParsedLeaderboardEntry[];
+  } | null> {
+    const data = await safeGet<string>(
       'https://josiahshields.com/beton/data.json',
+      5000,
       {
         responseType: 'arraybuffer',
         // proxy: {
@@ -64,8 +66,11 @@ export class BBLBApiService {
         // },
       },
     );
+
+    if (!data) return null;
+
     const text = Buffer.from(data).toString('utf8');
-    const json = JSON.parse(text);
+    const json = JSON.parse(text) as RawLeaderboardResponse;
 
     return this.parseLeaderboardData(json);
   }
