@@ -68,8 +68,8 @@ export class CollectionsService {
         description,
         mapsId: mapsId
           ? typeof mapsId === 'string'
-            ? [...collection.mapsId, mapsId]
-            : [...collection.mapsId, ...mapsId]
+            ? [...new Set(...collection.mapsId, mapsId)]
+            : [...new Set(...collection.mapsId, ...mapsId)]
           : mapsId === undefined
             ? collection.mapsId
             : [],
