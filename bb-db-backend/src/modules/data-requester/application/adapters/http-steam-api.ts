@@ -8,7 +8,7 @@ export class SteamApiService {
       5000,
     );
 
-    return user?.response.players[0].personaname ?? 'Unknown user';
+    return user?.response.players[0]?.personaname ?? 'Unknown user';
   }
 
   async getItem(steamId: string) {
@@ -19,7 +19,7 @@ export class SteamApiService {
       )
     )?.response;
 
-    if (!data) return null;
+    if (!data || !data.publishedfiledetails[0].vote_data) return null;
 
     const user = await this.getUsername(data.publishedfiledetails[0].creator);
 
@@ -112,8 +112,8 @@ export class SteamApiService {
         creator: 'unknown',
         createDate: new Date(map.time_created * 1000),
         creatorId: map.creator,
-        ratingUp: map.vote_data.votes_up,
-        ratingDown: map.vote_data.votes_down,
+        ratingUp: map.vote_data?.votes_up ?? 0,
+        ratingDown: map.vote_data?.votes_down ?? 0,
         previewUrl: map.preview_url,
         previews:
           map.previews

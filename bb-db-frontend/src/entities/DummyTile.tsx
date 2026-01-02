@@ -50,12 +50,11 @@ const DummyTile = () => {
   return (
     <div
       className={clsx(
-        "relative shadow-md group cursor-pointer",
+        "relative",
         sizeClass,
         colorClass
       )}
-    >
-    </div>
+    />
   );
 };
 

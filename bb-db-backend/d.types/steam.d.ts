@@ -52,7 +52,7 @@ declare type SteamPublishedFile = {
   previews: SteamPreview[];
   tags: SteamTag[];
   kvtags: SteamKVTag[];
-  vote_data: SteamVoteData;
+  vote_data?: SteamVoteData;
   language: number;
   maybe_inappropriate_sex: boolean;
   maybe_inappropriate_violence: boolean;

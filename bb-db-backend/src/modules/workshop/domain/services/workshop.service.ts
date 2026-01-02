@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { ObjectId } from 'mongodb';
 import { SteamApiService } from 'src/modules/data-requester/application/adapters/http-steam-api';
 import { FetchItemUseCase } from 'src/modules/data-requester/application/use-cases/fetch-item.usecase';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
@@ -280,17 +279,35 @@ export class WorkshopService {
     });
   }
 
-  async deleteItem(id: string): Promise<void> {
-    const isIdObject = ObjectId.isValid(id);
+  async deleteItem(steamId: string): Promise<void> {
+    const entries = await this.prisma.leaderboardEntry.findMany({
+      where: { mapId: steamId },
+    });
 
-    if (isIdObject) {
-      await this.prisma.workshopItem.delete({
-        where: { id },
-      });
-    } else {
-      await this.prisma.workshopItem.delete({
-        where: { steamId: id },
+    for (const entry of entries) {
+      await this.prisma.$transaction(async (prisma) => {
+        const users = await prisma.steamUser.findMany({
+          where: { replays: { has: entry.id } },
+          select: { id: true, replays: true },
+        });
+
+        for (const user of users) {
+          await prisma.steamUser.updateMany({
+            where: {
+              replays: { has: entry.id },
+            },
+            data: {
+              replays: [...new Set(user.replays.filter((r) => r !== entry.id))],
+            },
+          });
+        }
       });
     }
+
+    await this.prisma.workshopItem.delete({ where: { steamId } });
+    await this.prisma.leaderboard.delete({ where: { mapId: steamId } });
+    await this.prisma.leaderboardEntry.deleteMany({
+      where: { mapId: steamId },
+    });
   }
 }
