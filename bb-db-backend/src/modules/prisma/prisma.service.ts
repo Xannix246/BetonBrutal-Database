@@ -9,6 +9,7 @@ export class PrismaService
   async onModuleInit() {
     await this.$connect();
 
+    // migration
     await this.leaderboardEntry.updateMany({
       data: {
         banned: false,
