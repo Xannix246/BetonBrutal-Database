@@ -73,4 +73,6 @@
 
 body {
   background-color: #535353;
+  max-width: 100%;
+  overflow-x: hidden;
 }

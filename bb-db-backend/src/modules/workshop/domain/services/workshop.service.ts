@@ -372,6 +372,8 @@ export class WorkshopService {
         orderBy: { score: 'asc' },
       });
 
+      console.log(entries);
+
       await Promise.all(
         entries.map((entry, index) =>
           prisma.leaderboardEntry.update({

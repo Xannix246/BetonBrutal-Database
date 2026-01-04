@@ -130,7 +130,7 @@ export class WorkshopController {
   @OptionalAuth()
   async getReplays(
     @Param('id') id: string,
-    @Param('hideBanned') hideBanned: boolean,
+    @Query('hideBanned') hideBanned: boolean,
   ): Promise<Replay[]> {
     const leaderboard = await this.workshopService.getLeaderboard(id);
 
@@ -142,7 +142,7 @@ export class WorkshopController {
     return replays;
   }
 
-  @Delete(':id/replays')
+  @Delete('replays/:id')
   async deleteReplay(
     @Param('id') id: string,
     @Session() session: UserRoleSession,
@@ -154,7 +154,7 @@ export class WorkshopController {
     await this.workshopService.banOrDeleteLeaderboardEntry(id, true);
   }
 
-  @Put(':id/replays/ban')
+  @Put('replays/:id/ban')
   async banReplay(
     @Param('id') id: string,
     @Session() session: UserRoleSession,
@@ -166,7 +166,7 @@ export class WorkshopController {
     await this.workshopService.banOrDeleteLeaderboardEntry(id);
   }
 
-  @Put(':id/replays/unban')
+  @Put('replays/:id/unban')
   async unbanReplay(
     @Param('id') id: string,
     @Session() session: UserRoleSession,

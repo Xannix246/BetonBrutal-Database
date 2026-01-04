@@ -8,6 +8,13 @@ export class PrismaService
 {
   async onModuleInit() {
     await this.$connect();
+
+    await this.leaderboardEntry.updateMany({
+      data: {
+        banned: false,
+      },
+    });
+    console.log('Migration done');
   }
 
   async onModuleDestroy() {

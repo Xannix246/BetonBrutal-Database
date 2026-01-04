@@ -24,3 +24,7 @@ export const getFiles = () => useStore($files);
 export const $doc = atom<string>("# Type *here* something");
 export const setDoc = (doc: string) => $doc.set(doc);
 export const getDoc = () => useStore($doc);
+
+export const $targetData = atom<{id: string, name: string} | null>(null);
+export const setTargetData = (map: {id: string, name: string} | null) => $targetData.set(map);
+export const getTargetData = () => useStore($targetData);

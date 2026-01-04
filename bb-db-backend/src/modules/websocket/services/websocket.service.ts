@@ -91,6 +91,8 @@ export class WebsocketService {
       const returnReplays: Replay[] = [];
 
       for (const replay of replays) {
+        if (replay.banned) continue;
+
         returnReplays.push({
           id: replay.id,
           creator: replay.username,

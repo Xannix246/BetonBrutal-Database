@@ -8,13 +8,21 @@ import Background from "../../widgets/Background/Background";
 import Input from "../../shared/Input/Input";
 import Comment from "../../entities/Comment/Comment";
 import LeaderboardTable from "../../widgets/LeaderboardTable/LeaderboardTable";
-import { $prevLink, getFavorites, getUser } from "../../store/store";
+import {
+  $prevLink,
+  getFavorites,
+  getTargetData,
+  getUser,
+  setTargetData,
+} from "../../store/store";
 import { navigate } from "vike/client/router";
 import Button from "../../shared/Button/Button";
 import { addFavorites, removeFavorites } from "../../features/FavoriteManager";
 import clsx from "clsx";
 import { io } from "socket.io-client";
 import { config } from "../../../config/config";
+import { banReplay, deleteReplay } from "../../features/DataManager";
+import ContextMenu from "../../shared/ContextMenu/ContextMenu";
 
 const WorkshopItemPage = ({ id }: { id: string }) => {
   const [mapData, setMapData] = useState<WorkshopItem | null>();
@@ -25,6 +33,41 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
   const [value, setValue] = useState("");
   const [preivewId, setPreviewId] = useState<number | null>(null);
   const favorites = getFavorites();
+  const [openCMenu, setOpenCMenu] = useState(false);
+  const targetData = getTargetData();
+
+  const menuItems = [
+    {
+      name: `Delete ${targetData?.name}'s replay`,
+      onClick: () => {
+        if (!targetData) return;
+
+        const updatedItems = [
+          ...replays.filter((item) => item.id !== targetData.id),
+        ];
+        setReplays(updatedItems);
+        deleteReplay(targetData.id);
+      },
+    },
+    {
+      name: `Ban ${targetData?.name}'s replay`,
+      onClick: () => {
+        if (!targetData) return;
+
+        const updatedItems = [
+          ...replays.filter((item) => item.id !== targetData.id),
+        ];
+        setReplays(updatedItems);
+        banReplay(targetData.id);
+      },
+    },
+  ];
+
+  useEffect(() => {
+    if (targetData) {
+      setOpenCMenu(true);
+    }
+  }, [targetData]);
 
   useEffect(() => {
     (async () => {
@@ -32,18 +75,20 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
         return navigate("/");
       }
       const map = await getMap(id);
-      const replays = (await getReplays(id)).sort(
-        (a, b) => a.score - b.score
-      );
+      const replays = (await getReplays(id)).sort((a, b) => a.score - b.score);
       if (map) {
         setMapData(map);
         setReplays(replays);
 
-        if (map.previews.length > 0) setPreviewId(Math.floor(Math.random() * map.previews.length));
+        if (map.previews.length > 0)
+          setPreviewId(Math.floor(Math.random() * map.previews.length));
 
-        setComments((await getComments(id)).sort(
-          (a, b) => new Date(b.createdAt).valueOf() - new Date(a.createdAt).valueOf()
-        ));
+        setComments(
+          (await getComments(id)).sort(
+            (a, b) =>
+              new Date(b.createdAt).valueOf() - new Date(a.createdAt).valueOf()
+          )
+        );
         setLoaded(true);
       } else {
         setMapData(null);
@@ -65,42 +110,72 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
     });
   }, []);
 
-
-  const handleSendComment = async (event: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleSendComment = async (
+    event: React.KeyboardEvent<HTMLInputElement>
+  ) => {
     if (event.key === "Enter" && value.length > 0) {
       const comment = await postComment(id, value);
       setComments([comment, ...comments]);
       setValue("");
     }
-  }
+  };
 
   return (
     <div className="w-full min-h-screen h-full">
-      {preivewId !== null && mapData ? <img src={mapData.previews[preivewId]} className="fixed inset-0 -z-10 w-full h-full object-cover blur-md" /> : <Background />}
+      {preivewId !== null && mapData ? (
+        <img
+          src={mapData.previews[preivewId]}
+          className="fixed inset-0 -z-10 w-full h-full object-cover blur-md"
+        />
+      ) : (
+        <Background />
+      )}
+
+      {["moderator", "admin"].includes(user?.role as string) && (
+        <ContextMenu
+          menu={menuItems}
+          open={openCMenu}
+          setOpen={setOpenCMenu}
+          onClose={() => setTargetData(null)}
+        />
+      )}
 
       <div className="fixed left-0 w-full z-50">
         <Header isAbsolute={true} />
       </div>
 
       <div className="h-full justify-between">
-        {loaded ?
+        {loaded ? (
           <div className="flex flex-col gap-2 pt-32 px-4 min-h-screen w-full">
             <div className="flex flex-col md:flex-row gap-2">
               <div className="flex flex-col gap-2">
                 <div className="group relative w-full h-64 md:w-96 md:h-96 lg:w-128 lg:h-128 bg-black/70">
-                  <img src={mapData?.previewUrl} className="absolute w-full h-64 md:w-96 md:h-96 lg:w-128 lg:h-128 object-cover bottom-0 right-0 group-hover:-bottom-5 group-hover:-right-5 transition-all duration-300" />
+                  <img
+                    src={mapData?.previewUrl}
+                    className="absolute w-full h-64 md:w-96 md:h-96 lg:w-128 lg:h-128 object-cover bottom-0 right-0 group-hover:-bottom-5 group-hover:-right-5 transition-all duration-300"
+                  />
                 </div>
                 <Container className="text-white flex gap-16 text-2xl sm:text-4xl justify-center mb-8 md:mb-0">
-                  <h2 className="text-green">{mapData && mapData.ratingUp > 0 && "+"} {mapData?.ratingUp}</h2>
+                  <h2 className="text-green">
+                    {mapData && mapData.ratingUp > 0 && "+"} {mapData?.ratingUp}
+                  </h2>
+                  |{mapData && <h2>{mapData.ratingUp - mapData.ratingDown}</h2>}
                   |
-                  {mapData && <h2>{mapData.ratingUp - mapData.ratingDown}</h2>}
-                  |
-                  <h2 className="text-red">{mapData && mapData.ratingDown > 0 && "-"} {mapData?.ratingDown}</h2>
+                  <h2 className="text-red">
+                    {mapData && mapData.ratingDown > 0 && "-"}{" "}
+                    {mapData?.ratingDown}
+                  </h2>
                 </Container>
               </div>
               <div className="flex flex-col w-full gap-2">
                 <Container className="text-white text-5xl lg:text-8xl w-full text-center">
-                  <a target="_blank" href={`https://steamcommunity.com/sharedfiles/filedetails/?id=${mapData?.id}`} rel="noreferrer">{mapData?.title.toUpperCase()}</a>
+                  <a
+                    target="_blank"
+                    href={`https://steamcommunity.com/sharedfiles/filedetails/?id=${mapData?.id}`}
+                    rel="noreferrer"
+                  >
+                    {mapData?.title.toUpperCase()}
+                  </a>
                 </Container>
                 <Container className="text-gray-300 text-2xl lg:text-4xl w-full text-center flex justify-between place-items-center">
                   <a
@@ -108,20 +183,36 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                     onClick={() => $prevLink.set("mapCreator")}
                     onPointerDown={() => $prevLink.set("mapCreator")}
                     className="hover:text-white hover:underline"
-                  >BY {mapData?.creator.toUpperCase()}</a>
-                  {user && <Button
-                    onClick={() => favorites.includes(id) ? removeFavorites(id) : addFavorites(id)}
-                    className={clsx(
-                      "bg-transparent p-1 text-2xl lg:text-4xl transition duration-300 text-white",
-                      favorites.includes(id) ? "hover:bg-red/40" : "hover:bg-green/40"
-                    )}
-                  >{favorites.includes(id) ? "REMOVE FROM FAVORITES" : "ADD TO FAVORITES"}</Button>}
+                  >
+                    BY {mapData?.creator.toUpperCase()}
+                  </a>
+                  {user && (
+                    <Button
+                      onClick={() =>
+                        favorites.includes(id)
+                          ? removeFavorites(id)
+                          : addFavorites(id)
+                      }
+                      className={clsx(
+                        "bg-transparent p-1 text-2xl lg:text-4xl transition duration-300 text-white",
+                        favorites.includes(id)
+                          ? "hover:bg-red/40"
+                          : "hover:bg-green/40"
+                      )}
+                    >
+                      {favorites.includes(id)
+                        ? "REMOVE FROM FAVORITES"
+                        : "ADD TO FAVORITES"}
+                    </Button>
+                  )}
                   <a
                     target="_blank"
                     href={`https://josiahshields.com/beton/leaderboard/?lb=${mapData?.id}`}
                     rel="noreferrer"
                     className="hover:text-white hover:underline"
-                  >MAP ON BBLB</a>
+                  >
+                    MAP ON BBLB
+                  </a>
                 </Container>
                 <Container className="text-2xl w-full">
                   <DescriptionFormatter content={mapData?.description} />
@@ -131,30 +222,41 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
             <div className="flex flex-col-reverse gap-16 mt-16 md:mt-0 md:flex-row md:gap-2 w-full">
               <div className="flex flex-col gap-2 w-full">
                 <Container>
-                  <h2 className="text-white tracking-wider text-xl">COMMENTS</h2>
+                  <h2 className="text-white tracking-wider text-xl">
+                    COMMENTS
+                  </h2>
                 </Container>
-                {user ?
+                {user ? (
                   <Input
                     className="text-xl md:mx-2 p-3 bg-white/10"
                     placeholder="Type your comment here..."
                     value={value}
-                    onChange={(e) => { setValue(e.target.value) }}
+                    onChange={(e) => {
+                      setValue(e.target.value);
+                    }}
                     onKeyDown={handleSendComment}
                   />
-                  :
-                  <Container className="text-white text-xl md:mx-2">You need to be logged in to leave comments</Container>
-                }
-                {comments.map(comment => (
+                ) : (
+                  <Container className="text-white text-xl md:mx-2">
+                    You need to be logged in to leave comments
+                  </Container>
+                )}
+                {comments.map((comment) => (
                   <Comment comment={comment} key={comment.id} />
                 ))}
-                {comments.length === 0 && <Container className="md:mx-2">
-                  <h2 className="text-[#f1e4c7] tracking-wider text-xl text-center">SEEMS LIKE STILL NO ONE HAS LEFT A COMMENT HERE... DO YOU WANT TO BE FIRST?</h2>
-                </Container>}
+                {comments.length === 0 && (
+                  <Container className="md:mx-2">
+                    <h2 className="text-[#f1e4c7] tracking-wider text-xl text-center">
+                      SEEMS LIKE STILL NO ONE HAS LEFT A COMMENT HERE... DO YOU
+                      WANT TO BE FIRST?
+                    </h2>
+                  </Container>
+                )}
               </div>
               <LeaderboardTable replays={replays} />
             </div>
           </div>
-          :
+        ) : (
           <div className="flex gap-2 pt-32 px-4 h-screen w-full">
             <div className="w-full text-white text-center">
               <Container className="text-6xl w-full">
@@ -162,12 +264,12 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
               </Container>
             </div>
           </div>
-        }
+        )}
 
         <Footer />
       </div>
     </div>
   );
-}
+};
 
 export default WorkshopItemPage;

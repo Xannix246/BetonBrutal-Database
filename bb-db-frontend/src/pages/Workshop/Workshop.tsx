@@ -8,6 +8,9 @@ import { getMaps, getRandomMap } from "./requests";
 import MapTile from "../../entities/MapTile";
 import Background from "../../widgets/Background/Background";
 import { navigate } from "vike/client/router";
+import ContextMenu from "../../shared/ContextMenu/ContextMenu";
+import { getTargetData, getUser, setTargetData } from "../../store/store";
+import { DeleteMap } from "../../features/DataManager";
 
 const Workshop = () => {
   const [loaded, setLoaded] = useState(false);
@@ -18,6 +21,22 @@ const Workshop = () => {
   const [hasMore, setHasMore] = useState(true);
   const isLoadingMore = useRef(false);
   const pageRef = useRef(page);
+  const [openCMenu, setOpenCMenu] = useState(false);
+  const targetData = getTargetData();
+  const user = getUser();
+
+  const menuItems = [
+    {
+      name: `Delete "${targetData?.name}"`,
+      onClick: () => {
+        if (!targetData) return;
+
+        const updatedItems = [...items.filter((item) => item.id !== targetData.id)];
+        setItems(updatedItems);
+        DeleteMap(targetData.id);
+      },
+    },
+  ];
 
   const loadMaps = async (sort: SortBy, pageNumber: number, append = false) => {
     if (isLoadingMore.current) return;
@@ -26,7 +45,7 @@ const Workshop = () => {
     const maps = await getMaps(sort, 50, pageNumber);
     if (maps.length < 50) setHasMore(false);
 
-    setItems(prev => append ? [...prev, ...maps] : maps);
+    setItems((prev) => (append ? [...prev, ...maps] : maps));
     setLoaded(true);
     isLoadingMore.current = false;
   };
@@ -62,9 +81,21 @@ const Workshop = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [activeSort, hasMore]);
 
+  useEffect(() => {
+    if (targetData) {
+      setOpenCMenu(true);
+    }
+  }, [targetData]);
+
   return (
     <div className="w-full min-h-screen h-full bg-center bg-fixed bg-no-repeat bg-cover">
-      <Background/>
+      <Background />
+      {["moderator", "admin"].includes(user?.role as string) && <ContextMenu
+        menu={menuItems}
+        open={openCMenu}
+        setOpen={setOpenCMenu}
+        onClose={() => setTargetData(null)}
+      />}
       <div className="fixed left-0 w-full z-50">
         <Header isAbsolute={true} />
       </div>
@@ -72,10 +103,13 @@ const Workshop = () => {
         <Container className="flex justify-center gap-10 text-2xl md:text-4xl tracking-wide place-items-center">
           <h1 className="text-white">SORT BY:</h1>
           <div className="flex gap-5">
-            {["newest", "oldest", "mostPopular"].map(sortOption => (
+            {["newest", "oldest", "mostPopular"].map((sortOption) => (
               <Button
                 key={sortOption}
-                className={clsx("bg-none", activeSort === sortOption && "text-green")}
+                className={clsx(
+                  "bg-none",
+                  activeSort === sortOption && "text-green"
+                )}
                 onClick={() => setActiveSort(sortOption as SortBy)}
               >
                 {sortOption === "newest" && "NEWEST"}
@@ -85,18 +119,22 @@ const Workshop = () => {
             ))}
           </div>
           {width > 768 && <h1 className="text-white"> |</h1>}
-          {width > 768 && <Button
-            className="bg-transparent p-0"
-            onClick={async () => navigate(`/workshop/${await getRandomMap()}`)}
-          >
-            RANDOM MAP
-          </Button>}
+          {width > 768 && (
+            <Button
+              className="bg-transparent p-0"
+              onClick={async () =>
+                navigate(`/workshop/${await getRandomMap()}`)
+              }
+            >
+              RANDOM MAP
+            </Button>
+          )}
         </Container>
 
         {loaded ? (
           <div className="flex gap-2 w-full">
             <div className="grid sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[200px] lg:auto-rows-[300px] gap-6 p-6 w-full">
-              {items.map(m => (
+              {items.map((m) => (
                 <MapTile key={m.id} {...m} />
               ))}
             </div>
