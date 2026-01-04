@@ -37,6 +37,7 @@ model LeaderboardEntry {
     score    Int
     replayId String?
     date     DateTime?
+    banned   Boolean? @default(false)
 
     @@unique([mapId, steamId])
 }

@@ -8,17 +8,19 @@ import {
   HttpStatus,
   Param,
   Post,
+  Put,
   Query,
   Res,
 } from '@nestjs/common';
 import { ApiExcludeEndpoint, ApiQuery } from '@nestjs/swagger';
-import { OptionalAuth } from '@thallesp/nestjs-better-auth';
+import { OptionalAuth, Session } from '@thallesp/nestjs-better-auth';
 import { type Response } from 'express';
 import { env } from 'process';
 import { FetchBBLBUseCase } from 'src/modules/data-requester/application/use-cases/fetch-bblb.usecase';
 import { RefreshDatabaseUseCase } from 'src/modules/data-requester/application/use-cases/refresh-database.usecase';
 import { WorkshopService } from 'src/modules/workshop/domain/services/workshop.service';
 import { GetQueryListDto, GetQueryReplaysDto } from './workshop.dto';
+import { type UserRoleSession } from 'src/modules/auth/auth.module';
 
 @Controller('workshop')
 export class WorkshopController {
@@ -126,24 +128,63 @@ export class WorkshopController {
 
   @Get(':id/replays')
   @OptionalAuth()
-  async getReplays(@Param('id') id: string): Promise<Replay[]> {
+  async getReplays(
+    @Param('id') id: string,
+    @Param('hideBanned') hideBanned: boolean,
+  ): Promise<Replay[]> {
     const leaderboard = await this.workshopService.getLeaderboard(id);
 
     const replays = this.workshopService.getQueryReplays(
       leaderboard?.enteries || [],
+      hideBanned,
     );
 
     return replays;
   }
 
+  @Delete(':id/replays')
+  async deleteReplay(
+    @Param('id') id: string,
+    @Session() session: UserRoleSession,
+  ): Promise<void> {
+    if (!['moderator', 'admin'].includes(session.user.role as string)) {
+      throw new ForbiddenException('Forbidden');
+    }
+
+    await this.workshopService.banOrDeleteLeaderboardEntry(id, true);
+  }
+
+  @Put(':id/replays/ban')
+  async banReplay(
+    @Param('id') id: string,
+    @Session() session: UserRoleSession,
+  ): Promise<void> {
+    if (!['moderator', 'admin'].includes(session.user.role as string)) {
+      throw new ForbiddenException('Forbidden');
+    }
+
+    await this.workshopService.banOrDeleteLeaderboardEntry(id);
+  }
+
+  @Put(':id/replays/unban')
+  async unbanReplay(
+    @Param('id') id: string,
+    @Session() session: UserRoleSession,
+  ): Promise<void> {
+    if (!['moderator', 'admin'].includes(session.user.role as string)) {
+      throw new ForbiddenException('Forbidden');
+    }
+
+    await this.workshopService.unbanReplay(id);
+  }
+
   @Delete(':id/delete')
-  @OptionalAuth()
   async deleteItem(
     @Param('id') id: string,
-    @Body() body: { secret: string },
+    @Session() session: UserRoleSession,
   ): Promise<void> {
-    if (body.secret !== env.FORCE_UPDATE_SECRET) {
-      throw new ForbiddenException('Invalid secret');
+    if (!['moderator', 'admin'].includes(session.user.role as string)) {
+      throw new ForbiddenException('Forbidden');
     }
 
     return await this.workshopService.deleteItem(id);

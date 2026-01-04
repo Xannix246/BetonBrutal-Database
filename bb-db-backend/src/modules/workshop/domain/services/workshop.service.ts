@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { ObjectId } from 'mongodb';
 import { SteamApiService } from 'src/modules/data-requester/application/adapters/http-steam-api';
 import { FetchItemUseCase } from 'src/modules/data-requester/application/use-cases/fetch-item.usecase';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
@@ -204,6 +209,7 @@ export class WorkshopService {
   async getQueryReplays(
     ids: string[],
     requestMapNames: boolean = false,
+    hideBanned = true,
   ): Promise<Replay[]> {
     const replays = await this.prisma.leaderboardEntry.findMany({
       where: { id: { in: ids } },
@@ -213,6 +219,8 @@ export class WorkshopService {
     const returnReplays: Replay[] = [];
 
     for (const replay of replays) {
+      if (hideBanned && replay.banned) continue;
+
       let mapName = '';
       if (requestMapNames) {
         mapName =
@@ -308,6 +316,113 @@ export class WorkshopService {
     await this.prisma.leaderboard.delete({ where: { mapId: steamId } });
     await this.prisma.leaderboardEntry.deleteMany({
       where: { mapId: steamId },
+    });
+  }
+
+  async banOrDeleteLeaderboardEntry(
+    id: string,
+    deleteEntry = false,
+  ): Promise<void> {
+    if (!ObjectId.isValid(id)) {
+      throw new BadRequestException('Invalid id');
+    }
+
+    const leaderboardEntry = await this.prisma.leaderboardEntry.findUnique({
+      where: { id },
+    });
+
+    if (!leaderboardEntry) {
+      throw new NotFoundException('Entry not found');
+    }
+
+    await this.prisma.$transaction(async (prisma) => {
+      const leaderboard = await prisma.leaderboard.findUniqueOrThrow({
+        where: { mapId: leaderboardEntry.mapId },
+      });
+      const updatedEntries: string[] = [];
+
+      if (deleteEntry) {
+        const lb = await prisma.leaderboard.update({
+          where: { mapId: leaderboardEntry.mapId },
+          data: {
+            enteries: leaderboard?.enteries.filter(
+              (e) => e !== leaderboardEntry.id,
+            ),
+          },
+        });
+
+        await prisma.leaderboardEntry.delete({ where: { id } });
+        updatedEntries.push(...lb.enteries);
+      } else {
+        await prisma.leaderboardEntry.update({
+          where: { id },
+          data: {
+            banned: true,
+          },
+        });
+
+        updatedEntries.push(...leaderboard.enteries.filter((e) => e !== id));
+      }
+
+      const entries = await prisma.leaderboardEntry.findMany({
+        where: {
+          id: { in: updatedEntries },
+          banned: false,
+        },
+        orderBy: { score: 'asc' },
+      });
+
+      await Promise.all(
+        entries.map((entry, index) =>
+          prisma.leaderboardEntry.update({
+            where: { id: entry.id },
+            data: { place: index + 1 },
+          }),
+        ),
+      );
+    });
+  }
+
+  async unbanReplay(id: string): Promise<void> {
+    if (!ObjectId.isValid(id)) {
+      throw new BadRequestException('Invalid id');
+    }
+
+    const leaderboardEntry = await this.prisma.leaderboardEntry.findUnique({
+      where: { id },
+    });
+
+    if (!leaderboardEntry) {
+      throw new NotFoundException('Entry not found');
+    }
+
+    if (!leaderboardEntry.banned) {
+      throw new BadRequestException('Entry not banned');
+    }
+
+    await this.prisma.$transaction(async (prisma) => {
+      const leaderboard = await prisma.leaderboard.findUniqueOrThrow({
+        where: { mapId: leaderboardEntry.mapId },
+      });
+
+      const entries = await prisma.leaderboardEntry.findMany({
+        where: {
+          id: { in: leaderboard.enteries },
+          banned: false,
+        },
+      });
+
+      entries.push({ ...leaderboardEntry, banned: false });
+      entries.sort((a, b) => a.score - b.score);
+
+      await Promise.all(
+        entries.map((entry, index) =>
+          prisma.leaderboardEntry.update({
+            where: { id: entry.id },
+            data: { place: index + 1 },
+          }),
+        ),
+      );
     });
   }
 }
