@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { setTargetData } from "../store/store";
+import { getUser, setTargetData } from "../store/store";
 
 type Props = {
   id?: string;
@@ -19,6 +19,7 @@ const getTileSize = (title: string, ratingUp: number) => {
 
 const MapTile = ({ steamId, title, creator, previewUrl, ratingUp, id }: Props) => {
   const sizeClass = getTileSize(title, ratingUp);
+  const user = getUser();
 
   return (
     <a
@@ -29,8 +30,10 @@ const MapTile = ({ steamId, title, creator, previewUrl, ratingUp, id }: Props) =
       )}
       href={`/workshop/${steamId === undefined ? id : steamId}`}
       onContextMenu={(e) => {
-        e.preventDefault();
-        setTargetData({ id: id as string, name: title})
+        if (["moderator", "admin"].includes(user?.role as string)) {
+          e.preventDefault();
+          setTargetData({ id: id as string, name: title})
+        }
       }}
     >
       <div className="absolute right-0 bottom-0 w-full h-full group-hover:-right-5 group-hover:-bottom-5 transform transition-all duration-300">

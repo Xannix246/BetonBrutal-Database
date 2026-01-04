@@ -1,5 +1,5 @@
 import Container from "../shared/Containter/Container";
-import { $prevLink, setTargetData } from "../store/store";
+import { $prevLink, getUser, setTargetData } from "../store/store";
 import { useEffect, useState } from "react";
 
 type Props = {
@@ -23,6 +23,7 @@ function formatTime(score: number): string {
 
 const LeaderboardEntry = ({ replay }: Props) => {
   const [useMap, setUseMap] = useState(false);
+  const user = getUser();
 
   const isOfficialMap = () => {
     switch (replay.mapId) {
@@ -46,8 +47,10 @@ const LeaderboardEntry = ({ replay }: Props) => {
     <Container
       className="sm:mx-2 tracking-wider hover:bg-[#1f1f1f] transition"
       onContextMenu={(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
-        e.preventDefault();
-        setTargetData({ id: replay.id as string, name: replay.creator });
+        if (["moderator", "admin"].includes(user?.role as string)) {
+          e.preventDefault();
+          setTargetData({ id: replay.id as string, name: replay.creator });
+        }
       }}
     >
       <div className="flex items-center justify-between text-[#f1e4c7] gap-4">
