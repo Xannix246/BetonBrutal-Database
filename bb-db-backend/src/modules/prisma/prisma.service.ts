@@ -10,12 +10,12 @@ export class PrismaService
     await this.$connect();
 
     // migration
-    await this.leaderboardEntry.updateMany({
-      data: {
-        banned: false,
-      },
-    });
-    console.log('Migration done');
+    // await this.leaderboardEntry.updateMany({
+    //   data: {
+    //     banned: false,
+    //   },
+    // });
+    // console.log('Migration done');
   }
 
   async onModuleDestroy() {
