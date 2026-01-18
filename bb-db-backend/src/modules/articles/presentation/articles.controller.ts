@@ -8,11 +8,13 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
-import { OptionalAuth, Session } from '@thallesp/nestjs-better-auth';
+import { AuthGuard, OptionalAuth, Session } from '@thallesp/nestjs-better-auth';
 import { type UserRoleSession } from 'src/modules/auth/auth.module';
 import { PostArticleDto } from './dto/articles.dto';
-import { ArticlesService } from '../domain/articles.service';
+import { ArticlesService } from '../services/articles.service';
+import { Roles } from 'src/modules/auth/guards/role.guard';
 
 @Controller('articles')
 export class ArticlesController {
@@ -45,9 +47,11 @@ export class ArticlesController {
   }
 
   @Post('new-article')
+  @Roles('admin', 'moderator', 'writer')
+  @UseGuards(AuthGuard)
   async postArticle(
-    @Session() session: UserRoleSession,
     @Body() body: PostArticleDto,
+    @Session() session: UserRoleSession,
   ) {
     if (!body) {
       throw new BadRequestException();
@@ -57,14 +61,18 @@ export class ArticlesController {
   }
 
   @Delete(':id/delete')
+  @Roles('admin', 'moderator', 'writer')
+  @UseGuards(AuthGuard)
   async deleteArticle(
-    @Session() session: UserRoleSession,
     @Param('id') id: string,
+    @Session() session: UserRoleSession,
   ) {
     return await this.articles.deleteArticle(session, id);
   }
 
   @Put(':id/update')
+  @Roles('admin', 'moderator', 'writer')
+  @UseGuards(AuthGuard)
   async updateArticle(
     @Session() session: UserRoleSession,
     @Param('id') id: string,

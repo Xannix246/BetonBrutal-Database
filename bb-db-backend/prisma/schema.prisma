@@ -26,6 +26,7 @@ model WorkshopItem {
     ratingDown Int      @default(0)
     previewUrl String
     previews   String[]
+    filename   String? // if map was uploaded
 }
 
 model LeaderboardEntry {

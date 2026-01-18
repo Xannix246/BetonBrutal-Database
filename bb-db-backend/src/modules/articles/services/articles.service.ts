@@ -6,7 +6,7 @@ import {
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { PostArticleDto } from '../presentation/dto/articles.dto';
 import { UserRoleSession } from 'src/modules/auth/auth.module';
-import { GridFSService } from 'src/modules/uploads/domain/gridfs.service';
+import { GridFSService } from 'src/modules/uploads/services/gridfs.service';
 
 @Injectable()
 export class ArticlesService {
@@ -147,14 +147,6 @@ export class ArticlesService {
     session: UserRoleSession,
     data: PostArticleDto,
   ): Promise<string> {
-    if (
-      !['writer', 'moderator', 'admin'].includes(session.user.role as string)
-    ) {
-      throw new ForbiddenException();
-    }
-
-    console.log(data);
-
     return (
       await this.prisma.article.create({
         data: {
@@ -176,12 +168,6 @@ export class ArticlesService {
     id: string,
     data: PostArticleDto,
   ): Promise<string> {
-    if (
-      !['writer', 'moderator', 'admin'].includes(session.user.role as string)
-    ) {
-      throw new ForbiddenException();
-    }
-
     const article = await this.prisma.article.findUnique({ where: { id } });
 
     if (!article) throw new NotFoundException();
@@ -203,12 +189,6 @@ export class ArticlesService {
   }
 
   async deleteArticle(session: UserRoleSession, id: string): Promise<void> {
-    if (
-      !['writer', 'moderator', 'admin'].includes(session.user.role as string)
-    ) {
-      throw new ForbiddenException();
-    }
-
     const article = await this.prisma.article.findUnique({ where: { id } });
 
     if (!article) throw new NotFoundException();

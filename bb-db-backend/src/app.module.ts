@@ -7,7 +7,7 @@ import { OptionalAuth } from '@thallesp/nestjs-better-auth';
 import { ScheduleModule } from '@nestjs/schedule';
 import { BAuthModule } from './modules/auth/auth.module';
 import { ArticlesModule } from './modules/articles/articles.module';
-import { GridFSModule } from './modules/uploads/gridfs.module';
+import { UploadModule } from './modules/uploads/uploads.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { CollectionsModule } from './modules/collections/collections.module';
@@ -29,7 +29,7 @@ class AppController {
     UsersModule,
     PrismaModule,
     DataRequesterModule,
-    GridFSModule,
+    UploadModule,
     ArticlesModule,
     CollectionsModule,
     ServeStaticModule.forRoot({

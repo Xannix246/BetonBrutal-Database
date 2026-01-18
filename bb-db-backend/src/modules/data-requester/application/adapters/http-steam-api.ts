@@ -82,6 +82,7 @@ export class SteamApiService {
           map.previews
             ?.filter((preview) => preview?.url)
             .map((preview) => preview.url) || [],
+        filename: null,
       });
     }
 
@@ -119,6 +120,7 @@ export class SteamApiService {
           map.previews
             ?.filter((preview) => preview?.url)
             .map((preview) => preview.url) || [],
+        filename: null,
       });
     }
     return returnedItems;

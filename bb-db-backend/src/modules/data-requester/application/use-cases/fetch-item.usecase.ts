@@ -66,6 +66,7 @@ export class FetchItemUseCase {
         previewUrl: itemData.previewUrl,
         createDate: itemData.createDate,
         previews: itemData.previews,
+        filename: null,
       },
     });
 
@@ -81,6 +82,7 @@ export class FetchItemUseCase {
       createDate: map.createDate,
       previewUrl: itemData.previewUrl,
       previews: itemData.previews,
+      filename: map.filename,
     };
   }
 }

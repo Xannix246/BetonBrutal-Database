@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
-import { GridFSModule } from '../uploads/gridfs.module';
+import { UploadModule } from '../uploads/uploads.module';
 import { FileController } from './presentation/files.controller';
 import { PrismaModule } from '../prisma/prisma.module';
-import { GridFSService } from '../uploads/domain/gridfs.service';
+import { GridFSService } from '../uploads/services/gridfs.service';
 import { ArticlesController } from './presentation/articles.controller';
-import { ArticlesService } from './domain/articles.service';
+import { ArticlesService } from './services/articles.service';
 
 @Module({
-  imports: [PrismaModule, GridFSModule],
+  imports: [PrismaModule, UploadModule],
   controllers: [FileController, ArticlesController],
   providers: [GridFSService, ArticlesService],
 })

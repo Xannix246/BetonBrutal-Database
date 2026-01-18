@@ -3,7 +3,6 @@ import {
   Body,
   Controller,
   Delete,
-  ForbiddenException,
   Get,
   HttpStatus,
   Param,
@@ -11,16 +10,17 @@ import {
   Put,
   Query,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiExcludeEndpoint, ApiQuery } from '@nestjs/swagger';
-import { OptionalAuth, Session } from '@thallesp/nestjs-better-auth';
+import { AuthGuard, OptionalAuth } from '@thallesp/nestjs-better-auth';
 import { type Response } from 'express';
 import { env } from 'process';
 import { FetchBBLBUseCase } from 'src/modules/data-requester/application/use-cases/fetch-bblb.usecase';
 import { RefreshDatabaseUseCase } from 'src/modules/data-requester/application/use-cases/refresh-database.usecase';
 import { WorkshopService } from 'src/modules/workshop/domain/services/workshop.service';
 import { GetQueryListDto, GetQueryReplaysDto } from './workshop.dto';
-import { type UserRoleSession } from 'src/modules/auth/auth.module';
+import { Roles } from 'src/modules/auth/guards/role.guard';
 
 @Controller('workshop')
 export class WorkshopController {
@@ -143,50 +143,30 @@ export class WorkshopController {
   }
 
   @Delete('replays/:id')
-  async deleteReplay(
-    @Param('id') id: string,
-    @Session() session: UserRoleSession,
-  ): Promise<void> {
-    if (!['moderator', 'admin'].includes(session.user.role as string)) {
-      throw new ForbiddenException('Forbidden');
-    }
-
+  @Roles('admin', 'moderator')
+  @UseGuards(AuthGuard)
+  async deleteReplay(@Param('id') id: string): Promise<void> {
     await this.workshopService.banOrDeleteLeaderboardEntry(id, true);
   }
 
   @Put('replays/:id/ban')
-  async banReplay(
-    @Param('id') id: string,
-    @Session() session: UserRoleSession,
-  ): Promise<void> {
-    if (!['moderator', 'admin'].includes(session.user.role as string)) {
-      throw new ForbiddenException('Forbidden');
-    }
-
+  @Roles('admin', 'moderator')
+  @UseGuards(AuthGuard)
+  async banReplay(@Param('id') id: string): Promise<void> {
     await this.workshopService.banOrDeleteLeaderboardEntry(id);
   }
 
   @Put('replays/:id/unban')
-  async unbanReplay(
-    @Param('id') id: string,
-    @Session() session: UserRoleSession,
-  ): Promise<void> {
-    if (!['moderator', 'admin'].includes(session.user.role as string)) {
-      throw new ForbiddenException('Forbidden');
-    }
-
+  @Roles('admin', 'moderator')
+  @UseGuards(AuthGuard)
+  async unbanReplay(@Param('id') id: string): Promise<void> {
     await this.workshopService.unbanReplay(id);
   }
 
   @Delete(':id/delete')
-  async deleteItem(
-    @Param('id') id: string,
-    @Session() session: UserRoleSession,
-  ): Promise<void> {
-    if (!['moderator', 'admin'].includes(session.user.role as string)) {
-      throw new ForbiddenException('Forbidden');
-    }
-
+  @Roles('admin', 'moderator')
+  @UseGuards(AuthGuard)
+  async deleteItem(@Param('id') id: string): Promise<void> {
     return await this.workshopService.deleteItem(id);
   }
 }

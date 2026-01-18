@@ -6,15 +6,14 @@ import {
   Get,
   Param,
   Res,
-  ForbiddenException,
-  Session,
+  UseGuards,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { OptionalAuth } from '@thallesp/nestjs-better-auth';
 import { type Response } from 'express';
-import { type UserRoleSession } from 'src/modules/auth/auth.module';
+import { AuthGuard, Roles } from 'src/modules/auth/guards/role.guard';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
-import { GridFSService } from 'src/modules/uploads/domain/gridfs.service';
+import { GridFSService } from 'src/modules/uploads/services/gridfs.service';
 
 @Controller('files')
 export class FileController {
@@ -24,17 +23,10 @@ export class FileController {
   ) {}
 
   @Post('upload')
+  @Roles('admin', 'moderator', 'writer')
+  @UseGuards(AuthGuard)
   @UseInterceptors(FileInterceptor('file'))
-  async uploadFile(
-    @UploadedFile() file: ArticleFile,
-    @Session() session: UserRoleSession,
-  ) {
-    if (
-      !['writer', 'moderator', 'admin'].includes(session.user.role as string)
-    ) {
-      throw new ForbiddenException();
-    }
-
+  async uploadFile(@UploadedFile() file: ArticleFile) {
     const id = await this.gridFs.upload(
       file.originalname,
       file.buffer,

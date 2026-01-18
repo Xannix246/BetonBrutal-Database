@@ -152,6 +152,7 @@ export class WorkshopService {
         ratingDown: item.ratingDown,
         previewUrl: item.previewUrl,
         previews: item.previews,
+        filename: item.filename,
       };
     } else {
       return null;
@@ -253,9 +254,9 @@ export class WorkshopService {
 
     if (leaderboard) {
       return {
-        id: leaderboard?.id,
-        mapId: leaderboard?.mapId,
-        enteries: leaderboard?.enteries,
+        id: leaderboard.id,
+        mapId: leaderboard.mapId,
+        enteries: leaderboard.enteries,
       };
     } else {
       return null;

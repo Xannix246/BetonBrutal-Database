@@ -1,17 +1,18 @@
 import {
   Body,
   Controller,
-  ForbiddenException,
   Get,
   Post,
   // Put,
   // Query,
   Session,
+  UseGuards,
 } from '@nestjs/common';
 import { type UserRoleSession } from 'src/modules/auth/auth.module';
 import { UserModService } from '../../application/users-mod.service';
 import { UserService } from '../../application/users.service';
 import { Role } from '@prisma/client';
+import { AuthGuard, Roles } from 'src/modules/auth/guards/role.guard';
 
 @Controller('manage')
 export class ModController {
@@ -20,26 +21,20 @@ export class ModController {
     private readonly userModService: UserModService,
   ) {}
 
-  private checkRole(session: UserRoleSession) {
-    if (!['moderator', 'admin'].includes(session.user.role as string)) {
-      throw new ForbiddenException();
-    }
-  }
-
   @Get()
-  allowAccess(@Session() session: UserRoleSession) {
-    this.checkRole(session);
-
+  @Roles('admin', 'moderator')
+  @UseGuards(AuthGuard)
+  allowAccess() {
     return 'ok';
   }
 
   @Post('set-role')
+  @Roles('admin', 'moderator')
+  @UseGuards(AuthGuard)
   async setRole(
     @Session() session: UserRoleSession,
     @Body() body: { id: string; role: Role },
   ) {
-    this.checkRole(session);
-
     return await this.userModService.setRole(session, body.id, body.role);
   }
 
@@ -59,12 +54,9 @@ export class ModController {
   // }
 
   @Post('ban-user')
-  async banUser(
-    @Session() session: UserRoleSession,
-    @Body() body: { id: string; banReason: string },
-  ) {
-    this.checkRole(session);
-
+  @Roles('admin', 'moderator')
+  @UseGuards(AuthGuard)
+  async banUser(@Body() body: { id: string; banReason: string }) {
     return await this.userSevice.banUser(body.id, body.banReason);
   }
 }

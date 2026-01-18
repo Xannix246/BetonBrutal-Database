@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Role } from '@prisma/client';
 import { auth, UserRoleSession } from 'src/modules/auth/auth.module';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
@@ -24,10 +24,6 @@ export class UserModService {
   }
 
   async forceSetRole(userId: string, role: Role) {
-    if (!['admin', 'writer', 'user', 'moderator'].includes(role)) {
-      throw new BadRequestException('Invalid role');
-    }
-
     await this.prisma.user.update({
       where: { id: userId },
       data: { role },

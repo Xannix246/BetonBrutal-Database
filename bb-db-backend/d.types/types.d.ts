@@ -1,4 +1,5 @@
 /* eslint-disable prettier/prettier */
+
 declare type SortBy = 'mostPopular' | 'newest' | 'oldest' | 'mostPlayed';
 
 declare type WorkshopItem = {
@@ -13,6 +14,7 @@ declare type WorkshopItem = {
   createDate: Date;
   previewUrl: string;
   previews: string[];
+  filename: null | string;
 };
 
 declare type WorkshopItemHeader = {
@@ -115,4 +117,20 @@ declare type Collection = {
   mapsId: string[];
   showOnMain: boolean;
   descColor: $Enums.Color;
+};
+
+declare interface AuthRequest extends Request {
+  user?: {
+    name: string;
+    email: string;
+    emailVerified: boolean;
+    image: string;
+    createdAt: Date;
+    updatedAt: Date;
+    role: $Enums.Role;
+    banned: boolean;
+    banReason: null | string;
+    banExpires: null | Date;
+    id: string;
+  };
 }

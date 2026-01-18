@@ -15,7 +15,9 @@ export async function safeGet<T>(
     logger.warn({
       url: url,
       message: 'Failed to GET URL, returning null',
-      error: err,
+      status: (err as AxiosError).response?.status,
+      code: (err as AxiosError).code,
+      axiosMessage: (err as AxiosError).message,
     });
     return null;
   }
