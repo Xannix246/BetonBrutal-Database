@@ -15,6 +15,7 @@ export class MulterService {
 
   async saveFile(file: Express.Multer.File, id: string) {
     if (!id) {
+      unlinkSync(join(file.path));
       throw new BadRequestException('ID is required');
     }
 
@@ -23,6 +24,7 @@ export class MulterService {
     });
 
     if (!map) {
+      unlinkSync(join(file.path));
       throw new NotFoundException('Map not found');
     }
 
@@ -62,7 +64,7 @@ export class MulterService {
     }
 
     const files = readdirSync(multerConfig.dest);
-    const file = files.find((f) => f.startsWith(id + '.'));
+    const file = files.find((file) => file.startsWith(id + '.'));
 
     if (!file) {
       throw new NotFoundException('File not found');
@@ -77,7 +79,7 @@ export class MulterService {
 
   deleteFile(id: string) {
     const files = readdirSync(multerConfig.dest);
-    const file = files.find((f) => f.startsWith(id + '.'));
+    const file = files.find((file) => file.startsWith(id + '.'));
 
     if (!file) {
       throw new NotFoundException('Archive not found');

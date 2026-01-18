@@ -336,54 +336,52 @@ export class WorkshopService {
       throw new NotFoundException('Entry not found');
     }
 
-    await this.prisma.$transaction(async (prisma) => {
-      const leaderboard = await prisma.leaderboard.findUniqueOrThrow({
-        where: { mapId: leaderboardEntry.mapId },
-      });
-      const updatedEntries: string[] = [];
-
-      if (deleteEntry) {
-        const lb = await prisma.leaderboard.update({
-          where: { mapId: leaderboardEntry.mapId },
-          data: {
-            enteries: leaderboard?.enteries.filter(
-              (e) => e !== leaderboardEntry.id,
-            ),
-          },
-        });
-
-        await prisma.leaderboardEntry.delete({ where: { id } });
-        updatedEntries.push(...lb.enteries);
-      } else {
-        await prisma.leaderboardEntry.update({
-          where: { id },
-          data: {
-            banned: true,
-          },
-        });
-
-        updatedEntries.push(...leaderboard.enteries.filter((e) => e !== id));
-      }
-
-      const entries = await prisma.leaderboardEntry.findMany({
-        where: {
-          id: { in: updatedEntries },
-          banned: false,
-        },
-        orderBy: { score: 'asc' },
-      });
-
-      console.log(entries);
-
-      await Promise.all(
-        entries.map((entry, index) =>
-          prisma.leaderboardEntry.update({
-            where: { id: entry.id },
-            data: { place: index + 1 },
-          }),
-        ),
-      );
+    const leaderboard = await this.prisma.leaderboard.findUniqueOrThrow({
+      where: { mapId: leaderboardEntry.mapId },
     });
+    const updatedEntries: string[] = [];
+
+    if (deleteEntry) {
+      const lb = await this.prisma.leaderboard.update({
+        where: { mapId: leaderboardEntry.mapId },
+        data: {
+          enteries: leaderboard?.enteries.filter(
+            (e) => e !== leaderboardEntry.id,
+          ),
+        },
+      });
+
+      await this.prisma.leaderboardEntry.delete({ where: { id } });
+      updatedEntries.push(...lb.enteries);
+    } else {
+      await this.prisma.leaderboardEntry.update({
+        where: { id },
+        data: {
+          banned: true,
+        },
+      });
+
+      updatedEntries.push(...leaderboard.enteries.filter((e) => e !== id));
+    }
+
+    const entries = await this.prisma.leaderboardEntry.findMany({
+      where: {
+        id: { in: updatedEntries },
+        banned: false,
+      },
+      orderBy: { score: 'asc' },
+    });
+
+    console.log(entries);
+
+    await Promise.all(
+      entries.map((entry, index) =>
+        this.prisma.leaderboardEntry.update({
+          where: { id: entry.id },
+          data: { place: index + 1 },
+        }),
+      ),
+    );
   }
 
   async unbanReplay(id: string): Promise<void> {
@@ -403,29 +401,27 @@ export class WorkshopService {
       throw new BadRequestException('Entry not banned');
     }
 
-    await this.prisma.$transaction(async (prisma) => {
-      const leaderboard = await prisma.leaderboard.findUniqueOrThrow({
-        where: { mapId: leaderboardEntry.mapId },
-      });
-
-      const entries = await prisma.leaderboardEntry.findMany({
-        where: {
-          id: { in: leaderboard.enteries },
-          banned: false,
-        },
-      });
-
-      entries.push({ ...leaderboardEntry, banned: false });
-      entries.sort((a, b) => a.score - b.score);
-
-      await Promise.all(
-        entries.map((entry, index) =>
-          prisma.leaderboardEntry.update({
-            where: { id: entry.id },
-            data: { place: index + 1 },
-          }),
-        ),
-      );
+    const leaderboard = await this.prisma.leaderboard.findUniqueOrThrow({
+      where: { mapId: leaderboardEntry.mapId },
     });
+
+    const entries = await this.prisma.leaderboardEntry.findMany({
+      where: {
+        id: { in: leaderboard.enteries },
+        banned: false,
+      },
+    });
+
+    entries.push({ ...leaderboardEntry, banned: false });
+    entries.sort((a, b) => a.score - b.score);
+
+    await Promise.all(
+      entries.map((entry, index) =>
+        this.prisma.leaderboardEntry.update({
+          where: { id: entry.id },
+          data: { place: index + 1 },
+        }),
+      ),
+    );
   }
 }
