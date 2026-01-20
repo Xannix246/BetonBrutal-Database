@@ -21,7 +21,8 @@ export class MapSaveController {
   constructor(private readonly multerService: MulterService) {}
 
   @Post('upload')
-  @OptionalAuth()
+  @Roles('admin', 'moderator')
+  @UseGuards(AuthGuard)
   @UseInterceptors(FileInterceptor('file', multerOptions))
   async uploadMapFile(
     @UploadedFile() file: Express.Multer.File,

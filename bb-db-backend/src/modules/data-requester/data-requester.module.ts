@@ -8,11 +8,13 @@ import { GetNewMapsScheduler } from './infrastructure/schedulers/get-new-maps.sc
 import { FetchBBLBUseCase } from './application/use-cases/fetch-bblb.usecase';
 import { BBLBApiService } from './application/adapters/bblb-api';
 import { FetchBBLBReplaysScheduler } from './infrastructure/schedulers/fetch-bblb-replays.schedule';
+import { SteamCmdService } from './application/services/steamcmd.service';
 
 @Module({
   imports: [PrismaModule],
   providers: [
     SteamApiService,
+    SteamCmdService,
     BBLBApiService,
     FetchItemUseCase,
     SyncUserMapsUseCase,
