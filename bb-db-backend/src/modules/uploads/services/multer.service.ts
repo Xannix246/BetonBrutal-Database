@@ -77,7 +77,7 @@ export class MulterService {
     res.download(fullPath, downloadName);
   }
 
-  deleteFile(id: string) {
+  async deleteFile(id: string) {
     const files = readdirSync(multerConfig.dest);
     const file = files.find((file) => file.startsWith(id + '.'));
 
@@ -86,6 +86,13 @@ export class MulterService {
     }
 
     unlinkSync(join(multerConfig.dest, file));
+
+    await this.prisma.workshopItem.update({
+      where: { steamId: id },
+      data: {
+        filename: null,
+      },
+    });
 
     return { ok: true };
   }

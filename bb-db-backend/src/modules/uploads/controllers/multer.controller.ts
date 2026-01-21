@@ -40,7 +40,7 @@ export class MapSaveController {
   @Delete('delete')
   @Roles('admin', 'moderator')
   @UseGuards(AuthGuard)
-  deleteMapFile(@Query('id') id: string) {
-    this.multerService.deleteFile(id);
+  async deleteMapFile(@Query('id') id: string) {
+    await this.multerService.deleteFile(id);
   }
 }
