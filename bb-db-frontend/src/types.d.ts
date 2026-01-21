@@ -12,6 +12,7 @@ declare type WorkshopItem = {
   createDate: Date;
   previewUrl: string;
   previews: string[];
+  filename: null | string;
 };
 
 declare type Replay = {

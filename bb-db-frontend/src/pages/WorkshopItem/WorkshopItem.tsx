@@ -1,7 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Footer from "../../widgets/Footer/Footer";
 import Header from "../../widgets/Header/Header";
-import { getComments, getMap, getReplays, postComment } from "./requests";
+import {
+  getComments,
+  getMap,
+  getReplays,
+  postComment,
+  uploadMap,
+} from "./requests";
 import Container from "../../shared/Containter/Container";
 import DescriptionFormatter from "../../features/DescriptionFormatter";
 import Background from "../../widgets/Background/Background";
@@ -35,6 +41,7 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
   const favorites = getFavorites();
   const [openCMenu, setOpenCMenu] = useState(false);
   const targetData = getTargetData();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const menuItems = [
     {
@@ -86,8 +93,8 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
         setComments(
           (await getComments(id)).sort(
             (a, b) =>
-              new Date(b.createdAt).valueOf() - new Date(a.createdAt).valueOf()
-          )
+              new Date(b.createdAt).valueOf() - new Date(a.createdAt).valueOf(),
+          ),
         );
         setLoaded(true);
       } else {
@@ -111,7 +118,7 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
   }, []);
 
   const handleSendComment = async (
-    event: React.KeyboardEvent<HTMLInputElement>
+    event: React.KeyboardEvent<HTMLInputElement>,
   ) => {
     if (event.key === "Enter" && value.length > 0) {
       const comment = await postComment(id, value);
@@ -119,6 +126,12 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
       setValue("");
     }
   };
+
+  const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files) return;
+    await uploadMap(id, event.target.files[0]);
+    event.target.value = "";
+  }
 
   return (
     <div className="w-full min-h-screen h-full">
@@ -166,6 +179,32 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                     {mapData?.ratingDown}
                   </h2>
                 </Container>
+                {["moderator", "admin"].includes(user?.role as string) && (
+                  <div>
+                    <input 
+                      type="file" 
+                      className="hidden" 
+                      onChange={handleUpload}
+                      accept="application/zip"
+                      multiple={false}
+                      ref={fileInputRef}
+                      />
+                    <Button 
+                      className="uppercase bg-blue/80 text-2xl sm:text-4xl p-3 w-full"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      Upload map
+                    </Button>
+                  </div>
+                )}
+                {mapData?.filename && (
+                  <a
+                    className="uppercase bg-green/80 text-2xl sm:text-4xl p-3 w-full flex justify-center text-white hover:text-pink transition duration-150"
+                    href={`${config.serverUri}/db/download?id=${id}`}
+                  >
+                    Download map
+                  </a>
+                )}
               </div>
               <div className="flex flex-col w-full gap-2">
                 <Container className="text-white text-5xl lg:text-8xl w-full text-center">
@@ -197,7 +236,7 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                         "bg-transparent p-1 text-2xl lg:text-4xl transition duration-300 text-white",
                         favorites.includes(id)
                           ? "hover:bg-red/40"
-                          : "hover:bg-green/40"
+                          : "hover:bg-green/40",
                       )}
                     >
                       {favorites.includes(id)

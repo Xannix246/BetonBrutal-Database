@@ -28,7 +28,12 @@ const Main = () => {
       setFollowedMaps(folMaps);
 
       const lastMaps = await getFollowedMaps("mostPopular", 20, true, "month");
-      setLastestMaps(lastMaps.toSorted((a, b) => new Date(b.createDate).valueOf() - new Date(a.createDate).valueOf()));
+      setLastestMaps(
+        lastMaps.toSorted(
+          (a, b) =>
+            new Date(b.createDate).valueOf() - new Date(a.createDate).valueOf(),
+        ),
+      );
     })();
   }, []);
 
@@ -42,15 +47,14 @@ const Main = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-
   return (
     <div className="w-full h-full">
       <Background />
       <div
         className={clsx(
-          isSticky ?
-            "fixed top-0 left-0 w-full z-50"
-            : "absolute top-64 left-0 w-full z-50"
+          isSticky
+            ? "fixed top-0 left-0 w-full z-50"
+            : "absolute top-64 left-0 w-full z-50",
         )}
       >
         <Header isAbsolute={isSticky} />
@@ -75,17 +79,21 @@ const Main = () => {
               <Button
                 className="text-3xl sm:text-4xl bg-white/10"
                 onClick={() => handleSearch(search)}
-              >SEARCH</Button>
+              >
+                SEARCH
+              </Button>
             </div>
           </div>
         </div>
 
         <div className="flex flex-col gap-4 place-items-center w-full mt-16">
-          <div className="w-full h-full mb-32">
-            {collections.map((collection, i) => (
-              <CollectionContainer collection={collection} key={i} />
-            ))}
-          </div>
+          {collections.length > 0 && (
+            <div className="w-full h-full mb-32">
+              {collections.map((collection, i) => (
+                <CollectionContainer collection={collection} key={i} />
+              ))}
+            </div>
+          )}
           <div className="p-4 bg-black/70">
             <h1 className="w-fit text-center text-7xl text-[#ffd884] tracking-wider text-shadow-md">
               MAPS OF THE YEAR
@@ -104,7 +112,7 @@ const Main = () => {
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 place-items-center w-full mt-32">
+        <div className="flex flex-col gap-4 place-items-center w-full mt-16">
           <div className="p-4 bg-black/70">
             <h1 className="w-fit text-center lg:text-left text-4xl text-[#ffd884] tracking-wider text-shadow-md">
               Want to see some other maps? Here are a couple of them
@@ -112,14 +120,14 @@ const Main = () => {
           </div>
           <div className="flex justify-center w-full">
             <div className="grid sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[200px] lg:auto-rows-[300px] gap-6 p-6 w-full">
-              {lastestMaps.map(m => (
+              {lastestMaps.map((m) => (
                 <MapTile key={m.id} {...m} />
               ))}
             </div>
           </div>
-          <Button
-            onClick={() => navigate("/workshop")}
-          >DISCOVER ALL MAPS -&gt;</Button>
+          <Button onClick={() => navigate("/workshop")}>
+            DISCOVER ALL MAPS -&gt;
+          </Button>
         </div>
 
         <Footer />

@@ -3,7 +3,7 @@ import archiver from 'archiver';
 import { existsSync } from 'fs';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
-import { createWriteStream } from 'node:fs';
+import { createWriteStream, rmSync } from 'node:fs';
 import Path from 'node:path';
 import { env } from 'node:process';
 import { multerConfig } from 'src/modules/uploads/config/multer.config';
@@ -67,10 +67,13 @@ export class SteamCmdService {
     const archive = archiver('zip', { zlib: { level: 9 } });
 
     output.on('close', () => {
-      this.logger.log(archive.pointer() + ' total bytes');
+      this.logger.log(`${archive.pointer()} total bytes`);
       this.logger.log(
-        'Archiver has been finalized and the output file descriptor has closed.',
+        'Archiver has been finalized and the output file descriptor has closed. Clearing downloaded data...',
       );
+
+      rmSync(mapPath, { recursive: true });
+      this.logger.log('Deleted downloaded data');
     });
 
     archive.on('error', (error) => {

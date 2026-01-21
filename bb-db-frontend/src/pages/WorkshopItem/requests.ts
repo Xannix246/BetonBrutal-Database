@@ -15,7 +15,7 @@ export const getComments = async (mapId: string): Promise<UserComment[]> => {
 
 export const postComment = async (
   mapId: string,
-  message: string
+  message: string,
 ): Promise<UserComment> => {
   return (
     await api.post(`${config.serverUri}/comments/post`, {
@@ -24,3 +24,15 @@ export const postComment = async (
     })
   ).data;
 };
+
+export const uploadMap = async (mapId: string, file: Blob) => {
+  await api.post(
+    `db/upload?id=${mapId}`,
+    new FormData().append("file", file),
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      }
+    }
+  );
+}
