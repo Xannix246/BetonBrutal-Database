@@ -14,6 +14,8 @@ export class MulterService {
   constructor(private readonly prisma: PrismaService) {}
 
   async saveFile(file: Express.Multer.File, id: string) {
+    if (!file) return;
+
     if (!id) {
       unlinkSync(join(file.path));
       throw new BadRequestException('ID is required');

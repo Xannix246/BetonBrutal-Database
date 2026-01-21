@@ -28,7 +28,7 @@ export class MapSaveController {
     @UploadedFile() file: Express.Multer.File,
     @Query('id') id: string,
   ) {
-    await this.multerService.saveFile(file, id);
+    return this.multerService.saveFile(file, id);
   }
 
   @Get('download')

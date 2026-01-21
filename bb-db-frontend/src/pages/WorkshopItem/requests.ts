@@ -26,13 +26,8 @@ export const postComment = async (
 };
 
 export const uploadMap = async (mapId: string, file: Blob) => {
-  await api.post(
-    `db/upload?id=${mapId}`,
-    new FormData().append("file", file),
-    {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      }
-    }
-  );
-}
+  const formData = new FormData();
+  formData.append("file", file);
+
+  return (await api.post(`db/upload?id=${mapId}`, formData)).data;
+};

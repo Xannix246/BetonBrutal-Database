@@ -14,8 +14,7 @@ export const multerOptions: MulterOptions = {
   },
 
   fileFilter: (_req, file, callback) => {
-    if (file.mimetype.match(/\/(zip)$/)) {
-      ///\/(zip|7z|rar)$/)
+    if (file.originalname.match(/\.(zip)$/i)) {
       callback(null, true);
     } else {
       callback(new BadRequestException('Unsupported file type'), false);

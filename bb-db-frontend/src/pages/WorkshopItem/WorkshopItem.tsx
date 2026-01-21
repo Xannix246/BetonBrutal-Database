@@ -129,9 +129,19 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
 
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files) return;
-    await uploadMap(id, event.target.files[0]);
+    
+    const filename = (await uploadMap(id, event.target.files[0]))
+      .filename as string;
+
+    if (filename) {
+      setMapData({
+        ...mapData!,
+        filename,
+      });
+    }
+    
     event.target.value = "";
-  }
+  };
 
   return (
     <div className="w-full min-h-screen h-full">
@@ -181,16 +191,16 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                 </Container>
                 {["moderator", "admin"].includes(user?.role as string) && (
                   <div>
-                    <input 
-                      type="file" 
-                      className="hidden" 
+                    <input
+                      type="file"
+                      className="hidden"
                       onChange={handleUpload}
                       accept="application/zip"
                       multiple={false}
                       ref={fileInputRef}
-                      />
-                    <Button 
-                      className="uppercase bg-blue/80 text-2xl sm:text-4xl p-3 w-full"
+                    />
+                    <Button
+                      className="uppercase bg-blue/60 text-2xl sm:text-4xl p-3 w-full"
                       onClick={() => fileInputRef.current?.click()}
                     >
                       Upload map
@@ -199,7 +209,7 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                 )}
                 {mapData?.filename && (
                   <a
-                    className="uppercase bg-green/80 text-2xl sm:text-4xl p-3 w-full flex justify-center text-white hover:text-pink transition duration-150"
+                    className="uppercase bg-green/60 text-2xl sm:text-4xl p-3 w-full flex justify-center text-white hover:text-pink transition duration-150"
                     href={`${config.serverUri}/db/download?id=${id}`}
                   >
                     Download map
