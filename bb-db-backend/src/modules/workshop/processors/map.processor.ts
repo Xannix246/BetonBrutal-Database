@@ -15,7 +15,6 @@ export class MapDownloaderProcessor extends WorkerHost {
   }
 
   async process(job: Job<{ id: string }>) {
-    console.log('hello from worker!');
     const { id } = job.data;
 
     const map = await this.prisma.workshopItem.findUnique({

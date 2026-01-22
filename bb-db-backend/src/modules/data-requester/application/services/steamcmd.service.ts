@@ -63,7 +63,6 @@ export class SteamCmdService {
     );
 
     if (!existsSync(mapPath)) {
-      console.log(mapPath);
       return this.logger.error(`Path not found`);
     }
 
