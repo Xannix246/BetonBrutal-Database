@@ -1,8 +1,10 @@
+import { InjectQueue } from '@nestjs/bullmq';
 import {
   BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { Queue } from 'bullmq';
 import { ObjectId } from 'mongodb';
 import { SteamApiService } from 'src/modules/data-requester/application/adapters/http-steam-api';
 import { FetchItemUseCase } from 'src/modules/data-requester/application/use-cases/fetch-item.usecase';
@@ -17,7 +19,23 @@ export class WorkshopService {
     private readonly fetchItems: FetchItemUseCase,
     private readonly steamApi: SteamApiService,
     private readonly websocket: WebsocketGateway,
+    @InjectQueue('map-downloading') private readonly queue: Queue,
   ) {}
+
+  async addDownloadQueue(id: string) {
+    await this.queue.add(
+      'download-map',
+      { id },
+      {
+        removeOnComplete: true,
+        attempts: 3,
+        backoff: {
+          type: 'exponential',
+          delay: 5000,
+        },
+      },
+    );
+  }
 
   async getTotal(): Promise<number> {
     return await this.steamApi.getTotal();
@@ -126,6 +144,8 @@ export class WorkshopService {
     }
 
     if (item) {
+      await this.addDownloadQueue(id);
+
       this.websocket.sendRequest({
         type: 'fetch_by_id',
         mapId: item.steamId,

@@ -10,9 +10,16 @@ import { SyncUserMapsUseCase } from '../data-requester/application/use-cases/syn
 import { WebsocketModule } from '../websocket/websocket.module';
 import { UserModService } from './application/users-mod.service';
 import { ModController } from './presentation/controllers/mod.controller';
+import { BullModule } from '@nestjs/bullmq';
 
 @Module({
-  imports: [PrismaModule, WebsocketModule],
+  imports: [
+    PrismaModule,
+    WebsocketModule,
+    BullModule.registerQueue({
+      name: 'map-downloading',
+    }),
+  ],
   controllers: [CommentsController, UsersController, ModController],
   providers: [
     UserModService,

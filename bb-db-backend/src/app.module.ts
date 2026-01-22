@@ -11,6 +11,7 @@ import { UploadModule } from './modules/uploads/uploads.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { CollectionsModule } from './modules/collections/collections.module';
+import { BullModule } from '@nestjs/bullmq';
 
 @Controller()
 class AppController {
@@ -35,6 +36,12 @@ class AppController {
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'assets'),
       serveRoot: '/assets',
+    }),
+    BullModule.forRoot({
+      connection: {
+        host: 'localhost',
+        port: 6379,
+      },
     }),
   ],
   controllers: [AppController],
