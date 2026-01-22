@@ -15,6 +15,7 @@ export class SteamCmdService {
   private readonly login = env.STEAM_LOGIN;
   private readonly password = env.STEAM_PASSWORD;
   private readonly appId = 2330500;
+  private readonly useSl = Number(env.USE_AS_COMMAND);
 
   async downloadWorkshopItem(id: string): Promise<void> {
     if (!this.login || !this.password || !this.path) {
@@ -36,8 +37,10 @@ export class SteamCmdService {
       id,
       '+quit',
     ];
-
-    const steamCMD = spawn('steamcmd', args);
+    const steamCMD = spawn(
+      this.useSl ? 'steamcmd' : Path.join(this.path, 'steamcmd.exe'),
+      args,
+    );
 
     steamCMD.stderr.on('data', (data) => {
       this.logger.error(`stderr: ${data}`);
@@ -60,6 +63,7 @@ export class SteamCmdService {
     );
 
     if (!existsSync(mapPath)) {
+      console.log(mapPath);
       return this.logger.error(`Path not found`);
     }
 
