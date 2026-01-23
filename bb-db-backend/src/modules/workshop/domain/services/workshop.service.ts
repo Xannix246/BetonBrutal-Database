@@ -19,11 +19,12 @@ export class WorkshopService {
     private readonly fetchItems: FetchItemUseCase,
     private readonly steamApi: SteamApiService,
     private readonly websocket: WebsocketGateway,
-    @InjectQueue('map-downloading') private readonly queue: Queue,
+    @InjectQueue('map-downloading') private readonly downloadQueue: Queue,
+    @InjectQueue('request-map') private readonly reqQueue: Queue,
   ) {}
 
   async addDownloadQueue(id: string) {
-    await this.queue.add(
+    await this.downloadQueue.add(
       'download-map',
       { id },
       {
@@ -35,6 +36,10 @@ export class WorkshopService {
         },
       },
     );
+  }
+
+  async addRequestQueue(id: string) {
+    await this.reqQueue.add('update-map', { id });
   }
 
   async getTotal(): Promise<number> {
@@ -122,16 +127,17 @@ export class WorkshopService {
   }
 
   async getRandomItem(): Promise<string> {
-    const max = await this.getTotal();
-    const pos = Math.floor(Math.random() * max);
+    const count = await this.prisma.workshopItem.count();
+    const skip = Math.floor(Math.random() * count);
 
-    const ids = await this.prisma.workshopItem.findMany({
+    const item = await this.prisma.workshopItem.findFirst({
+      skip,
       select: {
         steamId: true,
       },
     });
 
-    return ids[pos].steamId;
+    return item!.steamId;
   }
 
   async getItem(id: string): Promise<WorkshopItem | null> {
@@ -144,22 +150,17 @@ export class WorkshopService {
     }
 
     if (item) {
-      await this.addDownloadQueue(id);
-
-      this.websocket.sendRequest({
+      void this.addRequestQueue(id);
+      void this.addDownloadQueue(id);
+      void this.websocket.sendRequest({
         type: 'fetch_by_id',
         mapId: item.steamId,
       });
 
-      const fetchedItem = await this.fetchItems.execute(item.steamId);
-      const description = fetchedItem
-        ? fetchedItem.description
-        : 'Seems like steam workshop service is down...';
-
       return {
         id: item.steamId,
         title: item.title,
-        description: description,
+        description: item.description || 'Updating...',
         steamId: item.steamId,
         creator: (
           await this.prisma.steamUser.findUnique({

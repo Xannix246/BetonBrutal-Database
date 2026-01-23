@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { CommentsController } from './presentation/controllers/comments.controller';
 import { UserService } from './application/users.service';
-import { PrismaModule } from '../prisma/prisma.module';
 import { UsersController } from './presentation/controllers/users.controller';
 import { WorkshopService } from '../workshop/domain/services/workshop.service';
 import { SteamApiService } from '../data-requester/application/adapters/http-steam-api';
@@ -14,11 +13,15 @@ import { BullModule } from '@nestjs/bullmq';
 
 @Module({
   imports: [
-    PrismaModule,
     WebsocketModule,
-    BullModule.registerQueue({
-      name: 'map-downloading',
-    }),
+    BullModule.registerQueue(
+      {
+        name: 'map-downloading',
+      },
+      {
+        name: 'request-map',
+      },
+    ),
   ],
   controllers: [CommentsController, UsersController, ModController],
   providers: [

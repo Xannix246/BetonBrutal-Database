@@ -55,6 +55,7 @@ export class FetchItemUseCase {
         ratingDown: itemData.votesDown,
         previewUrl: itemData.previewUrl,
         previews: itemData.previews,
+        description: itemData.description,
       },
       create: {
         steamId: itemData.steamId,
@@ -66,6 +67,7 @@ export class FetchItemUseCase {
         previewUrl: itemData.previewUrl,
         createDate: itemData.createDate,
         previews: itemData.previews,
+        description: itemData.description,
         filename: null,
       },
     });

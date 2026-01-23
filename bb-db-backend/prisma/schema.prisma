@@ -16,17 +16,18 @@ model SteamUser {
 }
 
 model WorkshopItem {
-    id         String   @id @default(auto()) @map("_id") @db.ObjectId
-    title      String
-    steamId    String   @unique
-    creator    String
-    creatorId  String
-    createDate DateTime @default(now())
-    ratingUp   Int      @default(0)
-    ratingDown Int      @default(0)
-    previewUrl String
-    previews   String[]
-    filename   String? // if map was uploaded
+    id          String   @id @default(auto()) @map("_id") @db.ObjectId
+    title       String
+    steamId     String   @unique
+    creator     String
+    creatorId   String
+    createDate  DateTime @default(now())
+    ratingUp    Int      @default(0)
+    ratingDown  Int      @default(0)
+    description String?
+    previewUrl  String
+    previews    String[]
+    filename    String? // if map was uploaded
 }
 
 model LeaderboardEntry {

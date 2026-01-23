@@ -12,14 +12,20 @@ import { WebsocketModule } from '../websocket/websocket.module';
 import { SteamCmdService } from '../data-requester/application/services/steamcmd.service';
 import { BullModule } from '@nestjs/bullmq';
 import { MapDownloaderProcessor } from './processors/map.processor';
+import { MapRequesterProcessor } from './processors/workshop.processor';
 
 @Module({
   imports: [
     PrismaModule,
     WebsocketModule,
-    BullModule.registerQueue({
-      name: 'map-downloading',
-    }),
+    BullModule.registerQueue(
+      {
+        name: 'map-downloading',
+      },
+      {
+        name: 'request-map',
+      },
+    ),
   ],
   controllers: [WorkshopController],
   providers: [
@@ -32,6 +38,7 @@ import { MapDownloaderProcessor } from './processors/map.processor';
     SyncUserMapsUseCase,
     FetchBBLBUseCase,
     MapDownloaderProcessor,
+    MapRequesterProcessor,
   ],
 })
 export class WorkshopModule {}
