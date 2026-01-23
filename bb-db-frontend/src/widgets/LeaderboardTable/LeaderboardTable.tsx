@@ -12,23 +12,35 @@ type SortKey = "score" | "creator" | "date" | "place";
 
 const LeaderboardTable = ({
   replays,
-  comment = "NO ONE HAS COMPLETED THIS MAP YET..."
+  comment = "NO ONE HAS COMPLETED THIS MAP YET...",
 }: Props) => {
   const [sortKey, setSortKey] = useState<SortKey>("place");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [useMap, setUseMap] = useState(false);
+  const [filtredReplays, setFiltredReplays] = useState<Replay[]>([]);
 
   useEffect(() => {
-    if (window.location.pathname.includes("player")) setUseMap(true);
-  }, []);
+    if (window.location.pathname.includes("player")) {
+      setUseMap(true);
+      setFiltredReplays(replays);
+    } else {
+      setFiltredReplays(
+        replays
+          .sort((a, b) => a.score - b.score)
+          .map((replay, i) => ((replay.place = i + 1), replay)),
+      );
+    }
+  }, [replays]);
 
   const sortedReplays = useMemo(() => {
-    const sorted = [...replays].sort((a, b) => {
+    const sorted = [...filtredReplays].sort((a, b) => {
       switch (sortKey) {
         case "creator":
           return a.creator.localeCompare(b.creator);
         case "date":
-          return new Date(a.date ?? 0).getTime() - new Date(b.date ?? 0).getTime();
+          return (
+            new Date(a.date ?? 0).getTime() - new Date(b.date ?? 0).getTime()
+          );
         case "place":
           return a.place - b.place;
         case "score":
@@ -37,7 +49,7 @@ const LeaderboardTable = ({
       }
     });
     return sortOrder === "asc" ? sorted : sorted.reverse();
-  }, [replays, sortKey, sortOrder]);
+  }, [filtredReplays, sortKey, sortOrder]);
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
@@ -57,34 +69,55 @@ const LeaderboardTable = ({
       <Container className="sm:mx-2 px-6 text-white font-semibold">
         <div className="flex items-center justify-between text-xl gap-4">
           <span
-            className={clsx("w-[120px] transition duration-300 cursor-pointer", sortKey === "place" && "text-green")}
+            className={clsx(
+              "w-[120px] transition duration-300 cursor-pointer",
+              sortKey === "place" && "text-green",
+            )}
             onClick={() => handleSort("place")}
-          >#</span>
+          >
+            #
+          </span>
           <span
-            className={clsx("w-full transition duration-300 cursor-pointer", sortKey === "creator" && "text-green")}
+            className={clsx(
+              "w-full transition duration-300 cursor-pointer",
+              sortKey === "creator" && "text-green",
+            )}
             onClick={() => handleSort("creator")}
-          >{useMap ? "Map" : "Player"}</span>
+          >
+            {useMap ? "Map" : "Player"}
+          </span>
           <span
-            className={clsx("w-[150px] transition duration-300 cursor-pointer", sortKey === "score" && "text-green")}
+            className={clsx(
+              "w-[150px] transition duration-300 cursor-pointer",
+              sortKey === "score" && "text-green",
+            )}
             onClick={() => handleSort("score")}
-          >Time</span>
+          >
+            Time
+          </span>
           <span
-            className={clsx("w-[150px] transition duration-300 cursor-pointer", sortKey === "date" && "text-green")}
+            className={clsx(
+              "w-[150px] transition duration-300 cursor-pointer",
+              sortKey === "date" && "text-green",
+            )}
             onClick={() => handleSort("date")}
-          >Date</span>
+          >
+            Date
+          </span>
         </div>
       </Container>
 
       {sortedReplays.map((replay) => (
-        <LeaderboardEntry
-          key={replay.id}
-          replay={replay}
-        />
+        <LeaderboardEntry key={replay.id} replay={replay} />
       ))}
 
-      {replays.length === 0 && <Container className="sm:mx-2">
-        <h2 className="text-[#f1e4c7] tracking-wider text-xl text-center">{comment}</h2>
-      </Container>}
+      {filtredReplays.length === 0 && (
+        <Container className="sm:mx-2">
+          <h2 className="text-[#f1e4c7] tracking-wider text-xl text-center">
+            {comment}
+          </h2>
+        </Container>
+      )}
     </div>
   );
 };

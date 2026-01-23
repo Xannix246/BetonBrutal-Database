@@ -26,6 +26,7 @@ export class FetchBBLBReplaysScheduler {
         place: true,
         score: true,
         date: true,
+        banned: true,
       },
     });
 
@@ -53,6 +54,8 @@ export class FetchBBLBReplaysScheduler {
         toCreate.push(entry);
         continue;
       }
+
+      if (existingEntry.banned) continue;
 
       const isChanged =
         existingEntry.place !== entry.place ||
