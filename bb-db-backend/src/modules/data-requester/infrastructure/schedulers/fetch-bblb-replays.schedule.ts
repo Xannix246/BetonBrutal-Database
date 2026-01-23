@@ -58,7 +58,6 @@ export class FetchBBLBReplaysScheduler {
       if (existingEntry.banned) continue;
 
       const isChanged =
-        existingEntry.place !== entry.place ||
         existingEntry.username !== entry.username ||
         existingEntry.score > entry.score ||
         existingEntry?.date?.getTime() !== entry?.date?.getTime();
