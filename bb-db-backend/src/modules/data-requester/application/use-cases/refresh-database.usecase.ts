@@ -43,6 +43,7 @@ export class RefreshDatabaseUseCase {
             ratingDown: item.ratingDown,
             previewUrl: item.previewUrl,
             createDate: item.createDate,
+            description: item.description,
           },
           create: {
             steamId: item.steamId,
@@ -54,6 +55,7 @@ export class RefreshDatabaseUseCase {
             createDate: item.createDate,
             previewUrl: item.previewUrl,
             previews: item.previews,
+            description: item.description,
           },
         });
       }

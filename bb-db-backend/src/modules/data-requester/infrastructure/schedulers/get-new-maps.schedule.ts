@@ -50,6 +50,7 @@ export class GetNewMapsScheduler {
           ratingDown: item.ratingDown,
           previewUrl: item.previewUrl,
           previews: item.previews,
+          description: item.description,
           filename: isDownloaded ? isDownloaded : null,
         },
         create: {
@@ -62,6 +63,7 @@ export class GetNewMapsScheduler {
           previewUrl: item.previewUrl,
           createDate: item.createDate,
           previews: item.previews,
+          description: item.description,
           filename: isDownloaded ? isDownloaded : null,
         },
       });
