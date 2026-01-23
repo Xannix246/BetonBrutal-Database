@@ -21,6 +21,9 @@ import { BullModule } from '@nestjs/bullmq';
       {
         name: 'request-map',
       },
+      {
+        name: 'ban-replay',
+      },
     ),
   ],
   controllers: [CommentsController, UsersController, ModController],

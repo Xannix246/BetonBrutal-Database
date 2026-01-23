@@ -13,6 +13,7 @@ import { SteamCmdService } from '../data-requester/application/services/steamcmd
 import { BullModule } from '@nestjs/bullmq';
 import { MapDownloaderProcessor } from './processors/map.processor';
 import { MapRequesterProcessor } from './processors/workshop.processor';
+import { BanReplayProcessor } from './processors/replay-ban.processor';
 
 @Module({
   imports: [
@@ -24,6 +25,9 @@ import { MapRequesterProcessor } from './processors/workshop.processor';
       },
       {
         name: 'request-map',
+      },
+      {
+        name: 'ban-replay',
       },
     ),
   ],
@@ -39,6 +43,7 @@ import { MapRequesterProcessor } from './processors/workshop.processor';
     FetchBBLBUseCase,
     MapDownloaderProcessor,
     MapRequesterProcessor,
+    BanReplayProcessor,
   ],
 })
 export class WorkshopModule {}

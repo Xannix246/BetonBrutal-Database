@@ -21,6 +21,8 @@ import { RefreshDatabaseUseCase } from 'src/modules/data-requester/application/u
 import { WorkshopService } from 'src/modules/workshop/domain/services/workshop.service';
 import { GetQueryListDto, GetQueryReplaysDto } from './workshop.dto';
 import { Roles } from 'src/modules/auth/guards/role.guard';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 
 @Controller('workshop')
 export class WorkshopController {
@@ -28,6 +30,7 @@ export class WorkshopController {
     private readonly workshopService: WorkshopService,
     private readonly refreshDb: RefreshDatabaseUseCase,
     private readonly fetchBblb: FetchBBLBUseCase,
+    @InjectQueue('ban-replay') private readonly banQueue: Queue,
   ) {}
 
   @Get()
@@ -146,14 +149,22 @@ export class WorkshopController {
   @Roles('admin', 'moderator')
   @UseGuards(AuthGuard)
   async deleteReplay(@Param('id') id: string): Promise<void> {
-    await this.workshopService.banOrDeleteLeaderboardEntry(id, true);
+    await this.banQueue.add(
+      'ban-entry',
+      { id, deleteReplay: true },
+      { jobId: `ban-${id}` },
+    );
   }
 
   @Put('replays/:id/ban')
   @Roles('admin', 'moderator')
   @UseGuards(AuthGuard)
   async banReplay(@Param('id') id: string): Promise<void> {
-    await this.workshopService.banOrDeleteLeaderboardEntry(id);
+    await this.banQueue.add(
+      'ban-entry',
+      { id, deleteReplay: false },
+      { jobId: `ban-${id}` },
+    );
   }
 
   @Put('replays/:id/unban')
