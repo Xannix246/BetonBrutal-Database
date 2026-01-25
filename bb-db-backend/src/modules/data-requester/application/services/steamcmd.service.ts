@@ -37,14 +37,11 @@ export class SteamCmdService {
       id,
       '+quit',
     ];
+
     const steamCMD = spawn(
-      this.useSl ? 'steamcmd' : Path.join(this.path, 'steamcmd.exe'),
+      this.useSl ? 'steamcmd' : Path.join(this.path, 'steamcmd.sh'),
       args,
     );
-
-    steamCMD.stdout.on('data', (data) => {
-      this.logger.log(`stdout: ${data}`);
-    });
 
     steamCMD.stderr.on('data', (data) => {
       this.logger.error(`stderr: ${data}`);
