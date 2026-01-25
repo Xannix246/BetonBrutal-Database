@@ -42,6 +42,10 @@ export class SteamCmdService {
       args,
     );
 
+    steamCMD.stdout.on('data', (data) => {
+      this.logger.log(`stdout: ${data}`);
+    });
+
     steamCMD.stderr.on('data', (data) => {
       this.logger.error(`stderr: ${data}`);
     });
