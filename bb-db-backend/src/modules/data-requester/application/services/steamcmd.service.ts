@@ -15,6 +15,7 @@ export class SteamCmdService implements OnModuleInit {
   private readonly login = env.STEAM_LOGIN;
   private readonly password = env.STEAM_PASSWORD;
   private readonly appId = 2330500;
+  private readonly useAsCommand = Number(env.USE_AS_COMMAND);
 
   private ptyProcess!: pty.IPty;
 
@@ -36,12 +37,21 @@ export class SteamCmdService implements OnModuleInit {
 
   private startSteamCmd() {
     if (!this.login || !this.password || !this.path) {
-      throw new Error(`Login, password or directory not provided`);
+      this.logger.error(`Login, password or directory not provided`);
+      return;
     }
 
-    const shell = os.platform() === 'win32' ? 'steamcmd.exe' : 'steamcmd.sh';
+    const shell =
+      os.platform() === 'win32'
+        ? this.useAsCommand
+          ? 'powershell.exe'
+          : 'steamcmd.exe'
+        : this.useAsCommand
+          ? 'bash'
+          : 'steamcmd.sh';
 
     const args = [
+      this.useAsCommand ? 'steamcmd' : '',
       '+@ShutdownOnFailedCommand',
       '1',
       '+@NoPromptForPassword',
@@ -53,17 +63,21 @@ export class SteamCmdService implements OnModuleInit {
       this.password,
     ];
 
-    this.ptyProcess = pty.spawn(Path.join(this.path, shell), args, {
-      name: 'xterm-color',
-      cwd: this.path,
-      env: process.env as Record<string, string>,
-    });
+    this.ptyProcess = pty.spawn(
+      this.useAsCommand ? shell : Path.join(this.path, shell),
+      args,
+      {
+        name: 'xterm-color',
+        cwd: this.path,
+        env: process.env as Record<string, string>,
+      },
+    );
 
     this.ptyProcess.onData((data) => this.handleOutput(data));
   }
 
   private handleOutput(data: string) {
-    // this.logger.debug(data);
+    this.logger.debug(data);
 
     if (!this.current) return;
 
