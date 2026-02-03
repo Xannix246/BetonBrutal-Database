@@ -24,6 +24,12 @@ import { SteamCmdService } from './application/services/steamcmd.service';
     FetchItemUseCase,
     FetchBBLBUseCase,
   ],
-  exports: [FetchItemUseCase, FetchBBLBUseCase],
+  exports: [
+    SteamCmdService,
+    FetchItemUseCase,
+    FetchBBLBUseCase,
+    SteamApiService,
+    BBLBApiService,
+  ],
 })
 export class DataRequesterModule {}

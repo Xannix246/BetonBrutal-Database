@@ -31,7 +31,7 @@ export class MapDownloaderProcessor extends WorkerHost {
 
     this.logger.log(`Trying to download ${id}`);
 
-    await this.steamCmd.downloadWorkshopItem(id);
+    await this.steamCmd.enqueue(id);
     const filename = await this.steamCmd.copyFileToStorage(id);
 
     if (!filename) {

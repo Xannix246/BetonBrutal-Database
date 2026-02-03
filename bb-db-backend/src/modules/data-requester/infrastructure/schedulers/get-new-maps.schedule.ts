@@ -37,7 +37,7 @@ export class GetNewMapsScheduler {
     newItemsCount = newItems.length;
 
     for (const item of newItems) {
-      await this.steamCmd.downloadWorkshopItem(item.steamId);
+      await this.steamCmd.enqueue(item.steamId);
       const isDownloaded = await this.steamCmd.copyFileToStorage(item.steamId);
 
       await this.prisma.workshopItem.upsert({
