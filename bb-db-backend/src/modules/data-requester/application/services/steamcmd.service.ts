@@ -63,7 +63,7 @@ export class SteamCmdService implements OnModuleInit {
   }
 
   private handleOutput(data: string) {
-    this.logger.debug(data);
+    // this.logger.debug(data);
 
     if (!this.current) return;
 
