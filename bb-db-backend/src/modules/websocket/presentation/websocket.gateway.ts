@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, UseGuards } from '@nestjs/common';
 import {
   WebSocketGateway,
   WebSocketServer,
@@ -13,6 +13,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import * as wsMessagesDto from './../dto/ws-messages.dto';
 import { WebsocketService } from '../services/websocket.service';
+import { LeaderboardGuard } from '../guards/leaderboard.guard';
 
 @Injectable()
 @WebSocketGateway({
@@ -65,6 +66,7 @@ export class WebsocketGateway
   }
 
   @SubscribeMessage('leaderboard_update')
+  @UseGuards(LeaderboardGuard)
   async getReplays(@MessageBody() data: wsMessagesDto.RecieveReplay) {
     // console.log('got replays for: ' + data.mapId);
     // console.log(data.entries);

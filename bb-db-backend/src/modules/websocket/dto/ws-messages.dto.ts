@@ -4,6 +4,7 @@ export type SendRequest =
   | { type: string; [k: string]: any };
 
 export type RecieveReplay = {
+  secret: string;
   mapId: string;
   entries: {
     userName: string;
