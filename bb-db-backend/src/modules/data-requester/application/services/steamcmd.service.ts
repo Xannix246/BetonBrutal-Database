@@ -36,6 +36,8 @@ export class SteamCmdService implements OnModuleInit {
   }
 
   private startSteamCmd() {
+    if (Number(env.DISABLE_DOWNLOADING)) return;
+
     if (!this.login || !this.password || !this.path) {
       this.logger.error(`Login, password or directory not provided`);
       return;
@@ -93,6 +95,16 @@ export class SteamCmdService implements OnModuleInit {
       this.current = null;
       this.processNext();
     }
+
+    if (data.includes('steamcmd has been disconnected')) {
+      this.ptyProcess.kill();
+
+      setTimeout(() => {
+        this.startSteamCmd();
+      }, 500);
+
+      return;
+    }
   }
 
   private send(command: string) {
@@ -116,6 +128,8 @@ export class SteamCmdService implements OnModuleInit {
   }
 
   async copyFileToStorage(id: string): Promise<string | void> {
+    if (Number(env.DISABLE_DOWNLOADING)) return;
+
     if (!this.path) {
       return this.logger.error(`Path not provided`);
     }

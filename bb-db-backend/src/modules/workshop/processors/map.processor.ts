@@ -1,6 +1,7 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
 import { Job } from 'bullmq';
+import { env } from 'node:process';
 import { SteamCmdService } from 'src/modules/data-requester/application/services/steamcmd.service';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 
@@ -15,6 +16,8 @@ export class MapDownloaderProcessor extends WorkerHost {
   }
 
   async process(job: Job<{ id: string }>) {
+    if (Number(env.DISABLE_DOWNLOADING)) return;
+
     const { id } = job.data;
 
     const map = await this.prisma.workshopItem.findUnique({
