@@ -18,7 +18,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd ${{ env.REPO_PATH }}
+            cd ${{ secrets.REPO_PATH }}
             git pull origin main
 
             cd bb-db-backend
