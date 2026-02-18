@@ -3,6 +3,7 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { SteamApiService } from '../../application/adapters/http-steam-api';
 import { SteamCmdService } from '../../application/services/steamcmd.service';
+import { env } from 'node:process';
 
 @Injectable()
 export class GetNewMapsScheduler {
@@ -37,8 +38,12 @@ export class GetNewMapsScheduler {
     newItemsCount = newItems.length;
 
     for (const item of newItems) {
-      await this.steamCmd.enqueue(item.steamId);
-      const isDownloaded = await this.steamCmd.copyFileToStorage(item.steamId);
+      let isDownloaded: string | null | void = null;
+
+      if (!Number(env.DISABLE_DOWNLOADING)) {
+        await this.steamCmd.enqueue(item.steamId);
+        isDownloaded = await this.steamCmd.copyFileToStorage(item.steamId);
+      }
 
       await this.prisma.workshopItem.upsert({
         where: { steamId: item.steamId },

@@ -1,0 +1,32 @@
+name: Publish
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy project
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ${{ env.REPO_PATH }}
+            git pull origin main
+
+            cd bb-db-backend
+            pnpm i --frozen-lockfile
+            npx prisma generate
+            pnpm build
+            pm2 restart bb-backend || pm2 start "pnpm start:prod" --name bb-backend
+
+            cd ../bb-db-frontend
+            pnpm i --frozen-lockfile
+            pnpm build
+            pm2 restart bb-frontend || pm2 start "pnpm preview" --name bb-frontend
