@@ -18,6 +18,9 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            export NVM_DIR="$HOME/.nvm"
+            source $NVM_DIR/nvm.sh
+
             cd ${{ secrets.REPO_PATH }}
             git pull origin main
 
