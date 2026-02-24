@@ -29,6 +29,8 @@ import { io } from "socket.io-client";
 import { config } from "../../../config/config";
 import { banReplay, deleteReplay } from "../../features/DataManager";
 import ContextMenu from "../../shared/ContextMenu/ContextMenu";
+import getMedianTime from "./getMedianTime";
+import formatTime from "../../features/FormatTime";
 
 const WorkshopItemPage = ({ id }: { id: string }) => {
   const [mapData, setMapData] = useState<WorkshopItem | null>();
@@ -129,7 +131,7 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
 
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files) return;
-    
+
     const filename = (await uploadMap(id, event.target.files[0]))
       .filename as string;
 
@@ -139,7 +141,7 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
         filename,
       });
     }
-    
+
     event.target.value = "";
   };
 
@@ -219,6 +221,7 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
               <div className="flex flex-col w-full gap-2">
                 <Container className="text-white text-5xl lg:text-8xl w-full text-center">
                   <a
+                    className="hover:underline"
                     target="_blank"
                     href={`https://steamcommunity.com/sharedfiles/filedetails/?id=${mapData?.id}`}
                     rel="noreferrer"
@@ -262,6 +265,20 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                   >
                     MAP ON BBLB
                   </a>
+                </Container>
+                <Container className="flex flex-col gap-6 text-2xl lg:text-3xl text-white">
+                  <div className="flex gap-4">
+                    <h4 className="uppercase text-blue">Release date:</h4>
+                    <h4 className="uppercase">
+                      {mapData && new Date(mapData.createDate).toLocaleDateString()}
+                    </h4>
+                  </div>
+                  <div className="flex gap-4">
+                    <h4 className="uppercase text-green">Median time:</h4>
+                    <h4 className="uppercase">
+                      {getMedianTime(replays) ? formatTime(getMedianTime(replays)!) : "N/A"}
+                    </h4>
+                  </div>
                 </Container>
                 <Container className="text-2xl w-full">
                   <DescriptionFormatter content={mapData?.description} />

@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import LeaderboardEntry from "../../entities/LeaderboardEntry";
 import Container from "../../shared/Containter/Container";
+import { List, RowComponentProps } from "react-window";
 import clsx from "clsx";
 
 type Props = {
@@ -107,9 +108,14 @@ const LeaderboardTable = ({
         </div>
       </Container>
 
-      {sortedReplays.map((replay) => (
-        <LeaderboardEntry key={replay.id} replay={replay} />
-      ))}
+      <List
+        rowComponent={Row}
+        rowCount={sortedReplays.length}
+        rowHeight={68}
+        rowProps={{
+          replays: sortedReplays
+        }}
+      />
 
       {filtredReplays.length === 0 && (
         <Container className="sm:mx-2">
@@ -118,6 +124,22 @@ const LeaderboardTable = ({
           </h2>
         </Container>
       )}
+    </div>
+  );
+};
+
+const Row = ({
+  index,
+  replays,
+  style,
+}: RowComponentProps<{
+  replays: Replay[];
+}>) => {
+  const replay = replays[index];
+
+  return (
+    <div style={style}>
+      <LeaderboardEntry replay={replay} />
     </div>
   );
 };

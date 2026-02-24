@@ -17,7 +17,6 @@ const Workshop = () => {
   const [items, setItems] = useState<WorkshopItem[]>([]);
   const [activeSort, setActiveSort] = useState<SortBy>("newest");
   const [page, setPage] = useState(1);
-  const [width, setWidth] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const isLoadingMore = useRef(false);
   const pageRef = useRef(page);
@@ -31,7 +30,9 @@ const Workshop = () => {
       onClick: () => {
         if (!targetData) return;
 
-        const updatedItems = [...items.filter((item) => item.id !== targetData.id)];
+        const updatedItems = [
+          ...items.filter((item) => item.id !== targetData.id),
+        ];
         setItems(updatedItems);
         DeleteMap(targetData.id);
       },
@@ -43,6 +44,7 @@ const Workshop = () => {
     isLoadingMore.current = true;
 
     const maps = await getMaps(sort, 50, pageNumber);
+    console.log(maps.length);
     if (maps.length < 50) setHasMore(false);
 
     setItems((prev) => (append ? [...prev, ...maps] : maps));
@@ -57,7 +59,6 @@ const Workshop = () => {
   useEffect(() => {
     setPage(1);
     setHasMore(true);
-    setWidth(window.innerWidth);
     setItems([]);
     loadMaps(activeSort, 1, false);
   }, [activeSort]);
@@ -90,45 +91,46 @@ const Workshop = () => {
   return (
     <div className="w-full min-h-screen h-full bg-center bg-fixed bg-no-repeat bg-cover">
       <Background />
-      {["moderator", "admin"].includes(user?.role as string) && <ContextMenu
-        menu={menuItems}
-        open={openCMenu}
-        setOpen={setOpenCMenu}
-        onClose={() => setTargetData(null)}
-      />}
+      {["moderator", "admin"].includes(user?.role as string) && (
+        <ContextMenu
+          menu={menuItems}
+          open={openCMenu}
+          setOpen={setOpenCMenu}
+          onClose={() => setTargetData(null)}
+        />
+      )}
       <div className="fixed left-0 w-full z-50">
         <Header isAbsolute={true} />
       </div>
       <div className="flex flex-col min-h-screen justify-between pt-32">
-        <Container className="flex justify-center gap-10 text-2xl md:text-4xl tracking-wide place-items-center">
+        <Container className="flex gap-10 text-2xl md:text-4xl tracking-wide md:justify-center place-items-center overflow-x-auto whitespace-nowrap">
           <h1 className="text-white">SORT BY:</h1>
           <div className="flex gap-5">
-            {["newest", "oldest", "mostPopular"].map((sortOption) => (
-              <Button
-                key={sortOption}
-                className={clsx(
-                  "bg-none",
-                  activeSort === sortOption && "text-green"
-                )}
-                onClick={() => setActiveSort(sortOption as SortBy)}
-              >
-                {sortOption === "newest" && "NEWEST"}
-                {sortOption === "oldest" && "OLDEST"}
-                {sortOption === "mostPopular" && "MOST POPULAR"}
-              </Button>
-            ))}
+            {["newest", "oldest", "mostPopular", "mostPlayed"].map(
+              (sortOption) => (
+                <Button
+                  key={sortOption}
+                  className={clsx(
+                    "bg-none",
+                    activeSort === sortOption && "text-green",
+                  )}
+                  onClick={() => setActiveSort(sortOption as SortBy)}
+                >
+                  {sortOption === "newest" && "NEWEST"}
+                  {sortOption === "oldest" && "OLDEST"}
+                  {sortOption === "mostPopular" && "MOST POPULAR"}
+                  {sortOption === "mostPlayed" && "MOST PLAYED"}
+                </Button>
+              ),
+            )}
           </div>
-          {width > 768 && <h1 className="text-white"> |</h1>}
-          {width > 768 && (
-            <Button
-              className="bg-transparent p-0"
-              onClick={async () =>
-                navigate(`/workshop/${await getRandomMap()}`)
-              }
-            >
-              RANDOM MAP
-            </Button>
-          )}
+          <h1 className="text-white"> |</h1>
+          <Button
+            className="bg-transparent p-0"
+            onClick={async () => navigate(`/workshop/${await getRandomMap()}`)}
+          >
+            RANDOM MAP
+          </Button>
         </Container>
 
         {loaded ? (

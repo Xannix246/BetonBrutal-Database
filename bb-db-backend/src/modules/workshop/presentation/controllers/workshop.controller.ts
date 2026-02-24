@@ -43,7 +43,7 @@ export class WorkshopController {
   @OptionalAuth()
   @ApiQuery({
     name: 'sortBy',
-    description: "one of 'mostPopular', 'newest' or 'oldest'", // or mostPlayed
+    description: "one of 'mostPopular', 'newest', 'oldest' or 'mostPlayed'",
   })
   @ApiQuery({
     name: 'timeRange',
@@ -102,6 +102,18 @@ export class WorkshopController {
   @OptionalAuth()
   async search(@Query('q') query: string = '') {
     return this.workshopService.searchWorkshopItems(query);
+  }
+
+  @Post('leaderboards')
+  @OptionalAuth()
+  async getLeaderboards(
+    @Body() body: { ids?: string[] },
+  ): Promise<Leaderboard[]> {
+    const leaderboard = await this.workshopService.getQueryLeaderboards(
+      body?.ids,
+    );
+
+    return leaderboard;
   }
 
   @Get('force-update')

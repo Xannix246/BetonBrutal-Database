@@ -45,9 +45,10 @@ model LeaderboardEntry {
 }
 
 model Leaderboard {
-    id       String   @id @default(auto()) @map("_id") @db.ObjectId
-    mapId    String   @unique
-    enteries String[] //LeaderboardEntry id's
+    id           String   @id @default(auto()) @map("_id") @db.ObjectId
+    mapId        String   @unique
+    enteries     String[] //LeaderboardEntry id's
+    playersCount Int?
 }
 
 model Comment {

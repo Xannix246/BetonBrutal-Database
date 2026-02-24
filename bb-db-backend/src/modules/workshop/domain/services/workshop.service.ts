@@ -14,6 +14,8 @@ import { parseSearchInput } from 'src/shared/parseSearchUriData';
 
 @Injectable()
 export class WorkshopService {
+  private readonly mainMaps = ['TimeMS', 'TimeDLC1', 'TimeBirthday'];
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly fetchItems: FetchItemUseCase,
@@ -58,6 +60,8 @@ export class WorkshopService {
       createDate?: 'asc' | 'desc';
     };
 
+    let leaderboardsEntries: string[] | undefined;
+
     switch (sortBy) {
       case 'mostPopular':
         orderBy = { ratingUp: 'desc' };
@@ -68,9 +72,17 @@ export class WorkshopService {
       case 'oldest':
         orderBy = { createDate: 'asc' };
         break;
-      //   case 'mostPlayed':
-      //     orderBy = { ratingUp: 'desc' };
-      //     break;
+      case 'mostPlayed':
+        orderBy = {};
+        leaderboardsEntries = (
+          await this.prisma.leaderboard.findMany({
+            where: { mapId: { notIn: this.mainMaps } },
+            orderBy: { playersCount: 'desc' },
+            skip: (page - 1) * quantity,
+            take: quantity,
+          })
+        ).map((entry) => entry.mapId);
+        break;
       default:
         orderBy = { createDate: 'desc' };
     }
@@ -97,12 +109,27 @@ export class WorkshopService {
 
     const where = dateFilter ? { createDate: { gte: dateFilter } } : undefined;
 
-    const items = await this.prisma.workshopItem.findMany({
-      take: quantity,
-      skip: (page - 1) * quantity,
-      orderBy,
-      where,
-    });
+    const items = leaderboardsEntries
+      ? await this.prisma.workshopItem.findMany({
+          where: { steamId: { in: leaderboardsEntries } },
+        })
+      : await this.prisma.workshopItem.findMany({
+          take: quantity,
+          skip: (page - 1) * quantity,
+          orderBy,
+          where,
+        });
+
+    if (leaderboardsEntries) {
+      const orderMap = new Map(
+        leaderboardsEntries.map((id, index) => [id, index]),
+      );
+
+      items.sort(
+        (a, b) =>
+          (orderMap.get(a.steamId) ?? 0) - (orderMap.get(b.steamId) ?? 0),
+      );
+    }
 
     const returnItems: WorkshopItemHeader[] = [];
 
@@ -282,6 +309,45 @@ export class WorkshopService {
     } else {
       return null;
     }
+  }
+
+  async getQueryLeaderboards(ids?: string[]): Promise<Leaderboard[]> {
+    const fixedLeaderboards: Leaderboard[] = [];
+    let parsedIds: string[] | undefined;
+
+    if (ids) {
+      parsedIds = [];
+
+      if (ObjectId.isValid(ids[0])) {
+        parsedIds?.push(...ids);
+      } else {
+        const leaderboards = await this.prisma.leaderboard.findMany({
+          where: { mapId: { in: ids } },
+        });
+
+        parsedIds?.push(...leaderboards.map((leaderboard) => leaderboard.id));
+      }
+    }
+
+    const leaderboards = await this.prisma.leaderboard.findMany({
+      where: { id: { in: parsedIds } },
+    });
+
+    const leaderboardsToUpdate = leaderboards.filter(
+      (leaderboard) => leaderboard.playersCount === null,
+    );
+
+    for (const leaderboard of leaderboardsToUpdate) {
+      const updatedLeaderboard = await this.prisma.leaderboard.update({
+        where: { id: leaderboard.id },
+        data: {
+          playersCount: leaderboard.enteries.length,
+        },
+      });
+
+      fixedLeaderboards.push(updatedLeaderboard);
+    }
+    return [...new Set([...fixedLeaderboards, ...leaderboards])];
   }
 
   async searchWorkshopItems(input: string) {

@@ -16,8 +16,10 @@ const Footer = () => {
         |
         <Link className="text-yellow opacity-50 hover:opacity-100 hover:underline" href="https://josiahshields.com/beton/">BBLB</Link>
       </div>
-      <div>
+      <div className="flex gap-1 sm:gap-6 place-items-center">
         <Link className="opacity-50 hover:opacity-100 hover:underline" href="/api/docs">BBDB Api</Link>
+        |
+        <Link className="text-blue opacity-50 hover:opacity-100 hover:underline" href="https://github.com/Xannix246/BetonBrutal-Database">GitHub source page</Link>
       </div>
     </footer>
   );

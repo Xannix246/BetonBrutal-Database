@@ -128,6 +128,7 @@ export class FetchBBLBReplaysScheduler {
         create: {
           mapId: entry.mapId,
           enteries: [entry.id],
+          playersCount: 1,
         },
       });
 
@@ -144,6 +145,21 @@ export class FetchBBLBReplaysScheduler {
           username: entry.username,
           items: [],
           replays: [entry.id],
+        },
+      });
+    }
+
+    for (const map of toUpdate) {
+      const leaderboard = await this.prisma.leaderboard.findUnique({
+        where: { mapId: map.id },
+      });
+
+      if (!leaderboard) continue;
+
+      await this.prisma.leaderboard.update({
+        where: { mapId: map.id },
+        data: {
+          playersCount: leaderboard?.enteries.length,
         },
       });
     }

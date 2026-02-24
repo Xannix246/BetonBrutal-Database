@@ -41,19 +41,23 @@ export class FetchBBLBUseCase {
         where: { mapId: entry.mapId },
       });
 
+      const updatedEntries = [
+        ...new Set([
+          ...(existingLeaderboard?.enteries || []),
+          leaderboardEntry.id,
+        ]),
+      ];
+
       await this.prisma.leaderboard.upsert({
         where: { mapId: entry.mapId },
         update: {
-          enteries: [
-            ...new Set([
-              ...(existingLeaderboard?.enteries || []),
-              leaderboardEntry.id,
-            ]),
-          ],
+          enteries: updatedEntries,
+          playersCount: updatedEntries.length,
         },
         create: {
           mapId: entry.mapId,
           enteries: [leaderboardEntry.id],
+          playersCount: 1,
         },
       });
 

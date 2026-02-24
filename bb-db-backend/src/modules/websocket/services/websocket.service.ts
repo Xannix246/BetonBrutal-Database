@@ -51,10 +51,19 @@ export class WebsocketService {
         },
       });
 
+      const updatedEntries = [...new Set([...enteries, replay.id])];
+
       await this.prisma.leaderboard.upsert({
         where: { mapId: entry.mapId },
-        update: { enteries: [...new Set([...enteries, replay.id])] },
-        create: { mapId: entry.mapId, enteries: [replay.id] },
+        update: {
+          enteries: updatedEntries,
+          playersCount: updatedEntries.length,
+        },
+        create: {
+          mapId: entry.mapId,
+          enteries: [replay.id],
+          playersCount: updatedEntries.length,
+        },
       });
       enteries.push(replay.id);
       const user = await this.prisma.steamUser.findUnique({
