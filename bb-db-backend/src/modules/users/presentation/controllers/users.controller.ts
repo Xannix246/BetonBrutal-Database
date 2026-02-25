@@ -17,13 +17,13 @@ import { UserService } from '../../application/users.service';
 import { type UserRoleSession } from 'src/modules/auth/auth.module';
 import { env } from 'process';
 import { Role } from '@prisma/client';
-import { UserModService } from '../../application/users-mod.service';
+import { ModService } from '../../application/mod.service';
 
 @Controller('user')
 export class UsersController {
   constructor(
     private readonly userSevice: UserService,
-    private readonly userModService: UserModService,
+    private readonly modService: ModService,
   ) {}
 
   @Get('me')
@@ -65,7 +65,7 @@ export class UsersController {
       throw new ForbiddenException('Invalid secret');
     }
 
-    return await this.userModService.forceSetRole(id, body.role);
+    return await this.modService.forceSetRole(id, body.role);
   }
 
   @Get(':id')

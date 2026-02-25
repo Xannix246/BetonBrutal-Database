@@ -1,42 +1,44 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  Param,
   Post,
-  // Put,
+  Put,
   // Query,
-  Session,
   UseGuards,
 } from '@nestjs/common';
-import { type UserRoleSession } from 'src/modules/auth/auth.module';
-import { UserModService } from '../../application/users-mod.service';
+import { ModService } from '../../application/mod.service';
 import { UserService } from '../../application/users.service';
-import { Role } from '@prisma/client';
 import { AuthGuard, Roles } from 'src/modules/auth/guards/role.guard';
+import { WorkshopService } from 'src/modules/workshop/domain/services/workshop.service';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 
 @Controller('manage')
+@Roles('admin', 'moderator')
+@UseGuards(AuthGuard)
 export class ModController {
   constructor(
     private readonly userSevice: UserService,
-    private readonly userModService: UserModService,
+    private readonly modService: ModService,
+    private readonly workshopService: WorkshopService,
+    @InjectQueue('ban-replay') private readonly banQueue: Queue,
   ) {}
 
   @Get()
-  @Roles('admin', 'moderator')
-  @UseGuards(AuthGuard)
   allowAccess() {
     return 'ok';
   }
 
-  @Post('set-role')
-  @Roles('admin', 'moderator')
-  @UseGuards(AuthGuard)
-  async setRole(
-    @Session() session: UserRoleSession,
-    @Body() body: { id: string; role: Role },
-  ) {
-    return await this.userModService.setRole(session, body.id, body.role);
-  }
+  // @Post('set-role')
+  // async setRole(
+  //   @Session() session: UserRoleSession,
+  //   @Body() body: { id: string; role: Role },
+  // ) {
+  //   return await this.userModService.setRole(session, body.id, body.role);
+  // }
 
   // @Put('update-user')
   // updateUser(@Session() session: UserRoleSession) {
@@ -54,9 +56,39 @@ export class ModController {
   // }
 
   @Post('ban-user')
-  @Roles('admin', 'moderator')
+  @Roles('admin')
   @UseGuards(AuthGuard)
   async banUser(@Body() body: { id: string; banReason: string }) {
     return await this.userSevice.banUser(body.id, body.banReason);
+  }
+
+  @Delete('replays/:id')
+  async deleteReplay(@Param('id') id: string): Promise<void> {
+    await this.banQueue.add(
+      'ban-entry',
+      { id, deleteReplay: true },
+      { jobId: `ban-${id}` },
+    );
+  }
+
+  @Put('replays/:id/ban')
+  async banReplay(@Param('id') id: string): Promise<void> {
+    await this.banQueue.add(
+      'ban-entry',
+      { id, deleteReplay: false },
+      { jobId: `ban-${id}` },
+    );
+  }
+
+  @Put('replays/:id/unban')
+  async unbanReplay(@Param('id') id: string): Promise<void> {
+    await this.workshopService.unbanReplay(id);
+  }
+
+  @Delete('workshop/:id/delete')
+  @Roles('admin')
+  @UseGuards(AuthGuard)
+  async deleteItem(@Param('id') id: string): Promise<void> {
+    return await this.workshopService.deleteItem(id);
   }
 }

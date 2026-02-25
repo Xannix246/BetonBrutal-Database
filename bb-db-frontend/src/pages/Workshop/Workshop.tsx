@@ -11,6 +11,7 @@ import { navigate } from "vike/client/router";
 import ContextMenu from "../../shared/ContextMenu/ContextMenu";
 import { getTargetData, getUser, setTargetData } from "../../store/store";
 import { DeleteMap } from "../../features/DataManager";
+import { v4 } from "uuid";
 
 const Workshop = () => {
   const [loaded, setLoaded] = useState(false);
@@ -44,7 +45,6 @@ const Workshop = () => {
     isLoadingMore.current = true;
 
     const maps = await getMaps(sort, 50, pageNumber);
-    console.log(maps.length);
     if (maps.length < 50) setHasMore(false);
 
     setItems((prev) => (append ? [...prev, ...maps] : maps));
@@ -137,7 +137,7 @@ const Workshop = () => {
           <div className="flex gap-2 w-full">
             <div className="grid sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[200px] lg:auto-rows-[300px] gap-6 p-6 w-full">
               {items.map((m) => (
-                <MapTile key={m.id} {...m} />
+                <MapTile key={`${v4()}`} {...m} />
               ))}
             </div>
           </div>

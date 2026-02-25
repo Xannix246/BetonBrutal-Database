@@ -76,10 +76,10 @@ export class WorkshopService {
         orderBy = {};
         leaderboardsEntries = (
           await this.prisma.leaderboard.findMany({
-            where: { mapId: { notIn: this.mainMaps } },
-            orderBy: { playersCount: 'desc' },
-            skip: (page - 1) * quantity,
             take: quantity,
+            skip: (page - 1) * quantity,
+            orderBy: { playersCount: 'desc' },
+            where: { mapId: { notIn: this.mainMaps } },
           })
         ).map((entry) => entry.mapId);
         break;
@@ -508,5 +508,36 @@ export class WorkshopService {
         }),
       ),
     );
+  }
+
+  async createItem(workshopItem: {
+    steamId: string;
+    title: string;
+    previewUrl: string;
+    creator: string;
+    creatorId?: string;
+    description?: string;
+    previews?: string[];
+    createDate?: Date;
+  }): Promise<string> {
+    const user = await this.prisma.steamUser.findFirst({
+      where: { username: workshopItem.creator },
+    });
+
+    const cId = workshopItem.creatorId ?? user?.steamId ?? '';
+
+    const upload = await this.prisma.workshopItem.create({
+      data: {
+        creatorId: cId,
+        ...workshopItem,
+        creator:
+          user?.username ??
+          workshopItem.creatorId ??
+          workshopItem.creator ??
+          'unknown',
+      },
+    });
+
+    return upload.id;
   }
 }

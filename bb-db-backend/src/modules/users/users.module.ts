@@ -3,14 +3,19 @@ import { CommentsController } from './presentation/controllers/comments.controll
 import { UserService } from './application/users.service';
 import { UsersController } from './presentation/controllers/users.controller';
 import { WebsocketModule } from '../websocket/websocket.module';
-import { UserModService } from './application/users-mod.service';
+import { ModService } from './application/mod.service';
 import { ModController } from './presentation/controllers/mod.controller';
 import { WorkshopModule } from '../workshop/workshop.module';
+import { BullModule } from '@nestjs/bullmq';
 
 @Module({
-  imports: [WebsocketModule, WorkshopModule],
+  imports: [
+    WebsocketModule,
+    WorkshopModule,
+    BullModule.registerQueue({ name: 'ban-replay' }),
+  ],
   controllers: [CommentsController, UsersController, ModController],
-  providers: [UserModService, UserService],
-  exports: [UserModService, UserService],
+  providers: [ModService, UserService],
+  exports: [ModService, UserService],
 })
 export class UsersModule {}

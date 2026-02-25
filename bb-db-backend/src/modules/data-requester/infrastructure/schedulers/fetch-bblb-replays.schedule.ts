@@ -7,6 +7,7 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 export class FetchBBLBReplaysScheduler {
   private readonly logger = new Logger(FetchBBLBReplaysScheduler.name);
   private readonly DB_UPDATE_BATCH_SIZE = 500;
+  private readonly mainMaps = ['TimeMS', 'TimeDLC1', 'TimeBirthday'];
 
   constructor(
     private readonly prisma: PrismaService,
@@ -31,8 +32,9 @@ export class FetchBBLBReplaysScheduler {
     });
 
     const entries = (await this.bblbApi.getRawData())?.entries;
+    const maps = (await this.bblbApi.getRawData())?.maps;
 
-    if (!entries) return;
+    if (!entries || !maps) return;
 
     const entryMap = new Map<string, (typeof existingEntries)[0]>();
 
@@ -65,6 +67,30 @@ export class FetchBBLBReplaysScheduler {
       if (isChanged) {
         toUpdate.push({ id: existingEntry.id, data: entry });
       }
+    }
+
+    if (maps.length > 0) {
+      const mapsIds = (await this.prisma.workshopItem.findMany()).map(
+        (map) => map.steamId,
+      );
+
+      let foundMaps = 0;
+
+      for (const map of maps) {
+        if (this.mainMaps.includes(map.steamId)) continue;
+
+        if (!mapsIds.includes(map.steamId)) {
+          await this.prisma.workshopItem.create({
+            data: {
+              ...map,
+            },
+          });
+
+          foundMaps++;
+        }
+      }
+
+      this.logger.log(`Found ${foundMaps} maps`);
     }
 
     if (toCreate.length === 0 && toUpdate.length === 0) {

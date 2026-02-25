@@ -221,12 +221,12 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
               <div className="flex flex-col w-full gap-2">
                 <Container className="text-white text-5xl lg:text-8xl w-full text-center">
                   <a
-                    className="hover:underline"
+                    className="hover:underline uppercase"
                     target="_blank"
                     href={`https://steamcommunity.com/sharedfiles/filedetails/?id=${mapData?.id}`}
                     rel="noreferrer"
                   >
-                    {mapData?.title.toUpperCase()}
+                    {mapData?.title}
                   </a>
                 </Container>
                 <Container className="text-gray-300 text-2xl lg:text-4xl w-full text-center flex justify-between place-items-center">
@@ -234,9 +234,9 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                     href={`/workshop/player/${mapData?.creatorId}`}
                     onClick={() => $prevLink.set("mapCreator")}
                     onPointerDown={() => $prevLink.set("mapCreator")}
-                    className="hover:text-white hover:underline"
+                    className="hover:text-white hover:underline uppercase"
                   >
-                    BY {mapData?.creator.toUpperCase()}
+                    BY {mapData?.creator ?? mapData?.creatorId}
                   </a>
                   {user && (
                     <Button

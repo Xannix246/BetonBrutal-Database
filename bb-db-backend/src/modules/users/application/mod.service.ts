@@ -5,7 +5,7 @@ import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { WorkshopService } from 'src/modules/workshop/domain/services/workshop.service';
 
 @Injectable()
-export class UserModService {
+export class ModService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly workshopService: WorkshopService,
@@ -31,4 +31,27 @@ export class UserModService {
   }
 
   //async updateUser(session: UserRoleSession) {}
+
+  // workshop
+  async addMap(
+    steamId: string,
+    title: string,
+    previewUrl: string,
+    creator: string,
+    creatorId?: string,
+    description?: string,
+    previews?: string[],
+    createDate?: Date,
+  ) {
+    return await this.workshopService.createItem({
+      steamId,
+      title,
+      previewUrl,
+      creator,
+      creatorId,
+      description,
+      previews,
+      createDate,
+    });
+  }
 }
