@@ -80,9 +80,16 @@ export class FetchBBLBReplaysScheduler {
         if (this.mainMaps.includes(map.steamId)) continue;
 
         if (!mapsIds.includes(map.steamId)) {
+          const user = await this.prisma.steamUser.findFirst({
+            where: { username: map.creator ?? map.creatorId },
+          });
+
+          const cId = user?.steamId ?? '';
+
           await this.prisma.workshopItem.create({
             data: {
               ...map,
+              creatorId: cId,
             },
           });
 
