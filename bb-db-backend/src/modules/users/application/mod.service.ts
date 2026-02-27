@@ -33,25 +33,16 @@ export class ModService {
   //async updateUser(session: UserRoleSession) {}
 
   // workshop
-  async addMap(
-    steamId: string,
-    title: string,
-    previewUrl: string,
-    creator: string,
-    creatorId?: string,
-    description?: string,
-    previews?: string[],
-    createDate?: Date,
-  ) {
-    return await this.workshopService.createItem({
-      steamId,
-      title,
-      previewUrl,
-      creator,
-      creatorId,
-      description,
-      previews,
-      createDate,
-    });
+  async upsertMap(workshopItem: {
+    title: string;
+    steamId: string;
+    previewUrl: string;
+    creator: string;
+    creatorId?: string;
+    description?: string;
+    previews?: string[];
+    createDate?: Date;
+  }) {
+    await this.workshopService.upsertItem(workshopItem);
   }
 }

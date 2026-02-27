@@ -15,6 +15,7 @@ import { AuthGuard, Roles } from 'src/modules/auth/guards/role.guard';
 import { WorkshopService } from 'src/modules/workshop/domain/services/workshop.service';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
+import { UpsertMapDto } from './dto/mod.dto';
 
 @Controller('manage')
 @Roles('admin', 'moderator')
@@ -42,11 +43,6 @@ export class ModController {
 
   // @Put('update-user')
   // updateUser(@Session() session: UserRoleSession) {
-  //   this.checkRole(session);
-  // }
-
-  // @Get('ban-entry')
-  // banEntry(@Session() session: UserRoleSession, @Query('id') id: string) {
   //   this.checkRole(session);
   // }
 
@@ -83,6 +79,19 @@ export class ModController {
   @Put('replays/:id/unban')
   async unbanReplay(@Param('id') id: string): Promise<void> {
     await this.workshopService.unbanReplay(id);
+  }
+
+  @Put('workshop/:id/upsert')
+  @Roles('admin')
+  @UseGuards(AuthGuard)
+  async upsertItem(
+    @Param('id') id: string,
+    @Body() body: UpsertMapDto,
+  ): Promise<void> {
+    return await this.modService.upsertMap({
+      steamId: id,
+      ...body,
+    });
   }
 
   @Delete('workshop/:id/delete')

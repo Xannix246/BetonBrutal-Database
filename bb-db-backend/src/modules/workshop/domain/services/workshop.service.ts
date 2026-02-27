@@ -510,7 +510,7 @@ export class WorkshopService {
     );
   }
 
-  async createItem(workshopItem: {
+  async upsertItem(workshopItem: {
     steamId: string;
     title: string;
     previewUrl: string;
@@ -525,16 +525,23 @@ export class WorkshopService {
     });
 
     const cId = workshopItem.creatorId ?? user?.steamId ?? '';
+    const data = {
+      ...workshopItem,
+      creatorId: cId,
+      creator:
+        user?.username ??
+        workshopItem.creatorId ??
+        workshopItem.creator ??
+        'unknown',
+    };
 
-    const upload = await this.prisma.workshopItem.create({
-      data: {
-        creatorId: cId,
-        ...workshopItem,
-        creator:
-          user?.username ??
-          workshopItem.creatorId ??
-          workshopItem.creator ??
-          'unknown',
+    const upload = await this.prisma.workshopItem.upsert({
+      where: { steamId: workshopItem.steamId },
+      update: {
+        ...data,
+      },
+      create: {
+        ...data,
       },
     });
 

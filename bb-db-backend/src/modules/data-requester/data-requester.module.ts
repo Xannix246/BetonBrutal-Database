@@ -26,6 +26,8 @@ import { SteamCmdService } from './application/services/steamcmd.service';
   ],
   exports: [
     SteamCmdService,
+    RefreshDatabaseUseCase,
+    SyncUserMapsUseCase,
     FetchItemUseCase,
     FetchBBLBUseCase,
     SteamApiService,
