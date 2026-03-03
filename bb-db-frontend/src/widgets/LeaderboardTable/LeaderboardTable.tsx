@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import LeaderboardEntry from "../../entities/LeaderboardEntry";
 import Container from "../../shared/Containter/Container";
-import { List, RowComponentProps } from "react-window";
+// import { List, RowComponentProps } from "react-window";
 import clsx from "clsx";
 
 type Props = {
@@ -25,11 +25,14 @@ const LeaderboardTable = ({
       setUseMap(true);
       setFiltredReplays(replays);
     } else {
-      setFiltredReplays(
-        replays
-          .sort((a, b) => a.score - b.score)
-          .map((replay, i) => ((replay.place = i + 1), replay)),
-      );
+      const sorted = [...replays]
+        .sort((a, b) => a.score - b.score)
+        .map((replay, i) => ({
+          ...replay,
+          place: i + 1,
+        }));
+
+      setFiltredReplays(sorted);
     }
   }, [replays]);
 
@@ -108,14 +111,18 @@ const LeaderboardTable = ({
         </div>
       </Container>
 
-      <List
+      {/* <List
         rowComponent={Row}
         rowCount={sortedReplays.length}
         rowHeight={68}
         rowProps={{
-          replays: sortedReplays
+          replays: sortedReplays,
         }}
-      />
+      /> */}
+
+      {replays.map((replay, i) => (
+        <LeaderboardEntry replay={replay} key={i} />
+      ))}
 
       {filtredReplays.length === 0 && (
         <Container className="sm:mx-2">
@@ -128,20 +135,20 @@ const LeaderboardTable = ({
   );
 };
 
-const Row = ({
-  index,
-  replays,
-  style,
-}: RowComponentProps<{
-  replays: Replay[];
-}>) => {
-  const replay = replays[index];
+// const Row = ({
+//   index,
+//   replays,
+//   style,
+// }: RowComponentProps<{
+//   replays: Replay[];
+// }>) => {
+//   const replay = replays[index];
 
-  return (
-    <div style={style}>
-      <LeaderboardEntry replay={replay} />
-    </div>
-  );
-};
+//   return (
+//     <div style={style}>
+//       <LeaderboardEntry replay={replay} />
+//     </div>
+//   );
+// };
 
 export default LeaderboardTable;
