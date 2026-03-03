@@ -12,7 +12,7 @@ declare type WorkshopItem = {
   createDate: Date;
   previewUrl: string;
   previews: string[];
-  filename: null | string;
+  filename?: null | string;
 };
 
 declare type Replay = {
@@ -24,6 +24,7 @@ declare type Replay = {
   map?: string;
   score: number;
   date: Date | null;
+  banned?: boolean;
 };
 
 declare type Player = {

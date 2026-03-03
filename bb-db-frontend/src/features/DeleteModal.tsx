@@ -16,7 +16,7 @@ const DeleteModal = ({ open, setOpen }: { open: boolean, setOpen: (val: boolean)
   return (
     <div className="fixed">
       <Modal open={open} onClose={() => setOpen(false)} className="p-5 md:p-10 w-3xl flex flex-col gap-5">
-        <h1 className="text-2xl md:text-4xl uppercase text-center">Are you sure you want to delete your account? All user data like comments, article and favorite list will be deleted. This action cannot be canceled.</h1>
+        <h1 className="text-2xl md:text-4xl uppercase text-center">Are you sure you want to delete your account? All user data like comments, articles and favorite list will be deleted. This action cannot be canceled.</h1>
         <div className="flex w-full justify-between">
           <Button
             className="text-2xl bg-red/80 hover:text-black hover:bg-red-500/80"

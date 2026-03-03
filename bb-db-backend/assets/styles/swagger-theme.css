@@ -4,12 +4,12 @@
 }
 
 * {
-  font-family: "BebasNeue", sans-serif !important;
+  /* font-family: "BebasNeue", sans-serif !important; */
   outline: none !important;
 }
 
 body {
-  background: url('/assets/img/bg.jpg') center center fixed no-repeat;
+  /* background: url('/assets/img/bg.jpg') center center fixed no-repeat; */
   background-size: cover;
   background-color: #535353;
   font-family: 'BebasNeue', sans-serif;
@@ -151,6 +151,23 @@ i,
 
 .description {
   font-size: 20px !important;
+}
+
+.swagger-ui .opblock-description-wrapper p, .swagger-ui .opblock-external-docs-wrapper p, .swagger-ui .opblock-title_normal p {
+  color: white !important;
+}
+
+.swagger-ui .info .title {
+  color: white !important;
+}
+
+.swagger-ui .markdown p, .swagger-ui .markdown pre, .swagger-ui .renderedMarkdown p, .swagger-ui .renderedMarkdown pre {
+  color: white !important;
+}
+
+.swagger-ui input, .swagger-ui select, .swagger-ui textarea {
+  background-color: white !important;
+  color: black !important;
 }
 
 /* Scrollbar */

@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { MongoClient, GridFSBucket, ObjectId } from 'mongodb';
 
 @Injectable()
@@ -24,10 +24,12 @@ export class GridFSService implements OnModuleInit {
   }
 
   getFileStream(id: string) {
+    if (!ObjectId.isValid(id)) throw new NotFoundException();
     return this.bucket.openDownloadStream(new ObjectId(id));
   }
 
   async delete(id: string) {
+    if (!ObjectId.isValid(id)) throw new NotFoundException();
     return this.bucket.delete(new ObjectId(id));
   }
 }

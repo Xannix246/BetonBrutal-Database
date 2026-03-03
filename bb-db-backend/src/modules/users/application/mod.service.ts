@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Role } from '@prisma/client';
 import { auth, UserRoleSession } from 'src/modules/auth/auth.module';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
@@ -33,16 +33,17 @@ export class ModService {
   //async updateUser(session: UserRoleSession) {}
 
   // workshop
-  async upsertMap(workshopItem: {
-    title: string;
-    steamId: string;
-    previewUrl: string;
-    creator: string;
-    creatorId?: string;
-    description?: string;
-    previews?: string[];
-    createDate?: Date;
-  }) {
-    await this.workshopService.upsertItem(workshopItem);
+  async upsertMap(id: string, workshopItem: WorkshopItemUpsert) {
+    if (
+      workshopItem.type !== 'WorkshopItemCreate' &&
+      workshopItem.type !== 'WorkshopItemUpdate'
+    ) {
+      console.log(workshopItem);
+      throw new BadRequestException(
+        'Type should be "WorkshopItemCreate" or "WorkshopItemUpdate"',
+      );
+    }
+
+    return await this.workshopService.upsertItem(id, workshopItem);
   }
 }

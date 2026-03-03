@@ -258,7 +258,7 @@ export class WorkshopService {
   async getQueryReplays(
     ids: string[],
     requestMapNames: boolean = false,
-    hideBanned = true,
+    hideBanned: boolean = true,
   ): Promise<Replay[]> {
     const replays = await this.prisma.leaderboardEntry.findMany({
       where: { id: { in: ids } },
@@ -289,6 +289,7 @@ export class WorkshopService {
         map: mapName,
         score: replay.score,
         date: replay.date,
+        banned: replay.banned,
       });
     }
 
@@ -401,7 +402,7 @@ export class WorkshopService {
     }
 
     await this.prisma.workshopItem.delete({ where: { steamId } });
-    await this.prisma.leaderboard.delete({ where: { mapId: steamId } });
+    await this.prisma.leaderboard.deleteMany({ where: { mapId: steamId } });
     await this.prisma.leaderboardEntry.deleteMany({
       where: { mapId: steamId },
     });
@@ -444,6 +445,7 @@ export class WorkshopService {
       await this.prisma.leaderboardEntry.update({
         where: { id },
         data: {
+          place: 0,
           banned: true,
         },
       });
@@ -486,6 +488,13 @@ export class WorkshopService {
       throw new BadRequestException('Entry not banned');
     }
 
+    await this.prisma.leaderboardEntry.update({
+      where: { id },
+      data: {
+        banned: false,
+      },
+    });
+
     const leaderboard = await this.prisma.leaderboard.findUniqueOrThrow({
       where: { mapId: leaderboardEntry.mapId },
     });
@@ -508,43 +517,40 @@ export class WorkshopService {
         }),
       ),
     );
+
+    return;
   }
 
-  async upsertItem(workshopItem: {
-    steamId: string;
-    title: string;
-    previewUrl: string;
-    creator: string;
-    creatorId?: string;
-    description?: string;
-    previews?: string[];
-    createDate?: Date;
-  }): Promise<string> {
+  async upsertItem(
+    id: string,
+    workshopItem: WorkshopItemUpsert,
+  ): Promise<WorkshopItem> {
     const user = await this.prisma.steamUser.findFirst({
-      where: { username: workshopItem.creator },
+      where: { username: workshopItem.data.creator },
     });
 
-    const cId = workshopItem.creatorId ?? user?.steamId ?? '';
-    const data = {
-      ...workshopItem,
-      creatorId: cId,
-      creator:
-        user?.username ??
-        workshopItem.creatorId ??
-        workshopItem.creator ??
-        'unknown',
+    const upload =
+      workshopItem.type === 'WorkshopItemCreate'
+        ? await this.prisma.workshopItem.create({
+            data: {
+              ...workshopItem.data,
+              steamId: id,
+              creatorId: workshopItem.data.creatorId ?? user?.steamId ?? '',
+              creator:
+                user?.username ??
+                workshopItem.data.creatorId ??
+                workshopItem.data.creator ??
+                'unknown',
+            },
+          })
+        : await this.prisma.workshopItem.update({
+            where: { steamId: id },
+            data: { ...workshopItem.data },
+          });
+
+    return {
+      ...upload,
+      description: upload.description ?? 'no description',
     };
-
-    const upload = await this.prisma.workshopItem.upsert({
-      where: { steamId: workshopItem.steamId },
-      update: {
-        ...data,
-      },
-      create: {
-        ...data,
-      },
-    });
-
-    return upload.id;
   }
 }

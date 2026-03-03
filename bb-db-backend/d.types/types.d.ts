@@ -51,6 +51,7 @@ declare type Replay = {
   replayId?: string;
   score: number;
   date: Date | null;
+  banned?: boolean;
 };
 
 declare type User = {
@@ -134,3 +135,29 @@ declare interface AuthRequest extends Request {
     id: string;
   };
 }
+
+declare type WokshopItemUpdate = {
+  type: 'WorkshopItemUpdate',
+  data: {
+    title?: string;
+    previewUrl?: string;
+    creator?: string;
+    description?: string;
+    previews?: string[];
+  }
+}
+
+declare type WokshopItemCreate = {
+  type: 'WorkshopItemCreate',
+  data: {
+    title: string;
+    previewUrl: string;
+    creator: string;
+    creatorId?: string;
+    description?: string;
+    previews?: string[];
+    createDate?: Date;
+  }
+}
+
+declare type WorkshopItemUpsert = WokshopItemCreate | WokshopItemUpdate;

@@ -2,7 +2,7 @@ import clsx from "clsx";
 import Button from "../../shared/Button/Button";
 import Input from "../../shared/Input/Input";
 import Link from "../../shared/Link/Link";
-import { JSX, useEffect, useState } from "react";
+import { JSX, useCallback, useEffect, useState } from "react";
 import { handleEnterSearch, handleSearch } from "../../features/SearchManager";
 import { logOut, signIn } from "../../features/Auth";
 import Dropdown from "../../shared/Dropdown/Dropdown";
@@ -18,6 +18,17 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
   const [width, setWidth] = useState(0)
   const [mobileMenu, setMobileMenu] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
+
+  const handleWindowResize = useCallback(() => {
+    setWidth(window.innerWidth);
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("resize", handleWindowResize);
+    return () => {
+      window.removeEventListener("resize", handleWindowResize);
+    };
+  }, [handleWindowResize]);
 
   useEffect(() => {
     setWidth(window.innerWidth);

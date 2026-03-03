@@ -15,7 +15,11 @@ import { AuthGuard, Roles } from 'src/modules/auth/guards/role.guard';
 import { WorkshopService } from 'src/modules/workshop/domain/services/workshop.service';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
-import { UpsertMapDto } from './dto/mod.dto';
+import {
+  CreateMapDataDto,
+  UpdateMapDataDto,
+  UpsertMapDto,
+} from './dto/mod.dto';
 
 @Controller('manage')
 @Roles('admin', 'moderator')
@@ -60,25 +64,29 @@ export class ModController {
 
   @Delete('replays/:id')
   async deleteReplay(@Param('id') id: string): Promise<void> {
-    await this.banQueue.add(
-      'ban-entry',
-      { id, deleteReplay: true },
-      { jobId: `ban-${id}` },
-    );
+    await this.banQueue.add('ban-entry', {
+      id,
+      unban: false,
+      deleteReplay: true,
+    });
   }
 
   @Put('replays/:id/ban')
   async banReplay(@Param('id') id: string): Promise<void> {
-    await this.banQueue.add(
-      'ban-entry',
-      { id, deleteReplay: false },
-      { jobId: `ban-${id}` },
-    );
+    await this.banQueue.add('ban-entry', {
+      id,
+      unban: false,
+      deleteReplay: false,
+    });
   }
 
   @Put('replays/:id/unban')
   async unbanReplay(@Param('id') id: string): Promise<void> {
-    await this.workshopService.unbanReplay(id);
+    await this.banQueue.add('ban-entry', {
+      id,
+      unban: true,
+      deleteReplay: false,
+    });
   }
 
   @Put('workshop/:id/upsert')
@@ -87,11 +95,18 @@ export class ModController {
   async upsertItem(
     @Param('id') id: string,
     @Body() body: UpsertMapDto,
-  ): Promise<void> {
-    return await this.modService.upsertMap({
-      steamId: id,
-      ...body,
-    });
+  ): Promise<WorkshopItem> {
+    if (body.type === 'WorkshopItemCreate') {
+      return await this.modService.upsertMap(id, {
+        type: body.type,
+        data: body.data as CreateMapDataDto,
+      });
+    } else {
+      return await this.modService.upsertMap(id, {
+        type: body.type,
+        data: body.data as UpdateMapDataDto,
+      });
+    }
   }
 
   @Delete('workshop/:id/delete')

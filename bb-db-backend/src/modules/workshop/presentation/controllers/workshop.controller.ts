@@ -5,6 +5,8 @@ import {
   Get,
   HttpStatus,
   Param,
+  ParseBoolPipe,
+  ParseIntPipe,
   Post,
   Query,
   Res,
@@ -41,13 +43,15 @@ export class WorkshopController {
   @ApiQuery({
     name: 'timeRange',
     description: "one of 'day', 'week', 'month' or 'year'",
+    required: false,
   })
   async getList(
     @Query('sortBy') sortBy: SortBy,
-    @Query('quantity') quantity: number,
-    @Query('sendPreviews') sendPreviews: boolean,
+    @Query('quantity', ParseIntPipe) quantity: number,
+    @Query('sendPreviews', new ParseBoolPipe({ optional: true }))
+    sendPreviews: boolean,
     @Query('timeRange') timeRange?: 'day' | 'week' | 'month' | 'year',
-    @Query('page') page: number = 1,
+    @Query('page', new ParseIntPipe({ optional: true })) page: number = 1,
   ): Promise<WorkshopItemHeader[]> {
     if (!quantity) {
       throw new BadRequestException('Quantity is required');
@@ -55,10 +59,10 @@ export class WorkshopController {
 
     return await this.workshopService.getList(
       sortBy,
-      Number(quantity),
-      Boolean(sendPreviews),
+      quantity,
+      sendPreviews,
       timeRange,
-      Number(page),
+      page,
     );
   }
 
@@ -71,7 +75,8 @@ export class WorkshopController {
   @Post('get-query-list')
   @OptionalAuth()
   async getQueryList(
-    @Query('sendPreviews') sendPreviews: boolean = false,
+    @Query('sendPreviews', new ParseBoolPipe({ optional: true }))
+    sendPreviews: boolean = false,
     @Body() body: GetQueryListDto,
   ): Promise<WorkshopItemHeader[]> {
     if (!body.ids) {
@@ -88,7 +93,11 @@ export class WorkshopController {
       throw new BadRequestException('Quantity is required');
     }
 
-    return this.workshopService.getQueryReplays(body.ids, body.requestMapNames);
+    return this.workshopService.getQueryReplays(
+      body.ids,
+      body.requestMapNames,
+      body.hideBanned,
+    );
   }
 
   @Get('search')
@@ -138,12 +147,16 @@ export class WorkshopController {
   @OptionalAuth()
   async getReplays(
     @Param('id') id: string,
-    @Query('hideBanned') hideBanned: boolean,
+    @Query('getMapName', new ParseBoolPipe({ optional: true }))
+    getMapName?: boolean,
+    @Query('hideBanned', new ParseBoolPipe({ optional: true }))
+    hideBanned?: boolean,
   ): Promise<Replay[]> {
     const leaderboard = await this.workshopService.getLeaderboard(id);
 
     const replays = this.workshopService.getQueryReplays(
       leaderboard?.enteries || [],
+      getMapName,
       hideBanned,
     );
 

@@ -11,10 +11,10 @@ interface Props extends InputProps {
 
 const Input = ({ className, placeholder, leftIcon, rightIcon, ...props }: Props) => {
   return (
-    <div className={clsx(className, "flex gap-2 p-2 bg-black/50")}>
+    <div className={clsx(className, "flex gap-2 bg-black/50")}>
       {leftIcon}
       <HeadlessInput
-        className={"outline-none text-white w-full"}
+        className={clsx("outline-none text-white w-full p-2", props.disabled && "cursor-not-allowed")}
         placeholder={placeholder}
         autoComplete="off"
         {...props}

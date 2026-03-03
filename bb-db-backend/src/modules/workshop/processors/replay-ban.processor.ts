@@ -9,11 +9,15 @@ export class BanReplayProcessor extends WorkerHost {
   }
 
   async process(
-    job: Job<{ id: string; deleteReplay?: boolean }>,
+    job: Job<{ id: string; unban?: boolean; deleteReplay?: boolean }>,
   ): Promise<any> {
-    await this.workshopService.banOrDeleteLeaderboardEntry(
-      job.data.id,
-      job.data.deleteReplay,
-    );
+    if (job.data.unban) {
+      await this.workshopService.unbanReplay(job.data.id);
+    } else {
+      await this.workshopService.banOrDeleteLeaderboardEntry(
+        job.data.id,
+        job.data.deleteReplay,
+      );
+    }
   }
 }

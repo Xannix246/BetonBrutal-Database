@@ -25,4 +25,5 @@ export class GetQueryReplaysDto {
     example: true,
   })
   requestMapNames?: boolean;
+  hideBanned?: boolean;
 }

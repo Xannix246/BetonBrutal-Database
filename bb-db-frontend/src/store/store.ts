@@ -28,3 +28,7 @@ export const getDoc = () => useStore($doc);
 export const $targetData = atom<{id: string, name: string} | null>(null);
 export const setTargetData = (map: {id: string, name: string} | null) => $targetData.set(map);
 export const getTargetData = () => useStore($targetData);
+
+export const $activeMap = atom<WorkshopItem | null>(null);
+export const setActiveMap = (map: WorkshopItem | null) => $activeMap.set(map);
+export const getActiveMap = () => useStore($activeMap);
