@@ -120,7 +120,7 @@ const LeaderboardTable = ({
         }}
       /> */}
 
-      {replays.map((replay, i) => (
+      {sortedReplays.map((replay, i) => (
         <LeaderboardEntry replay={replay} key={i} />
       ))}
 
