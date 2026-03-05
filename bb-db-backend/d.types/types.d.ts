@@ -117,6 +117,7 @@ declare type Collection = {
   description: string | null;
   mapsId: string[];
   showOnMain: boolean;
+  isPublic?: boolean;
   descColor: $Enums.Color;
 };
 
@@ -133,6 +134,7 @@ declare interface AuthRequest extends Request {
     banReason: null | string;
     banExpires: null | Date;
     id: string;
+    steamId: null | string;
   };
 }
 

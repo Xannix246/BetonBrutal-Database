@@ -14,9 +14,7 @@ export class GridFSService implements OnModuleInit {
 
   async upload(filename: string, buffer: Buffer, contentType: string) {
     return new Promise<ObjectId>((resolve, reject) => {
-      const uploadStream = this.bucket.openUploadStream(filename, {
-        contentType,
-      });
+      const uploadStream = this.bucket.openUploadStream(filename);
       uploadStream.end(buffer);
       uploadStream.on('finish', () => resolve(uploadStream.id));
       uploadStream.on('error', reject);

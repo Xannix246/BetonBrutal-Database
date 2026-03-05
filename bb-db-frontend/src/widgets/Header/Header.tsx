@@ -4,13 +4,14 @@ import Input from "../../shared/Input/Input";
 import Link from "../../shared/Link/Link";
 import { JSX, useCallback, useEffect, useState } from "react";
 import { handleEnterSearch, handleSearch } from "../../features/SearchManager";
-import { logOut, signIn } from "../../features/Auth";
+import { logOut, signIn, unlinkSteam } from "../../features/Auth";
 import Dropdown from "../../shared/Dropdown/Dropdown";
-import { ArrowLeftEndOnRectangleIcon, StarIcon, Bars3Icon, TrashIcon } from "@heroicons/react/24/outline";
+import { ArrowLeftEndOnRectangleIcon, StarIcon, Bars3Icon, TrashIcon, LinkIcon, LinkSlashIcon } from "@heroicons/react/24/outline";
 import { navigate } from "vike/client/router";
 import MobileMenu from "./MobileMenu";
 import { getUser, setUser } from "../../store/store";
 import DeleteModal from "../../features/DeleteModal";
+import { config } from "../../../config/config";
 
 const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: boolean, hideSearch?: boolean, additionalComponent?: JSX.Element }) => {
   const [search, setSearch] = useState("");
@@ -47,6 +48,17 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
       name: "FAVORITES",
       icon: <StarIcon width={24} />,
       onClick: () => navigate(`/user/${user?.id}/favorites`)
+    },
+    {
+      name: user?.steamId ? "UNLINK STEAM" : "LINK STEAM",
+      icon: user?.steamId ? <LinkSlashIcon width={24} /> : <LinkIcon width={24} />,
+      onClick: async () => {
+        if (user?.steamId) {
+          unlinkSteam();
+        } else {
+          window.location.replace(`${config.serverUri}/user/steam`);
+        }
+      }
     },
     {
       name: "DELETE ACCOUNT",

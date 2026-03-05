@@ -1,0 +1,51 @@
+model SteamUser {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  steamId  String   @unique
+  username String
+  items    String[]
+  replays  String[]
+}
+
+model WorkshopItem {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  steamId     String   @unique
+  creator     String
+  creatorId   String
+  createDate  DateTime @default(now())
+  ratingUp    Int      @default(0)
+  ratingDown  Int      @default(0)
+  description String?
+  previewUrl  String
+  previews    String[]
+  filename    String? // if map was uploaded
+}
+
+model LeaderboardEntry {
+  id       String    @id @default(auto()) @map("_id") @db.ObjectId
+  place    Int
+  mapId    String
+  steamId  String
+  username String
+  score    Int
+  replayId String?
+  date     DateTime?
+  banned   Boolean   @default(false)
+
+  @@unique([mapId, steamId])
+}
+
+model Leaderboard {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  mapId        String   @unique
+  enteries     String[] //LeaderboardEntry id's
+  playersCount Int?
+}
+
+model Comment {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  mapId     String
+  userId    String
+  data      String
+  createdAt DateTime @default(now())
+}

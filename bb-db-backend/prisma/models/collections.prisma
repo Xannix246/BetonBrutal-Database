@@ -1,0 +1,26 @@
+enum Color {
+  white
+  black
+  red
+  blue
+  green
+  yellow
+}
+
+model Collection {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String?
+  mapsId      String[]
+  showOnMain  Boolean  @default(false)
+  isPublic    Boolean  @default(false)
+  descColor   Color    @default(black)
+}
+
+model Nominees {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  internal_name String?  @unique
+  description   String?
+  maps          String[]
+}

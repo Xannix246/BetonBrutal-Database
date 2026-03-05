@@ -7,6 +7,7 @@ import { ModService } from './application/mod.service';
 import { ModController } from './presentation/controllers/mod.controller';
 import { WorkshopModule } from '../workshop/workshop.module';
 import { BullModule } from '@nestjs/bullmq';
+import { SteamService } from './application/steam.service';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { BullModule } from '@nestjs/bullmq';
     BullModule.registerQueue({ name: 'ban-replay' }),
   ],
   controllers: [CommentsController, UsersController, ModController],
-  providers: [ModService, UserService],
+  providers: [ModService, UserService, SteamService],
   exports: [ModService, UserService],
 })
 export class UsersModule {}

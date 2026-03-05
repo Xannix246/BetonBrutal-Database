@@ -1,0 +1,24 @@
+type AttachmentHeader {
+  name String
+  url  String
+}
+
+model Article {
+  id          String             @id @default(auto()) @map("_id") @db.ObjectId
+  authorId    String
+  title       String
+  description String?
+  content     String
+  date        DateTime
+  tags        String[]
+  preview     String? // attachment id
+  attachments AttachmentHeader[] // attachment ids
+}
+
+model Attachment {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  fileId   String // id from gridfs
+  mimeType String
+  size     Int?
+}

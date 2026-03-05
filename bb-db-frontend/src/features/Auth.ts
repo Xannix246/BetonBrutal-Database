@@ -2,6 +2,7 @@ import { createAuthClient } from "better-auth/client";
 import { config } from "../../config/config";
 import { adminClient } from "better-auth/client/plugins"
 import axios from "axios";
+import { setUser } from "../store/store";
 
 export const authClient = createAuthClient({
   baseURL: config.baseAuthUrl,
@@ -22,6 +23,12 @@ export const signIn = async (callbackURL: string = "/") => {
 
 export const logOut = async () => {
   await authClient.signOut();
+}
+
+export const unlinkSteam = async () => {
+  await api.get('user/unlink-steam');
+
+  setUser((await authClient.getSession()).data?.user);
 }
 
 export const api = axios.create({
