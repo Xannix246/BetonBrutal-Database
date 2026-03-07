@@ -5,6 +5,8 @@ import Container from "../../shared/Containter/Container";
 import MapTile from "../../entities/MapTile";
 import Background from "../../widgets/Background/Background";
 import { getUser, getUserFavorites } from "./requests";
+import { navigate } from "vike/client/router";
+import { setPrevLink } from "../../store/store";
 
 const Favorites = ({ id }: { id: string }) => {
   const [user, setUser] = useState<User>();
@@ -13,7 +15,13 @@ const Favorites = ({ id }: { id: string }) => {
 
   useEffect(() => {
     (async () => {
-      setUser(await getUser(id));
+      const user = await getUser(id);
+      setUser(user);
+
+      if (user.steamId) {
+        setPrevLink("favorites");
+        return navigate(`/workshop/player/${user.steamId}`);
+      }
 
       setMapData(await getUserFavorites(id));
 

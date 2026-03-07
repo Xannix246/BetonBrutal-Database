@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Footer from "../../widgets/Footer/Footer";
 import Header from "../../widgets/Header/Header";
 import Container from "../../shared/Containter/Container";
-import { getPlayer, getPlayerMaps, getPlayerReplays } from "./requests";
+import { getPlayer, getPlayerMaps, getPlayerReplays, getUser, getUserFavorites } from "./requests";
 import MapTile from "../../entities/MapTile";
 import Background from "../../widgets/Background/Background";
 import { getPrevLink } from "../../store/store";
@@ -15,19 +15,41 @@ const PlayerPage = ({ id }: { id: string }) => {
   const [replays, setReplays] = useState<Replay[]>([]);
   const [loaded, setLoaded] = useState(false);
   const source = getPrevLink();
-  const [page, setPage] = useState<"mapCreator" | "run">(source);
+  const [page, setPage] = useState<"mapCreator" | "run" | "favorites">(source);
+  const [user, setUser] = useState<User>();
 
   useEffect(() => {
     (async () => {
       const player = await getPlayer(id);
-      setPlayer(player);
+      const user = await getUser(player.id);
 
-      setMapData(await getPlayerMaps(player.items));
+      setPlayer(player);
+      setUser(user);
+
       setReplays(await getPlayerReplays(player.replays));
 
       setLoaded(true);
     })();
   }, []);
+
+  useEffect(() => {
+    const onPageUpdate = async () => {
+      if (!player) return;
+
+      switch (page) {
+        case "mapCreator":
+          setMapData(await getPlayerMaps(player.items));
+          break;
+
+        case "favorites":
+          if (!user) return;
+          setMapData(await getUserFavorites(user.id));
+          break;
+      }
+    };
+
+    onPageUpdate();
+  }, [page, player, user]);
 
   return (
     <div className="w-full min-h-screen h-full">
@@ -41,29 +63,36 @@ const PlayerPage = ({ id }: { id: string }) => {
           <div className="flex gap-2 pt-32 min-h-screen w-full">
             <div className="flex flex-col gap-2 w-full text-gray-300">
               <Container className="flex justify-center gap-10 text-4xl tracking-wide place-items-center">
-                <div className="flex gap-3">
+                <div className="flex gap-3 uppercase">
                   <div className="flex gap-3">
                     <span
                       className={clsx("transition duration-300 cursor-pointer hover:text-pink", page === "mapCreator" && "text-green")}
                       onClick={() => setPage("mapCreator")}
-                    >MAPS</span>
+                    >Maps</span>
                     |
                     <span
                       className={clsx("transition duration-300 cursor-pointer hover:text-pink", page === "run" && "text-green")}
                       onClick={() => setPage("run")}
-                    >RUNS</span>
-                    <span>BY</span>
+                    >Runs</span>
+                    {!user?.steamId && <span>by</span>}
                   </div>
-                  <a
+                  {!user?.steamId && <a
                     target="_blank"
                     href={`https://steamcommunity.com/profiles/${player?.id}`}
                     rel="noreferrer"
                     className="hover:text-white hover:underline"
-                  >{player?.username.toUpperCase()}</a>
+                  >{player?.username}</a>}
+                  {user?.steamId && <>
+                    |
+                    <span
+                      className={clsx("transition duration-300 cursor-pointer hover:text-pink", page === "favorites" && "text-green")}
+                      onClick={() => setPage("favorites")}
+                    >Favorites</span>
+                  </>}
                 </div>
               </Container>
               <div className="px-4">
-                {page === "mapCreator" ?
+                {["mapCreator", "favorites"].includes(page) ?
                   <div className="flex w-full justify-center">
                     {mapData.length > 0 && <div className="grid sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[200px] lg:auto-rows-[300px] gap-6 p-6 w-full">
                       {mapData.map(m => (
@@ -71,7 +100,9 @@ const PlayerPage = ({ id }: { id: string }) => {
                       ))}
                     </div>}
                     {mapData.length === 0 && <Container className="w-5xl mt-16">
-                      <h2 className="text-[#f1e4c7] tracking-wider text-xl text-center">THIS PLAYER DIDN&apos;T POST ANY MAPS YET...</h2>
+                      {page === "mapCreator" ? <h2 className="text-[#f1e4c7] tracking-wider text-xl text-center">THIS PLAYER DIDN&apos;T POST ANY MAPS YET...</h2> 
+                      : <h2 className="text-[#f1e4c7] tracking-wider text-xl text-center">THIS PLAYER DON&apos;T HAVE FAVORITE MAPS YET...</h2>
+                      }
                     </Container>}
                   </div>
                   :

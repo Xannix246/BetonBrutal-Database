@@ -74,6 +74,11 @@ export class UsersController {
     return await this.steamService.unlinkSteamId(session.user.id);
   }
 
+  @Get('s-id/:id')
+  async getBySteamId(@Param('id') id: string) {
+    return await this.userSevice.getUserBySteamId(id);
+  }
+
   @Get(':id/favorites')
   @OptionalAuth()
   async getFavorites(@Param('id') id: string) {

@@ -27,11 +27,7 @@ export class FileController {
   @UseGuards(AuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(@UploadedFile() file: ArticleFile) {
-    const id = await this.gridFs.upload(
-      file.originalname,
-      file.buffer,
-      file.mimetype,
-    );
+    const id = await this.gridFs.upload(file.originalname, file.buffer);
 
     const attachment = await this.prisma.attachment.create({
       data: {

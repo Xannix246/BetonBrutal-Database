@@ -76,3 +76,17 @@ declare type Collection = {
   showOnMain: boolean;
   descColor: "white" | "black" | "red" | "blue" | "green" | "yellow";
 }
+
+type Link = {
+  showName: string;
+  url: string;
+}
+
+declare type PublicData = {
+  id: string;
+  userId: string;
+  profilePicUrl: string | null;
+  backgroundUrl: string | null;
+  about: string | null;
+  links: Link[];
+}

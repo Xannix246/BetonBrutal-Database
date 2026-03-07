@@ -1,4 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { PublicData } from '@prisma/client';
+import { UserSession } from '@thallesp/nestjs-better-auth';
+import { ObjectId } from 'mongodb';
 import { auth } from 'src/modules/auth/auth.module';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { WorkshopService } from 'src/modules/workshop/domain/services/workshop.service';
@@ -26,6 +34,27 @@ export class UserService {
       name: user.name,
       role: '',
       image: user.image,
+      steamId: user.steamId,
+    };
+  }
+
+  async getUserBySteamId(id: string): Promise<User | null> {
+    const user = await this.prisma.user.findUnique({
+      where: { steamId: id },
+    });
+
+    if (!user) return null;
+
+    return {
+      id: user.id,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+      email: '',
+      emailVerified: false,
+      name: user.name,
+      role: '',
+      image: user.image,
+      steamId: user.steamId,
     };
   }
 
@@ -83,16 +112,63 @@ export class UserService {
     return returnFav.mapsId;
   }
 
+  async getPublicData(userId: string): Promise<PublicData> {
+    if (!ObjectId.isValid(userId)) {
+      throw new BadRequestException('Incorrect user id');
+    }
+
+    const data = await this.prisma.publicData.findUnique({
+      where: { userId },
+    });
+
+    if (!data) {
+      throw new NotFoundException('User data not found');
+    }
+
+    return data;
+  }
+
+  async setPublicData(
+    data: PublicData,
+    session: UserSession,
+  ): Promise<PublicData> {
+    const existingData = await this.prisma.publicData.findFirst({
+      where: { OR: [{ id: data.id }, { userId: session.user.id }] },
+    });
+
+    if (existingData && existingData.userId !== session.user.id) {
+      throw new ForbiddenException();
+    }
+
+    return await this.prisma.publicData.upsert({
+      where: { id: data.id, userId: session.user.id },
+      update: {
+        profilePicUrl: data.profilePicUrl,
+        backgroundUrl: data.backgroundUrl,
+        about: data.about,
+        links: data.links,
+      },
+      create: {
+        userId: session.user.id,
+        profilePicUrl: data.profilePicUrl,
+        backgroundUrl: data.backgroundUrl,
+        about: data.about,
+        links: data.links,
+      },
+    });
+  }
+
   async deleteData(userId: string) {
     // delete all user data like favorites/comments and articles
 
     void (await this.prisma.favorites.deleteMany({
       where: { userId: userId },
     }));
-    void (await this.prisma.comment.deleteMany({ where: { userId: userId } }));
+    void (await this.prisma.comment.deleteMany({ where: { userId } }));
     void (await this.prisma.article.deleteMany({
       where: { authorId: userId },
     }));
+    void (await this.prisma.publicData.deleteMany({ where: { userId } }));
   }
 
   async banUser(userId: string, banReason?: string) {

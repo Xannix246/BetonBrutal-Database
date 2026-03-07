@@ -12,7 +12,7 @@ export class GridFSService implements OnModuleInit {
     this.bucket = new GridFSBucket(db, { bucketName: 'uploads' });
   }
 
-  async upload(filename: string, buffer: Buffer, contentType: string) {
+  async upload(filename: string, buffer: Buffer) {
     return new Promise<ObjectId>((resolve, reject) => {
       const uploadStream = this.bucket.openUploadStream(filename);
       uploadStream.end(buffer);

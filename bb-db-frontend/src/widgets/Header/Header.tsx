@@ -6,7 +6,7 @@ import { JSX, useCallback, useEffect, useState } from "react";
 import { handleEnterSearch, handleSearch } from "../../features/SearchManager";
 import { logOut, signIn, unlinkSteam } from "../../features/Auth";
 import Dropdown from "../../shared/Dropdown/Dropdown";
-import { ArrowLeftEndOnRectangleIcon, StarIcon, Bars3Icon, TrashIcon, LinkIcon, LinkSlashIcon } from "@heroicons/react/24/outline";
+import { ArrowLeftEndOnRectangleIcon, StarIcon, Bars3Icon, TrashIcon, LinkIcon, LinkSlashIcon, UserIcon } from "@heroicons/react/24/outline";
 import { navigate } from "vike/client/router";
 import MobileMenu from "./MobileMenu";
 import { getUser, setUser } from "../../store/store";
@@ -45,8 +45,8 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
       }
     },
     {
-      name: "FAVORITES",
-      icon: <StarIcon width={24} />,
+      name: user?.steamId ? "PROFILE" : "FAVORITES",
+      icon: user?.steamId ? <UserIcon width={24}/> : <StarIcon width={24} />,
       onClick: () => navigate(`/user/${user?.id}/favorites`)
     },
     {

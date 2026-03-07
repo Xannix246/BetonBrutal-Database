@@ -63,6 +63,7 @@ declare type User = {
   name: string;
   role?: string;
   image?: string | null | undefined;
+  steamId?: string | null;
 };
 
 declare type UserComment = {

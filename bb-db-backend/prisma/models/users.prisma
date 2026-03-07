@@ -18,9 +18,10 @@ model User {
   sessions      Session[]
   accounts      Account[]
 
-  banned     Boolean?  @default(false)
-  banReason  String?
-  banExpires DateTime?
+  banned      Boolean?     @default(false)
+  banReason   String?
+  banExpires  DateTime?
+  publicDatas PublicData[]
 
   @@unique([email])
   @@map("user")
@@ -78,4 +79,19 @@ model Favorites {
   id     String   @id @default(auto()) @map("_id") @db.ObjectId
   userId String   @unique
   mapsId String[]
+}
+
+type Link {
+  showName String
+  url      String
+}
+
+model PublicData {
+  id            String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String  @unique
+  profilePicUrl String?
+  backgroundUrl String?
+  about         String?
+  links         Link[]
+  user          User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
