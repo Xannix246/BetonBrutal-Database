@@ -174,10 +174,10 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
           <div className="flex flex-col gap-2 pt-32 px-4 min-h-screen w-full">
             <div className="flex flex-col md:flex-row gap-2">
               <div className="flex flex-col gap-2">
-                <div className="group relative w-full h-64 md:w-96 md:h-96 lg:w-128 lg:h-128 bg-black/70">
+                <div className="aspect-square group relative w-full md:w-96 md:h-96 lg:w-128 lg:h-128 bg-black/70">
                   <img
                     src={mapData?.previewUrl}
-                    className="absolute w-full h-64 md:w-96 md:h-96 lg:w-128 lg:h-128 object-cover bottom-0 right-0 group-hover:-bottom-5 group-hover:-right-5 transition-all duration-300"
+                    className="aspect-square absolute w-full md:w-96 md:h-96 lg:w-128 lg:h-128 object-cover bottom-0 right-0 group-hover:-bottom-5 group-hover:-right-5 transition-all duration-300"
                   />
                 </div>
                 <Container className="text-white flex gap-16 text-2xl sm:text-4xl justify-center mb-8 md:mb-0">

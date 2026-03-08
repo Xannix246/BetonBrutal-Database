@@ -8,6 +8,7 @@ import Background from "../../widgets/Background/Background";
 import { getPrevLink } from "../../store/store";
 import clsx from "clsx";
 import LeaderboardTable from "../../widgets/LeaderboardTable/LeaderboardTable";
+import UserProfile from "./UserProfile";
 
 const PlayerPage = ({ id }: { id: string }) => {
   const [player, setPlayer] = useState<Player>();
@@ -17,6 +18,7 @@ const PlayerPage = ({ id }: { id: string }) => {
   const source = getPrevLink();
   const [page, setPage] = useState<"mapCreator" | "run" | "favorites">(source);
   const [user, setUser] = useState<User>();
+  const [publicData, setPublicData] = useState<PublicData>();
 
   useEffect(() => {
     (async () => {
@@ -53,7 +55,14 @@ const PlayerPage = ({ id }: { id: string }) => {
 
   return (
     <div className="w-full min-h-screen h-full">
-      <Background />
+      {publicData?.backgroundUrl ? (
+        <img
+          src={publicData.backgroundUrl}
+          className="fixed inset-0 -z-10 w-full h-full object-cover blur-md"
+        />
+      ) : (
+        <Background />
+      )}
       <div className="fixed left-0 w-full z-50">
         <Header isAbsolute={true} />
       </div>
@@ -62,6 +71,7 @@ const PlayerPage = ({ id }: { id: string }) => {
         {loaded ?
           <div className="flex gap-2 pt-32 min-h-screen w-full">
             <div className="flex flex-col gap-2 w-full text-gray-300">
+              {user?.steamId && player && <UserProfile user={user} player={player} publicData={publicData} setPublicData={setPublicData} /> }
               <Container className="flex justify-center gap-10 text-4xl tracking-wide place-items-center">
                 <div className="flex gap-3 uppercase">
                   <div className="flex gap-3">

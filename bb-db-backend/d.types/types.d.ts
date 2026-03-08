@@ -164,3 +164,17 @@ declare type WokshopItemCreate = {
 }
 
 declare type WorkshopItemUpsert = WokshopItemCreate | WokshopItemUpdate;
+
+type Link = {
+  showName: string;
+  url: string;
+}
+
+declare type PublicData = {
+  id: string;
+  userId: string;
+  profilePicUrl?: string | null;
+  backgroundUrl?: string | null;
+  about?: string | null;
+  links?: Link[];
+}

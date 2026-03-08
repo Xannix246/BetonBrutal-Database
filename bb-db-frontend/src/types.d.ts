@@ -85,8 +85,8 @@ type Link = {
 declare type PublicData = {
   id: string;
   userId: string;
-  profilePicUrl: string | null;
-  backgroundUrl: string | null;
-  about: string | null;
-  links: Link[];
+  profilePicUrl?: string | null;
+  backgroundUrl?: string | null;
+  about?: string | null;
+  links?: Link[];
 }

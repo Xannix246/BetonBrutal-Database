@@ -1,12 +1,9 @@
 import {
-  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PublicData } from '@prisma/client';
 import { UserSession } from '@thallesp/nestjs-better-auth';
-import { ObjectId } from 'mongodb';
 import { auth } from 'src/modules/auth/auth.module';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { WorkshopService } from 'src/modules/workshop/domain/services/workshop.service';
@@ -113,10 +110,6 @@ export class UserService {
   }
 
   async getPublicData(userId: string): Promise<PublicData> {
-    if (!ObjectId.isValid(userId)) {
-      throw new BadRequestException('Incorrect user id');
-    }
-
     const data = await this.prisma.publicData.findUnique({
       where: { userId },
     });
@@ -133,7 +126,7 @@ export class UserService {
     session: UserSession,
   ): Promise<PublicData> {
     const existingData = await this.prisma.publicData.findFirst({
-      where: { OR: [{ id: data.id }, { userId: session.user.id }] },
+      where: { userId: session.user.id },
     });
 
     if (existingData && existingData.userId !== session.user.id) {
@@ -141,7 +134,7 @@ export class UserService {
     }
 
     return await this.prisma.publicData.upsert({
-      where: { id: data.id, userId: session.user.id },
+      where: { userId: session.user.id },
       update: {
         profilePicUrl: data.profilePicUrl,
         backgroundUrl: data.backgroundUrl,

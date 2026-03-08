@@ -29,3 +29,7 @@ export const getPlayerReplays = async (ids: string[]): Promise<Replay[]> => {
     })
   ).data;
 };
+
+export const getUserPublicData = async (id: string): Promise<PublicData> => {
+  return (await api.get(`/user/public-data/${id}`)).data;
+}

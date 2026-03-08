@@ -6,6 +6,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Query,
   Req,
   Res,
@@ -22,6 +23,7 @@ import { Role } from '@prisma/client';
 import { ModService } from '../../application/mod.service';
 import { SteamService } from '../../application/steam.service';
 import { type Response } from 'express';
+import { UpdatePublicDataDto } from './dto/update-data.dto';
 
 @Controller('user')
 export class UsersController {
@@ -52,6 +54,25 @@ export class UsersController {
     @Session() session: UserSession,
   ) {
     return await this.userSevice.removeFromFavorites(session.user.id, id);
+  }
+
+  @Get('public-data/:id')
+  async getPublicData(@Param('id') id: string) {
+    return await this.userSevice.getPublicData(id);
+  }
+
+  @Put('public-data')
+  async setPublicData(
+    @Body() body: UpdatePublicDataDto,
+    @Session() session: UserSession,
+  ) {
+    return await this.userSevice.setPublicData(
+      {
+        ...body,
+        userId: session.user.id,
+      },
+      session,
+    );
   }
 
   @Get('steam')
