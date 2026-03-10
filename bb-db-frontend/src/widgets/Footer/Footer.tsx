@@ -1,3 +1,4 @@
+import i18n, { resources, supportedLanguages } from "../../../i18n/config";
 import Link from "../../shared/Link/Link";
 
 const Footer = () => {
@@ -15,6 +16,15 @@ const Footer = () => {
         <Link className="text-blue opacity-50 hover:opacity-100 hover:underline" href="https://discord.com/invite/DqKwJyugGv">BETON BRUTAL Discord server</Link>
         |
         <Link className="text-yellow opacity-50 hover:opacity-100 hover:underline" href="https://josiahshields.com/beton/">BBLB</Link>
+      </div>
+      <div className="flex gap-1 sm:gap-6 place-items-center">
+        {supportedLanguages.map((lang, i) => (
+          <Link
+            key={i}
+            className="opacity-50 hover:opacity-100 hover:underline"
+            href={`/?lang=${i18n.getResource(lang, "translation", "language")}`}
+          >{i18n.getResource(lang, "translation", "localLanguage")}</Link>
+        ))}
       </div>
       <div className="flex gap-1 sm:gap-6 place-items-center">
         <Link className="opacity-50 hover:opacity-100 hover:underline" href="/api/docs">BBDB Api</Link>

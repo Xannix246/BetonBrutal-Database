@@ -11,6 +11,7 @@ import { navigate } from "vike/client/router";
 import { handleEnterSearch, handleSearch } from "../../features/SearchManager";
 import Background from "../../widgets/Background/Background";
 import CollectionContainer from "../../features/CollectionContainer/CollectionContainer";
+import { t } from "i18next";
 // import { CircleStackIcon } from "@heroicons/react/24/outline";
 
 const Main = () => {
@@ -19,8 +20,11 @@ const Main = () => {
   const [collections, setCollections] = useState<Collection[]>([]);
   const [isSticky, setIsSticky] = useState(false);
   const [search, setSearch] = useState("");
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
+    setLoaded(window ? true : false);
+
     (async () => {
       setCollections(await getCollections());
 
@@ -47,6 +51,8 @@ const Main = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  if (!loaded) return null;
+
   return (
     <div className="w-full h-full">
       <Background />
@@ -60,7 +66,7 @@ const Main = () => {
         <Header isAbsolute={isSticky} />
       </div>
       <div className="flex flex-col gap-32 justify-center">
-        <div className="flex flex-col">
+        <div className="flex flex-col uppercase">
           <div className="bg-black/80 w-full h-64 flex flex-col place-items-center px-4 py-8 md:p-8 gap-8">
             <div className="relative">
               <h1 className="text-[#ffd884] text-6xl tracking-wider text-shadow-lg/30 text-center">
@@ -71,16 +77,16 @@ const Main = () => {
             <div className="flex w-full drop-shadow-md justify-center">
               <Input
                 className="text-2xl w-full sm:text-4xl md:w-2xl lg:w-4xl bg-white/10"
-                placeholder="Search by name, author, id or url"
+                placeholder={t("header.placeholder")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => handleEnterSearch(search, e)}
               />
               <Button
-                className="text-3xl sm:text-4xl bg-white/10"
+                className="text-3xl sm:text-4xl bg-white/10 uppercase"
                 onClick={() => handleSearch(search)}
               >
-                SEARCH
+                {t("header.search")}
               </Button>
             </div>
           </div>
@@ -88,15 +94,15 @@ const Main = () => {
 
         <div className="flex flex-col gap-4 place-items-center w-full mt-16">
           {collections.length > 0 && (
-            <div className="w-full h-full mb-32">
+            <div className="w-full mb-32">
               {collections.map((collection, i) => (
                 <CollectionContainer collection={collection} key={i} />
               ))}
             </div>
           )}
-          <div className="p-4 bg-black/70">
+          <div className="p-4 bg-black/70 uppercase">
             <h1 className="w-fit text-center text-7xl text-[#ffd884] tracking-wider text-shadow-md">
-              MAPS OF THE YEAR
+              {t("main.yearMaps")}
             </h1>
           </div>
           <div className="flex flex-col lg:flex-row justify-center gap-8 w-full h-500 lg:h-232 overflow-clip">
@@ -115,7 +121,7 @@ const Main = () => {
         <div className="flex flex-col gap-4 place-items-center w-full mt-16">
           <div className="p-4 bg-black/70">
             <h1 className="w-fit text-center lg:text-left text-4xl text-[#ffd884] tracking-wider text-shadow-md">
-              Want to see some other maps? Here are a couple of them
+              {t("main.newMaps")}
             </h1>
           </div>
           <div className="flex justify-center w-full">
@@ -125,8 +131,8 @@ const Main = () => {
               ))}
             </div>
           </div>
-          <Button onClick={() => navigate("/workshop")}>
-            DISCOVER ALL MAPS -&gt;
+          <Button onClick={() => navigate("/workshop")} className="uppercase">
+            {t("main.discoverBtn")}
           </Button>
         </div>
 

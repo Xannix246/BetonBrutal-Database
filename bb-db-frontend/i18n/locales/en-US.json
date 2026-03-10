@@ -1,0 +1,39 @@
+{
+  "language": "en-US",
+  "localLanguage": "English",
+  "dataCheck": "Checking what's new...",
+
+  "header": {
+    "home": "Home",
+    "maps": "Maps",
+    "rankings": "Rankings",
+    "articles": "Articles",
+
+    "search": "Search",
+    "placeholder": "Search by name, author, id or url",
+
+    "login": "Log in",
+    "logout": "Log out",
+    "profile": "Profile",
+    "favorites": "Favorites",
+    "unlSteam": "Unlink Steam",
+    "lSteam": "Link Steam",
+    "deleteAcc": "Delete account"
+  },
+  "main": {
+    "yearMaps": "Maps of the year",
+    "newMaps": "Want to see some other maps? Here are a couple of them",
+    "discoverBtn": "Discover all maps ->"
+  },
+  "workshop": {
+    "deleteBtn": "Delete \"{{map}}\"",
+    
+    "sort": "Sort by:",
+    "newest": "Newest",
+    "oldest": "Oldest",
+    "mostPopular": "Most popular",
+    "mostPlayed": "Most played",
+
+    "randomMap": "Random map"
+  }
+}

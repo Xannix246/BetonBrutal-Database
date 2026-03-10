@@ -6,8 +6,11 @@ import MapTile from "../../entities/MapTile";
 
 const CollectionContainer = ({ collection }: { collection: Collection }) => {
   const [maps, setMaps] = useState<WorkshopItem[]>([]);
+  const [width, setWidth] = useState(0);
 
   useEffect(() => {
+    setWidth(window.innerWidth);
+
     (async () => {
       setMaps(await getMaps(collection.mapsId));
     })();
@@ -47,7 +50,7 @@ const CollectionContainer = ({ collection }: { collection: Collection }) => {
         "justify-center gap-8 w-full",
         maps.length <= 3 && "flex flex-col lg:flex-row h-156 lg:h-196 overflow-clip",
         maps.length > 3 && maps.length <= 6 && "flex flex-wrap justify-center max-w-[1400px] mx-auto h-306 overflow-clip",
-        maps.length > 6 && "grid sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[200px] lg:auto-rows-[300px]"
+        maps.length > 6 && "flex flex-col w-full h-full sm:grid sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[200px] lg:auto-rows-[300px]"
       )}>
         {maps.map((map) => (
           maps.length <= 6 ?
@@ -59,7 +62,7 @@ const CollectionContainer = ({ collection }: { collection: Collection }) => {
               key={map.id}
             />
             :
-            <MapTile key={map.id} {...map} />
+            <MapTile key={map.id} {...map} disableSizeClass={width < 640} />
         ))}
       </div>
     </div>

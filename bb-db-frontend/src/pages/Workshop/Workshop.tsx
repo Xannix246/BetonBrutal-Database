@@ -12,6 +12,7 @@ import ContextMenu from "../../shared/ContextMenu/ContextMenu";
 import { getTargetData, getUser, setTargetData } from "../../store/store";
 import { DeleteMap } from "../../features/DataManager";
 import { v4 } from "uuid";
+import { t } from "i18next";
 
 const Workshop = () => {
   const [loaded, setLoaded] = useState(false);
@@ -48,7 +49,7 @@ const Workshop = () => {
     if (maps.length < 50) setHasMore(false);
 
     setItems((prev) => (append ? [...prev, ...maps] : maps));
-    setLoaded(true);
+    setLoaded(window ? true : false);
     isLoadingMore.current = false;
   };
 
@@ -88,6 +89,8 @@ const Workshop = () => {
     }
   }, [targetData]);
 
+  if (!loaded) return;
+
   return (
     <div className="w-full min-h-screen h-full bg-center bg-fixed bg-no-repeat bg-cover">
       <Background />
@@ -102,34 +105,34 @@ const Workshop = () => {
       <div className="fixed left-0 w-full z-50">
         <Header isAbsolute={true} />
       </div>
-      <div className="flex flex-col min-h-screen justify-between pt-32">
+      <div className="flex flex-col min-h-screen justify-between pt-32 uppercase">
         <Container className="flex gap-10 text-2xl md:text-4xl tracking-wide md:justify-center place-items-center overflow-x-auto whitespace-nowrap">
-          <h1 className="text-white">SORT BY:</h1>
+          <h1 className="text-white">{t("workshop.sort")}</h1>
           <div className="flex gap-5">
             {["newest", "oldest", "mostPopular", "mostPlayed"].map(
               (sortOption) => (
                 <Button
                   key={sortOption}
                   className={clsx(
-                    "bg-none",
+                    "bg-none uppercase",
                     activeSort === sortOption && "text-green",
                   )}
                   onClick={() => setActiveSort(sortOption as SortBy)}
                 >
-                  {sortOption === "newest" && "NEWEST"}
-                  {sortOption === "oldest" && "OLDEST"}
-                  {sortOption === "mostPopular" && "MOST POPULAR"}
-                  {sortOption === "mostPlayed" && "MOST PLAYED"}
+                  {sortOption === "newest" && t("workshop.newest")}
+                  {sortOption === "oldest" && t("workshop.oldest")}
+                  {sortOption === "mostPopular" && t("workshop.mostPopular")}
+                  {sortOption === "mostPlayed" && t("workshop.mostPlayed")}
                 </Button>
               ),
             )}
           </div>
           <h1 className="text-white"> |</h1>
           <Button
-            className="bg-transparent p-0"
+            className="bg-transparent p-0 uppercase"
             onClick={async () => navigate(`/workshop/${await getRandomMap()}`)}
           >
-            RANDOM MAP
+            {t("workshop.randomMap")}
           </Button>
         </Container>
 
@@ -145,7 +148,7 @@ const Workshop = () => {
           <div className="flex gap-2 w-full px-4">
             <div className="w-full text-white text-center mt-64 mb-256">
               <Container className="text-6xl w-full">
-                CHECKING WHAT&apos;S NEW...
+                {t("dataCheck")}
               </Container>
             </div>
           </div>

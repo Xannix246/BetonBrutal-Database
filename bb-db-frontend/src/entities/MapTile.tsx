@@ -9,6 +9,7 @@ type Props = {
   previewUrl: string;
   ratingUp: number;
   ratingDown: number;
+  disableSizeClass?: boolean;
 }
 
 const getTileSize = (title: string, ratingUp: number) => {
@@ -17,7 +18,7 @@ const getTileSize = (title: string, ratingUp: number) => {
   return "tile-normal";
 };
 
-const MapTile = ({ steamId, title, creator, previewUrl, ratingUp, id }: Props) => {
+const MapTile = ({ steamId, title, creator, previewUrl, ratingUp, id, disableSizeClass = false }: Props) => {
   const sizeClass = getTileSize(title, ratingUp);
   const user = getUser();
 
@@ -26,7 +27,7 @@ const MapTile = ({ steamId, title, creator, previewUrl, ratingUp, id }: Props) =
       key={steamId === undefined ? id : steamId}
       className={clsx(
         "relative shadow-md group cursor-pointer bg-black/70",
-        sizeClass
+        !disableSizeClass ? sizeClass : "flex w-full h-full aspect-square"
       )}
       href={`/workshop/${steamId === undefined ? id : steamId}`}
       onContextMenu={(e) => {

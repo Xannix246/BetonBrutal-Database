@@ -12,11 +12,12 @@ import MobileMenu from "./MobileMenu";
 import { getUser, setUser } from "../../store/store";
 import DeleteModal from "../../features/DeleteModal";
 import { config } from "../../../config/config";
+import { t } from "i18next";
 
 const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: boolean, hideSearch?: boolean, additionalComponent?: JSX.Element }) => {
   const [search, setSearch] = useState("");
   const user = getUser();
-  const [width, setWidth] = useState(0)
+  const [width, setWidth] = useState<number | null>(null)
   const [mobileMenu, setMobileMenu] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
 
@@ -35,9 +36,11 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
     setWidth(window.innerWidth);
   }, []);
 
+  if (width === null) return null;
+
   const menu = [
     {
-      name: "LOG OUT",
+      name: t("header.login"),
       icon: <ArrowLeftEndOnRectangleIcon width={24} />,
       onClick: () => {
         logOut();
@@ -45,12 +48,12 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
       }
     },
     {
-      name: user?.steamId ? "PROFILE" : "FAVORITES",
+      name: user?.steamId ? t("header.profile") : t("header.favorites"),
       icon: user?.steamId ? <UserIcon width={24}/> : <StarIcon width={24} />,
       onClick: () => navigate(`/user/${user?.id}/favorites`)
     },
     {
-      name: user?.steamId ? "UNLINK STEAM" : "LINK STEAM",
+      name: user?.steamId ? t("header.unlSteam") : t("header.lSteam"),
       icon: user?.steamId ? <LinkSlashIcon width={24} /> : <LinkIcon width={24} />,
       onClick: async () => {
         if (user?.steamId) {
@@ -61,7 +64,7 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
       }
     },
     {
-      name: "DELETE ACCOUNT",
+      name: t("header.deleteAcc"),
       className: "text-red hover:text-red-500",
       icon: <TrashIcon width={24} />,
       onClick: () => setDeleteModal(true)
@@ -69,14 +72,14 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
   ];
 
   return (
-    <header className="bg-black/80 w-full h-16 border-b-1 border-amber-200 flex p-2 justify-between">
+    <header className="bg-black/80 w-full h-16 border-b-1 border-amber-200 flex p-2 justify-between uppercase">
       <DeleteModal open={deleteModal} setOpen={setDeleteModal} />
       <MobileMenu open={mobileMenu} setOpen={setMobileMenu} user={user} menu={menu} />
       {width > 1115 && <div className="h-full text-white text-shadow-lg text-4xl flex gap-10 place-items-center pl-8">
-        <Link className="hover:text-pink transition duration-150" href="/">HOME</Link>
-        <Link className="hover:text-pink transition duration-150" href="/workshop">MAPS</Link>
-        <Link className="hover:text-pink transition duration-150" href="/rankings">RANKINGS</Link>
-        <Link className="hover:text-pink transition duration-150" href="/articles">ARTICLES</Link>
+        <Link className="hover:text-pink transition duration-150" href="/">{t("header.home")}</Link>
+        <Link className="hover:text-pink transition duration-150" href="/workshop">{t("header.maps")}</Link>
+        <Link className="hover:text-pink transition duration-150" href="/rankings">{t("header.rankings")}</Link>
+        <Link className="hover:text-pink transition duration-150" href="/articles">{t("header.articles")}</Link>
       </div>}
       {width < 1115 && <div className="w-12 flex place-items-center justify-baseline">
         <Bars3Icon
@@ -96,15 +99,15 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
       >
         <Input
           className="text-2xl w-full bg-white/10"
-          placeholder="Search by name, author, id or url"
+          placeholder={t("header.placeholder")}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={(e) => handleEnterSearch(search, e)}
         />
         <Button
-          className="text-2xl bg-white/10"
+          className="text-2xl bg-white/10 uppercase"
           onClick={() => handleSearch(search)}
-        >SEARCH</Button>
+        >{t("header.search")}</Button>
       </div>}
       {additionalComponent}
       {width > 1115 && <div className="flex">
@@ -121,11 +124,11 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
           <Button
             className="text-2xl bg-white/10 place-items-center text-nowrap"
             onClick={() => signIn(window.location.pathname)}
-          >LOG IN</Button>
+          >{t("header.login")}</Button>
         }
       </div>}
     </header>
   );
 }
 
-export default Header
+export default Header;

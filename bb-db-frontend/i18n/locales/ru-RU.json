@@ -1,0 +1,26 @@
+{
+  "language": "ru-RU",
+  "localLanguage": "Русский",
+  "header": {
+    "home": "Главная",
+    "maps": "Карты",
+    "rankings": "Рейтинги",
+    "articles": "Статьи",
+
+    "search": "Найти",
+    "placeholder": "Попробуйте поискать по имени, автору, id или ссылке",
+
+    "login": "Войти",
+    "logout": "Выйти",
+    "profile": "Профиль",
+    "favorites": "Избранное",
+    "unlSteam": "Отвязать Steam",
+    "lSteam": "Привязать Steam",
+    "deleteAcc": "Удалить аккаунт"
+  },
+  "main": {
+    "yearMaps": "Карты года",
+    "newMaps": "Хотите посмотреть ещё какие-нибудь карты? Вот несколько из них",
+    "discoverBtn": "Просмотреть все карты ->"
+  }
+}
