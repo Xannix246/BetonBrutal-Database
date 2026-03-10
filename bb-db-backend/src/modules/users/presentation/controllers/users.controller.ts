@@ -57,6 +57,7 @@ export class UsersController {
   }
 
   @Get('public-data/:id')
+  @OptionalAuth()
   async getPublicData(@Param('id') id: string) {
     return await this.userSevice.getPublicData(id);
   }
@@ -96,6 +97,7 @@ export class UsersController {
   }
 
   @Get('s-id/:id')
+  @OptionalAuth()
   async getBySteamId(@Param('id') id: string) {
     return await this.userSevice.getUserBySteamId(id);
   }

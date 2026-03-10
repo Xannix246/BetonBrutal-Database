@@ -69,7 +69,7 @@ const PlayerPage = ({ id }: { id: string }) => {
 
       <div className="flex flex-col h-full justify-between">
         {loaded ?
-          <div className="flex gap-2 pt-32 min-h-screen w-full">
+          <div className="flex gap-2 pt-32 w-full">
             <div className="flex flex-col gap-2 w-full text-gray-300">
               {user?.steamId && player && <UserProfile user={user} player={player} publicData={publicData} setPublicData={setPublicData} /> }
               <Container className="flex justify-center gap-10 text-4xl tracking-wide place-items-center">

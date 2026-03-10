@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -131,6 +132,10 @@ export class UserService {
 
     if (existingData && existingData.userId !== session.user.id) {
       throw new ForbiddenException();
+    }
+
+    if (data.links && data.links.length > 5) {
+      throw new BadRequestException('Links limit is 5');
     }
 
     return await this.prisma.publicData.upsert({
