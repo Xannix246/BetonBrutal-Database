@@ -43,7 +43,7 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
 
   const menu = [
     {
-      name: t(key.login),
+      name: t(key.login).toUpperCase(),
       icon: <ArrowLeftEndOnRectangleIcon width={24} />,
       onClick: () => {
         logOut();
@@ -51,12 +51,12 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
       }
     },
     {
-      name: user?.steamId ? t(key.profile) : t(key.favorites),
+      name: user?.steamId ? t(key.profile).toUpperCase() : t(key.favorites).toUpperCase(),
       icon: user?.steamId ? <UserIcon width={24}/> : <StarIcon width={24} />,
       onClick: () => navigate(`/user/${user?.id}/favorites`)
     },
     {
-      name: user?.steamId ? t(key.unlSteam) : t(key.lSteam),
+      name: user?.steamId ? t(key.unlSteam).toUpperCase() : t(key.lSteam).toUpperCase(),
       icon: user?.steamId ? <LinkSlashIcon width={24} /> : <LinkIcon width={24} />,
       onClick: async () => {
         if (user?.steamId) {
@@ -67,7 +67,7 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
       }
     },
     {
-      name: t(key.deleteAcc),
+      name: t(key.deleteAcc).toUpperCase(),
       className: "text-red hover:text-red-500",
       icon: <TrashIcon width={24} />,
       onClick: () => setDeleteModal(true)
