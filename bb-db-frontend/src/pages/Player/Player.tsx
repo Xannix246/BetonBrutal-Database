@@ -118,7 +118,7 @@ const PlayerPage = ({ id }: { id: string }) => {
                         <MapTile key={m.id} {...m} />
                       ))}
                     </div>}
-                    {mapData.length === 0 && <Container className="w-5xl mt-16 uppercase">
+                    {mapData.length === 0 && <Container className="w-5xl h-fit mt-16 uppercase">
                       {page === "mapCreator" ? <h2 className="text-[#f1e4c7] tracking-wider text-xl text-center">{t(key.noMapsFound)}</h2> 
                       : <h2 className="text-[#f1e4c7] tracking-wider text-xl text-center">{t(key.noFavsFound)}</h2>
                       }

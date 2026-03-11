@@ -43,7 +43,7 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
 
   const menu = [
     {
-      name: t(key.login).toUpperCase(),
+      name: t(key.logout).toUpperCase(),
       icon: <ArrowLeftEndOnRectangleIcon width={24} />,
       onClick: () => {
         logOut();
@@ -125,7 +125,7 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
           </div>
           :
           <Button
-            className="text-2xl bg-white/10 place-items-center text-nowrap"
+            className="text-2xl bg-white/10 place-items-center text-nowrap uppercase"
             onClick={() => signIn(window.location.pathname)}
           >{t(key.login)}</Button>
         }
