@@ -3,6 +3,8 @@ import LeaderboardEntry from "../../entities/LeaderboardEntry";
 import Container from "../../shared/Containter/Container";
 // import { List, RowComponentProps } from "react-window";
 import clsx from "clsx";
+import { t } from "i18next";
+import { Keys } from "../../../i18n/keys";
 
 type Props = {
   replays: Replay[];
@@ -11,9 +13,11 @@ type Props = {
 
 type SortKey = "score" | "creator" | "date" | "place";
 
+const key = Keys.leaderboard;
+
 const LeaderboardTable = ({
   replays,
-  comment = "NO ONE HAS COMPLETED THIS MAP YET...",
+  comment = t(key.defaultComment),
 }: Props) => {
   const [sortKey, setSortKey] = useState<SortKey>("place");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
@@ -65,9 +69,9 @@ const LeaderboardTable = ({
   };
 
   return (
-    <div className="flex flex-col gap-2 w-full">
+    <div className="flex flex-col gap-2 w-full uppercase">
       <Container className="flex justify-between items-center">
-        <h2 className="text-white tracking-wider text-xl">LEADERBOARD</h2>
+        <h2 className="text-white tracking-wider text-xl">{t("leaderboard.title")}</h2>
       </Container>
 
       <Container className="sm:mx-2 px-6 text-white font-semibold">
@@ -88,7 +92,7 @@ const LeaderboardTable = ({
             )}
             onClick={() => handleSort("creator")}
           >
-            {useMap ? "Map" : "Player"}
+            {useMap ? t(key.map) : t(key.player)}
           </span>
           <span
             className={clsx(
@@ -97,7 +101,7 @@ const LeaderboardTable = ({
             )}
             onClick={() => handleSort("score")}
           >
-            Time
+            {t(key.time)}
           </span>
           <span
             className={clsx(
@@ -106,7 +110,7 @@ const LeaderboardTable = ({
             )}
             onClick={() => handleSort("date")}
           >
-            Date
+            {t(key.date)}
           </span>
         </div>
       </Container>
@@ -126,7 +130,7 @@ const LeaderboardTable = ({
 
       {filtredReplays.length === 0 && (
         <Container className="sm:mx-2">
-          <h2 className="text-[#f1e4c7] tracking-wider text-xl text-center">
+          <h2 className="text-[#f1e4c7] tracking-wider text-xl text-center uppercase">
             {comment}
           </h2>
         </Container>

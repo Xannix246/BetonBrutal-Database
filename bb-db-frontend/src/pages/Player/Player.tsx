@@ -9,18 +9,25 @@ import { getPrevLink } from "../../store/store";
 import clsx from "clsx";
 import LeaderboardTable from "../../widgets/LeaderboardTable/LeaderboardTable";
 import UserProfile from "./UserProfile";
+import { t } from "i18next";
+import { Keys } from "../../../i18n/keys";
+
+const key = Keys.player;
 
 const PlayerPage = ({ id }: { id: string }) => {
   const [player, setPlayer] = useState<Player>();
   const [mapData, setMapData] = useState<WorkshopItem[]>([]);
   const [replays, setReplays] = useState<Replay[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
   const source = getPrevLink();
   const [page, setPage] = useState<"mapCreator" | "run" | "favorites">(source);
   const [user, setUser] = useState<User>();
   const [publicData, setPublicData] = useState<PublicData>();
 
   useEffect(() => {
+    setHydrated(window && true);
+
     (async () => {
       const player = await getPlayer(id);
       const user = await getUser(player.id);
@@ -53,6 +60,8 @@ const PlayerPage = ({ id }: { id: string }) => {
     onPageUpdate();
   }, [page, player, user]);
 
+  if (!hydrated) return;
+
   return (
     <div className="w-full min-h-screen h-full">
       {publicData?.backgroundUrl ? (
@@ -78,13 +87,13 @@ const PlayerPage = ({ id }: { id: string }) => {
                     <span
                       className={clsx("transition duration-300 cursor-pointer hover:text-pink", page === "mapCreator" && "text-green")}
                       onClick={() => setPage("mapCreator")}
-                    >Maps</span>
+                    >{t(key.maps)}</span>
                     |
                     <span
                       className={clsx("transition duration-300 cursor-pointer hover:text-pink", page === "run" && "text-green")}
                       onClick={() => setPage("run")}
-                    >Runs</span>
-                    {!user?.steamId && <span>by</span>}
+                    >{t(key.runs)}</span>
+                    {!user?.steamId && <span>{t(key.by)}</span>}
                   </div>
                   {!user?.steamId && <a
                     target="_blank"
@@ -97,26 +106,26 @@ const PlayerPage = ({ id }: { id: string }) => {
                     <span
                       className={clsx("transition duration-300 cursor-pointer hover:text-pink", page === "favorites" && "text-green")}
                       onClick={() => setPage("favorites")}
-                    >Favorites</span>
+                    >{t(key.favorites)}</span>
                   </>}
                 </div>
               </Container>
               <div className="px-4">
                 {["mapCreator", "favorites"].includes(page) ?
-                  <div className="flex w-full justify-center">
+                  <div className="flex w-full justify-center min-h-screen">
                     {mapData.length > 0 && <div className="grid sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[200px] lg:auto-rows-[300px] gap-6 p-6 w-full">
                       {mapData.map(m => (
                         <MapTile key={m.id} {...m} />
                       ))}
                     </div>}
-                    {mapData.length === 0 && <Container className="w-5xl mt-16">
-                      {page === "mapCreator" ? <h2 className="text-[#f1e4c7] tracking-wider text-xl text-center">THIS PLAYER DIDN&apos;T POST ANY MAPS YET...</h2> 
-                      : <h2 className="text-[#f1e4c7] tracking-wider text-xl text-center">THIS PLAYER DON&apos;T HAVE FAVORITE MAPS YET...</h2>
+                    {mapData.length === 0 && <Container className="w-5xl mt-16 uppercase">
+                      {page === "mapCreator" ? <h2 className="text-[#f1e4c7] tracking-wider text-xl text-center">{t(key.noMapsFound)}</h2> 
+                      : <h2 className="text-[#f1e4c7] tracking-wider text-xl text-center">{t(key.noFavsFound)}</h2>
                       }
                     </Container>}
                   </div>
                   :
-                  <div className="flex w-full justify-center">
+                  <div className="flex w-full justify-center min-h-screen">
                     <div className="w-full md:w-5xl">
                       <LeaderboardTable replays={replays} />
                     </div>
@@ -128,8 +137,8 @@ const PlayerPage = ({ id }: { id: string }) => {
           :
           <div className="flex gap-2 pt-32 px-4 h-screen w-full">
             <div className="w-full text-white text-center">
-              <Container className="text-6xl w-full">
-                CHECKING WHAT&apos;S NEW...
+              <Container className="text-6xl w-full uppercase">
+                {t(Keys.dataCheck)}
               </Container>
             </div>
           </div>

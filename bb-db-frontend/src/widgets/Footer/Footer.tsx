@@ -19,11 +19,13 @@ const Footer = () => {
       </div>
       <div className="flex gap-1 sm:gap-6 place-items-center">
         {supportedLanguages.map((lang, i) => (
-          <Link
-            key={i}
-            className="opacity-50 hover:opacity-100 hover:underline"
-            href={`/?lang=${i18n.getResource(lang, "translation", "language")}`}
-          >{i18n.getResource(lang, "translation", "localLanguage")}</Link>
+          <div className="flex gap-6" key={i}>
+            <Link
+              className="opacity-50 hover:opacity-100 hover:underline"
+              href={`/?lang=${i18n.getResource(lang, "translation", "language")}`}
+            >{i18n.getResource(lang, "translation", "localLanguage")}</Link>
+            {i < supportedLanguages.length-1 && "|"}
+          </div>
         ))}
       </div>
       <div className="flex gap-1 sm:gap-6 place-items-center">

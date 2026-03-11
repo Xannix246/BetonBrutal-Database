@@ -12,7 +12,9 @@ import { handleEnterSearch, handleSearch } from "../../features/SearchManager";
 import Background from "../../widgets/Background/Background";
 import CollectionContainer from "../../features/CollectionContainer/CollectionContainer";
 import { t } from "i18next";
-// import { CircleStackIcon } from "@heroicons/react/24/outline";
+import { Keys } from "../../../i18n/keys";
+
+const key = Keys.main;
 
 const Main = () => {
   const [followedMaps, setFollowedMaps] = useState<WorkshopItem[]>([]);
@@ -77,7 +79,7 @@ const Main = () => {
             <div className="flex w-full drop-shadow-md justify-center">
               <Input
                 className="text-2xl w-full sm:text-4xl md:w-2xl lg:w-4xl bg-white/10"
-                placeholder={t("header.placeholder")}
+                placeholder={t(Keys.header.placeholder)}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => handleEnterSearch(search, e)}
@@ -86,7 +88,7 @@ const Main = () => {
                 className="text-3xl sm:text-4xl bg-white/10 uppercase"
                 onClick={() => handleSearch(search)}
               >
-                {t("header.search")}
+                {t(Keys.header.search)}
               </Button>
             </div>
           </div>
@@ -102,7 +104,7 @@ const Main = () => {
           )}
           <div className="p-4 bg-black/70 uppercase">
             <h1 className="w-fit text-center text-7xl text-[#ffd884] tracking-wider text-shadow-md">
-              {t("main.yearMaps")}
+              {t(key.yearMaps)}
             </h1>
           </div>
           <div className="flex flex-col lg:flex-row justify-center gap-8 w-full h-500 lg:h-232 overflow-clip">
@@ -121,7 +123,7 @@ const Main = () => {
         <div className="flex flex-col gap-4 place-items-center w-full mt-16">
           <div className="p-4 bg-black/70">
             <h1 className="w-fit text-center lg:text-left text-4xl text-[#ffd884] tracking-wider text-shadow-md">
-              {t("main.newMaps")}
+              {t(key.newMaps)}
             </h1>
           </div>
           <div className="flex justify-center w-full">
@@ -132,7 +134,7 @@ const Main = () => {
             </div>
           </div>
           <Button onClick={() => navigate("/workshop")} className="uppercase">
-            {t("main.discoverBtn")}
+            {t(key.discoverBtn)}
           </Button>
         </div>
 

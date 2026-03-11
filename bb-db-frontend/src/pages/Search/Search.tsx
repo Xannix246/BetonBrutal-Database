@@ -4,9 +4,21 @@ import Container from "../../shared/Containter/Container";
 import MapTile from "../../entities/MapTile";
 import { getSearchData } from "../../store/store";
 import Background from "../../widgets/Background/Background";
+import { t } from "i18next";
+import { useEffect, useState } from "react";
+import { Keys } from "../../../i18n/keys";
+
+const key = Keys.search;
 
 const Search = () => {
   const searchData = getSearchData();
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    setHydrated(window && true);
+  }, []);
+
+  if (!hydrated) return;
 
   return (
     <div className="w-full min-h-screen h-full">
@@ -18,8 +30,8 @@ const Search = () => {
         <div className="flex gap-2 pt-32 min-h-screen w-full">
           <div className="flex flex-col gap-2 w-full text-gray-300">
             <Container className="flex justify-center gap-10 text-4xl tracking-wide place-items-center">
-              <div className="flex gap-3">
-                <span>SEARCH RESULTS</span>
+              <div className="flex gap-3 uppercase">
+                <span>{t(key.results)}</span>
               </div>
             </Container>
             <div className="px-4">
@@ -32,8 +44,8 @@ const Search = () => {
                 :
                 <div className="flex w-full">
                   <Container className="flex flex-col w-full justify-center gap-10 text-4xl tracking-wide place-items-center">
-                    <span className="text-6xl text-red">FOUND NOTHING</span>
-                    <span className="text-gray-300 text-2xl">Maybe try to search something else?</span>
+                    <span className="text-6xl text-red uppercase">{t(key.notFound)}</span>
+                    <span className="text-gray-300 text-2xl">{t(key.tip)}</span>
                   </Container>
                 </div>
               }

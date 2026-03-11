@@ -13,6 +13,9 @@ import { getUser, setUser } from "../../store/store";
 import DeleteModal from "../../features/DeleteModal";
 import { config } from "../../../config/config";
 import { t } from "i18next";
+import { Keys } from "../../../i18n/keys";
+
+const key = Keys.header;
 
 const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: boolean, hideSearch?: boolean, additionalComponent?: JSX.Element }) => {
   const [search, setSearch] = useState("");
@@ -40,7 +43,7 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
 
   const menu = [
     {
-      name: t("header.login"),
+      name: t(key.login),
       icon: <ArrowLeftEndOnRectangleIcon width={24} />,
       onClick: () => {
         logOut();
@@ -48,12 +51,12 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
       }
     },
     {
-      name: user?.steamId ? t("header.profile") : t("header.favorites"),
+      name: user?.steamId ? t(key.profile) : t(key.favorites),
       icon: user?.steamId ? <UserIcon width={24}/> : <StarIcon width={24} />,
       onClick: () => navigate(`/user/${user?.id}/favorites`)
     },
     {
-      name: user?.steamId ? t("header.unlSteam") : t("header.lSteam"),
+      name: user?.steamId ? t(key.unlSteam) : t(key.lSteam),
       icon: user?.steamId ? <LinkSlashIcon width={24} /> : <LinkIcon width={24} />,
       onClick: async () => {
         if (user?.steamId) {
@@ -64,7 +67,7 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
       }
     },
     {
-      name: t("header.deleteAcc"),
+      name: t(key.deleteAcc),
       className: "text-red hover:text-red-500",
       icon: <TrashIcon width={24} />,
       onClick: () => setDeleteModal(true)
@@ -99,7 +102,7 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
       >
         <Input
           className="text-2xl w-full bg-white/10"
-          placeholder={t("header.placeholder")}
+          placeholder={t(key.placeholder)}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={(e) => handleEnterSearch(search, e)}
@@ -107,7 +110,7 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
         <Button
           className="text-2xl bg-white/10 uppercase"
           onClick={() => handleSearch(search)}
-        >{t("header.search")}</Button>
+        >{t(key.search)}</Button>
       </div>}
       {additionalComponent}
       {width > 1115 && <div className="flex">
@@ -124,7 +127,7 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
           <Button
             className="text-2xl bg-white/10 place-items-center text-nowrap"
             onClick={() => signIn(window.location.pathname)}
-          >{t("header.login")}</Button>
+          >{t(key.login)}</Button>
         }
       </div>}
     </header>

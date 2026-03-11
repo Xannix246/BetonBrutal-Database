@@ -7,6 +7,7 @@ import Background from "../../widgets/Background/Background";
 import { getUser, getUserFavorites } from "./requests";
 import { navigate } from "vike/client/router";
 import { setPrevLink } from "../../store/store";
+import { t } from "i18next";
 
 const Favorites = ({ id }: { id: string }) => {
   const [user, setUser] = useState<User>();
@@ -62,7 +63,7 @@ const Favorites = ({ id }: { id: string }) => {
           <div className="flex gap-2 pt-32 px-4 h-screen w-full">
             <div className="w-full text-white text-center">
               <Container className="text-6xl w-full">
-                CHECKING WHAT&apos;S NEW...
+                {t("dataCheck")}
               </Container>
             </div>
           </div>

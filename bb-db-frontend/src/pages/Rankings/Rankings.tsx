@@ -11,11 +11,16 @@ import Input from "../../shared/Input/Input";
 import { getTargetData, getUser, setTargetData } from "../../store/store";
 import { banReplay, deleteReplay } from "../../features/DataManager";
 import ContextMenu from "../../shared/ContextMenu/ContextMenu";
+import { t } from "i18next";
+import { Keys } from "../../../i18n/keys";
+
+const key = Keys.rankings;
 
 const Rankings = () => {
   const [page, setPage] = useState<"TimeMS" | "TimeDLC1" | "TimeBirthday">(
     "TimeMS"
   );
+  const [loaded, setLoaded] = useState(false);
   const [brutalReplays, setBrutalReplays] = useState<Replay[]>([]);
   const [bathReplays, setBathReplays] = useState<Replay[]>([]);
   const [bdayReplays, setBdayReplays] = useState<Replay[]>([]);
@@ -46,7 +51,7 @@ const Rankings = () => {
 
   const menuItems = [
     {
-      name: `Delete ${targetData?.name}'s replay`,
+      name: t(key.delReplay, { player: targetData?.name }),
       onClick: () => {
         if (!targetData) return;
 
@@ -55,7 +60,7 @@ const Rankings = () => {
       },
     },
     {
-      name: `Ban ${targetData?.name}'s replay`,
+      name: t(key.banReplay, { player: targetData?.name }),
       onClick: () => {
         if (!targetData) return;
 
@@ -82,12 +87,15 @@ const Rankings = () => {
   const result = searcher.search(searchText);
 
   useEffect(() => {
+    setLoaded(window && true);
     (async () => {
       setBrutalReplays(
         (await getBrutalReplays()).sort((a, b) => a.score - b.score)
       );
     })();
   }, []);
+
+  if (!loaded) return;
 
   return (
     <div className="w-full min-h-screen h-full">
@@ -165,23 +173,23 @@ const Rankings = () => {
                 </span>
               </div>
             </Container>
-            <Container className="my-16 text-5xl md:text-8xl">
-              {(page === "TimeMS" && "BETON BRUTAL REPLAYS") ||
-                (page === "TimeDLC1" && "BETON BATH REPLAYS") ||
-                "BETON B-DAY REPLAYS"}
+            <Container className="my-16 text-5xl md:text-8xl uppercase">
+              {(page === "TimeMS" && t(key.bBrutal)) ||
+                (page === "TimeDLC1" && t(key.bBath)) ||
+                t(key.bBday)}
             </Container>
           </div>
         </div>
         <div className="px-4">
           <div className="flex flex-col w-full place-items-center">
             <Input
-              placeholder="Search by name"
+              placeholder={t(key.placeholder)}
               className="bg-white/10 text-xl w-full md:w-5xl mb-5"
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
             />
             <div className="w-full md:w-5xl mb-64">
-              <LeaderboardTable replays={result} comment="NO PLAYERS FOUND" />
+              <LeaderboardTable replays={result} comment={t(key.lbComment).toUpperCase()} />
             </div>
           </div>
         </div>
