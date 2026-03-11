@@ -85,7 +85,10 @@ export const auth = betterAuth({
   session: {
     modelName: 'Session',
   },
-  trustedOrigins: [env.CLIENT_URL || 'db.betonbrutal.com'],
+  trustedOrigins: [
+    env.CLIENT_URL || 'db.betonbrutal.com',
+    env.MIRROR_URL || 'ru-db.betonbrutal.com',
+  ],
 });
 
 @Module({
