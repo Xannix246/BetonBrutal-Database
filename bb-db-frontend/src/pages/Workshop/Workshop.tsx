@@ -12,9 +12,14 @@ import ContextMenu from "../../shared/ContextMenu/ContextMenu";
 import { getTargetData, getUser, setTargetData } from "../../store/store";
 import { DeleteMap } from "../../features/DataManager";
 import { v4 } from "uuid";
+import { t } from "i18next";
+import { Keys } from "../../../i18n/keys";
+
+const key = Keys.workshop;
 
 const Workshop = () => {
   const [loaded, setLoaded] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
   const [items, setItems] = useState<WorkshopItem[]>([]);
   const [activeSort, setActiveSort] = useState<SortBy>("newest");
   const [page, setPage] = useState(1);
@@ -27,7 +32,7 @@ const Workshop = () => {
 
   const menuItems = [
     {
-      name: `Delete "${targetData?.name}"`,
+      name: t(key.deleteBtn, { map: targetData?.name }).toUpperCase(),
       onClick: () => {
         if (!targetData) return;
 
@@ -88,6 +93,12 @@ const Workshop = () => {
     }
   }, [targetData]);
 
+  useEffect(() => {
+    setHydrated(window && true);
+  }, []);
+
+  if (!hydrated) return;
+
   return (
     <div className="w-full min-h-screen h-full bg-center bg-fixed bg-no-repeat bg-cover">
       <Background />
@@ -104,32 +115,32 @@ const Workshop = () => {
       </div>
       <div className="flex flex-col min-h-screen justify-between pt-32">
         <Container className="flex gap-10 text-2xl md:text-4xl tracking-wide md:justify-center place-items-center overflow-x-auto whitespace-nowrap">
-          <h1 className="text-white">SORT BY:</h1>
+          <h1 className="text-white uppercase">{t(key.sort)}</h1>
           <div className="flex gap-5">
             {["newest", "oldest", "mostPopular", "mostPlayed"].map(
               (sortOption) => (
                 <Button
                   key={sortOption}
                   className={clsx(
-                    "bg-none",
+                    "bg-none uppercase",
                     activeSort === sortOption && "text-green",
                   )}
                   onClick={() => setActiveSort(sortOption as SortBy)}
                 >
-                  {sortOption === "newest" && "NEWEST"}
-                  {sortOption === "oldest" && "OLDEST"}
-                  {sortOption === "mostPopular" && "MOST POPULAR"}
-                  {sortOption === "mostPlayed" && "MOST PLAYED"}
+                  {sortOption === "newest" && t(key.newest)}
+                  {sortOption === "oldest" && t(key.oldest)}
+                  {sortOption === "mostPopular" && t(key.mostPopular)}
+                  {sortOption === "mostPlayed" && t(key.mostPlayed)}
                 </Button>
               ),
             )}
           </div>
           <h1 className="text-white"> |</h1>
           <Button
-            className="bg-transparent p-0"
+            className="bg-transparent p-0 uppercase"
             onClick={async () => navigate(`/workshop/${await getRandomMap()}`)}
           >
-            RANDOM MAP
+            {t(key.randomMap)}
           </Button>
         </Container>
 
@@ -144,8 +155,8 @@ const Workshop = () => {
         ) : (
           <div className="flex gap-2 w-full px-4">
             <div className="w-full text-white text-center mt-64 mb-256">
-              <Container className="text-6xl w-full">
-                CHECKING WHAT&apos;S NEW...
+              <Container className="text-6xl w-full uppercase">
+                {t(Keys.dataCheck)}
               </Container>
             </div>
           </div>

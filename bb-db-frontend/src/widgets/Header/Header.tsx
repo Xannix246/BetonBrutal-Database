@@ -4,18 +4,23 @@ import Input from "../../shared/Input/Input";
 import Link from "../../shared/Link/Link";
 import { JSX, useCallback, useEffect, useState } from "react";
 import { handleEnterSearch, handleSearch } from "../../features/SearchManager";
-import { logOut, signIn } from "../../features/Auth";
+import { logOut, signIn, unlinkSteam } from "../../features/Auth";
 import Dropdown from "../../shared/Dropdown/Dropdown";
-import { ArrowLeftEndOnRectangleIcon, StarIcon, Bars3Icon, TrashIcon } from "@heroicons/react/24/outline";
+import { ArrowLeftEndOnRectangleIcon, StarIcon, Bars3Icon, TrashIcon, LinkIcon, LinkSlashIcon, UserIcon } from "@heroicons/react/24/outline";
 import { navigate } from "vike/client/router";
 import MobileMenu from "./MobileMenu";
 import { getUser, setUser } from "../../store/store";
 import DeleteModal from "../../features/DeleteModal";
+import { config } from "../../../config/config";
+import { t } from "i18next";
+import { Keys } from "../../../i18n/keys";
+
+const key = Keys.header;
 
 const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: boolean, hideSearch?: boolean, additionalComponent?: JSX.Element }) => {
   const [search, setSearch] = useState("");
   const user = getUser();
-  const [width, setWidth] = useState(0)
+  const [width, setWidth] = useState<number | null>(null)
   const [mobileMenu, setMobileMenu] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
 
@@ -34,9 +39,11 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
     setWidth(window.innerWidth);
   }, []);
 
+  if (width === null) return null;
+
   const menu = [
     {
-      name: "LOG OUT",
+      name: t(key.logout).toUpperCase(),
       icon: <ArrowLeftEndOnRectangleIcon width={24} />,
       onClick: () => {
         logOut();
@@ -44,12 +51,23 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
       }
     },
     {
-      name: "FAVORITES",
-      icon: <StarIcon width={24} />,
+      name: user?.steamId ? t(key.profile).toUpperCase() : t(key.favorites).toUpperCase(),
+      icon: user?.steamId ? <UserIcon width={24}/> : <StarIcon width={24} />,
       onClick: () => navigate(`/user/${user?.id}/favorites`)
     },
     {
-      name: "DELETE ACCOUNT",
+      name: user?.steamId ? t(key.unlSteam).toUpperCase() : t(key.lSteam).toUpperCase(),
+      icon: user?.steamId ? <LinkSlashIcon width={24} /> : <LinkIcon width={24} />,
+      onClick: async () => {
+        if (user?.steamId) {
+          unlinkSteam();
+        } else {
+          window.location.replace(`${config.serverUri}/user/steam`);
+        }
+      }
+    },
+    {
+      name: t(key.deleteAcc).toUpperCase(),
       className: "text-red hover:text-red-500",
       icon: <TrashIcon width={24} />,
       onClick: () => setDeleteModal(true)
@@ -57,14 +75,14 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
   ];
 
   return (
-    <header className="bg-black/80 w-full h-16 border-b-1 border-amber-200 flex p-2 justify-between">
+    <header className="bg-black/80 w-full h-16 border-b-1 border-amber-200 flex p-2 justify-between uppercase">
       <DeleteModal open={deleteModal} setOpen={setDeleteModal} />
       <MobileMenu open={mobileMenu} setOpen={setMobileMenu} user={user} menu={menu} />
       {width > 1115 && <div className="h-full text-white text-shadow-lg text-4xl flex gap-10 place-items-center pl-8">
-        <Link className="hover:text-pink transition duration-150" href="/">HOME</Link>
-        <Link className="hover:text-pink transition duration-150" href="/workshop">MAPS</Link>
-        <Link className="hover:text-pink transition duration-150" href="/rankings">RANKINGS</Link>
-        <Link className="hover:text-pink transition duration-150" href="/articles">ARTICLES</Link>
+        <Link className="hover:text-pink transition duration-150" href="/">{t("header.home")}</Link>
+        <Link className="hover:text-pink transition duration-150" href="/workshop">{t("header.maps")}</Link>
+        <Link className="hover:text-pink transition duration-150" href="/rankings">{t("header.rankings")}</Link>
+        <Link className="hover:text-pink transition duration-150" href="/articles">{t("header.articles")}</Link>
       </div>}
       {width < 1115 && <div className="w-12 flex place-items-center justify-baseline">
         <Bars3Icon
@@ -84,15 +102,15 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
       >
         <Input
           className="text-2xl w-full bg-white/10"
-          placeholder="Search by name, author, id or url"
+          placeholder={t(key.placeholder)}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={(e) => handleEnterSearch(search, e)}
         />
         <Button
-          className="text-2xl bg-white/10"
+          className="text-2xl bg-white/10 uppercase"
           onClick={() => handleSearch(search)}
-        >SEARCH</Button>
+        >{t(key.search)}</Button>
       </div>}
       {additionalComponent}
       {width > 1115 && <div className="flex">
@@ -107,13 +125,13 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
           </div>
           :
           <Button
-            className="text-2xl bg-white/10 place-items-center text-nowrap"
+            className="text-2xl bg-white/10 place-items-center text-nowrap uppercase"
             onClick={() => signIn(window.location.pathname)}
-          >LOG IN</Button>
+          >{t(key.login)}</Button>
         }
       </div>}
     </header>
   );
 }
 
-export default Header
+export default Header;

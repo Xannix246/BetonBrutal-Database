@@ -18,7 +18,7 @@ export const handleSearch = async (searchQuery: string, returnOnlyData?: boolean
   }
 
   if (result.length === 1) {
-    navigate(`/workshop/${result[0].steamId}`);
+    window.location.replace(`/workshop/${result[0].steamId}`);
   } else {
     navigate(`/search`);
   }

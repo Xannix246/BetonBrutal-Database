@@ -31,10 +31,13 @@ import { banReplay, deleteReplay } from "../../features/DataManager";
 import ContextMenu from "../../shared/ContextMenu/ContextMenu";
 import getMedianTime from "./getMedianTime";
 import formatTime from "../../features/FormatTime";
+import { t } from "i18next";
+import { Keys } from "../../../i18n/keys";
 
 const WorkshopItemPage = ({ id }: { id: string }) => {
   const [mapData, setMapData] = useState<WorkshopItem | null>();
   const [loaded, setLoaded] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
   const user = getUser();
   const [comments, setComments] = useState<UserComment[]>([]);
   const [replays, setReplays] = useState<Replay[]>([]);
@@ -45,9 +48,11 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
   const targetData = getTargetData();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  const key = Keys.workshopItem;
+
   const menuItems = [
     {
-      name: `Delete ${targetData?.name}'s replay`,
+      name: t(Keys.rankings.delReplay, { player: targetData?.name }),
       onClick: () => {
         if (!targetData) return;
 
@@ -59,7 +64,7 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
       },
     },
     {
-      name: `Ban ${targetData?.name}'s replay`,
+      name: t(Keys.rankings.banReplay, { player: targetData?.name }),
       onClick: () => {
         if (!targetData) return;
 
@@ -79,6 +84,8 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
   }, [targetData]);
 
   useEffect(() => {
+    setHydrated(window && true);
+
     (async () => {
       if (["TimeMS", "TimeDLC1", "TimeBirthday"].includes(id)) {
         return navigate("/");
@@ -145,6 +152,8 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
     event.target.value = "";
   };
 
+  if (!hydrated) return;
+
   return (
     <div className="w-full min-h-screen h-full">
       {preivewId !== null && mapData ? (
@@ -174,10 +183,10 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
           <div className="flex flex-col gap-2 pt-32 px-4 min-h-screen w-full">
             <div className="flex flex-col md:flex-row gap-2">
               <div className="flex flex-col gap-2">
-                <div className="group relative w-full h-64 md:w-96 md:h-96 lg:w-128 lg:h-128 bg-black/70">
+                <div className="aspect-square group relative w-full md:w-96 md:h-96 lg:w-128 lg:h-128 bg-black/70">
                   <img
                     src={mapData?.previewUrl}
-                    className="absolute w-full h-64 md:w-96 md:h-96 lg:w-128 lg:h-128 object-cover bottom-0 right-0 group-hover:-bottom-5 group-hover:-right-5 transition-all duration-300"
+                    className="aspect-square absolute w-full md:w-96 md:h-96 lg:w-128 lg:h-128 object-cover bottom-0 right-0 group-hover:-bottom-5 group-hover:-right-5 transition-all duration-300"
                   />
                 </div>
                 <Container className="text-white flex gap-16 text-2xl sm:text-4xl justify-center mb-8 md:mb-0">
@@ -205,7 +214,7 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                       className="uppercase bg-blue/60 text-2xl sm:text-4xl p-3 w-full"
                       onClick={() => fileInputRef.current?.click()}
                     >
-                      Upload map
+                      {t(key.upload)}
                     </Button>
                   </div>
                 )}
@@ -214,7 +223,7 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                     className="uppercase bg-green/60 text-2xl sm:text-4xl p-3 w-full flex justify-center text-white hover:text-pink transition duration-150"
                     href={`${config.serverUri}/db/download?id=${id}`}
                   >
-                    Download map
+                    {t(key.download)}
                   </a>
                 )}
               </div>
@@ -246,35 +255,35 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                           : addFavorites(id)
                       }
                       className={clsx(
-                        "bg-transparent p-1 text-2xl lg:text-4xl transition duration-300 text-white",
+                        "bg-transparent p-1 text-2xl lg:text-4xl transition duration-300 text-white uppercase",
                         favorites.includes(id)
                           ? "hover:bg-red/40"
                           : "hover:bg-green/40",
                       )}
                     >
                       {favorites.includes(id)
-                        ? "REMOVE FROM FAVORITES"
-                        : "ADD TO FAVORITES"}
+                        ? t(key.favRemove)
+                        : t(key.favAdd)}
                     </Button>
                   )}
                   <a
                     target="_blank"
                     href={`https://josiahshields.com/beton/leaderboard/?lb=${mapData?.id}`}
                     rel="noreferrer"
-                    className="hover:text-white hover:underline"
+                    className="hover:text-white hover:underline uppercase"
                   >
-                    MAP ON BBLB
+                    {t(key.bblb)}
                   </a>
                 </Container>
                 <Container className="flex flex-col gap-6 text-2xl lg:text-3xl text-white">
                   <div className="flex gap-4">
-                    <h4 className="uppercase text-blue">Release date:</h4>
+                    <h4 className="uppercase text-blue">{t(key.release)}</h4>
                     <h4 className="uppercase">
                       {mapData && new Date(mapData.createDate).toLocaleDateString()}
                     </h4>
                   </div>
                   <div className="flex gap-4">
-                    <h4 className="uppercase text-green">Median time:</h4>
+                    <h4 className="uppercase text-green">{t(key.time)}</h4>
                     <h4 className="uppercase">
                       {getMedianTime(replays) ? formatTime(getMedianTime(replays)!) : "N/A"}
                     </h4>
@@ -286,16 +295,16 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
               </div>
             </div>
             <div className="flex flex-col-reverse gap-16 mt-16 md:mt-0 md:flex-row md:gap-2 w-full">
-              <div className="flex flex-col gap-2 w-full">
+              <div className="flex flex-col gap-2 w-full uppercase">
                 <Container>
                   <h2 className="text-white tracking-wider text-xl">
-                    COMMENTS
+                    {t(key.comments)}
                   </h2>
                 </Container>
                 {user ? (
                   <Input
                     className="text-xl md:mx-2 p-3 bg-white/10"
-                    placeholder="Type your comment here..."
+                    placeholder={t(key.placeholder)}
                     value={value}
                     onChange={(e) => {
                       setValue(e.target.value);
@@ -304,7 +313,7 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                   />
                 ) : (
                   <Container className="text-white text-xl md:mx-2">
-                    You need to be logged in to leave comments
+                    {t(key.commentsNoAuth)}
                   </Container>
                 )}
                 {comments.map((comment) => (
@@ -313,8 +322,7 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                 {comments.length === 0 && (
                   <Container className="md:mx-2">
                     <h2 className="text-[#f1e4c7] tracking-wider text-xl text-center">
-                      SEEMS LIKE STILL NO ONE HAS LEFT A COMMENT HERE... DO YOU
-                      WANT TO BE FIRST?
+                      {t(key.noComments)}
                     </h2>
                   </Container>
                 )}
@@ -325,8 +333,8 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
         ) : (
           <div className="flex gap-2 pt-32 px-4 h-screen w-full">
             <div className="w-full text-white text-center">
-              <Container className="text-6xl w-full">
-                {mapData === null ? "MAP NOT FOUND" : "CHECKING WHAT'S NEW..."}
+              <Container className="text-6xl w-full uppercase">
+                {mapData === null ? t(key.notFound) : t(Keys.dataCheck)}
               </Container>
             </div>
           </div>

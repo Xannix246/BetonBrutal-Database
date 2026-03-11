@@ -6,7 +6,10 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Query,
+  Req,
+  Res,
 } from '@nestjs/common';
 import {
   OptionalAuth,
@@ -18,12 +21,16 @@ import { type UserRoleSession } from 'src/modules/auth/auth.module';
 import { env } from 'process';
 import { Role } from '@prisma/client';
 import { ModService } from '../../application/mod.service';
+import { SteamService } from '../../application/steam.service';
+import { type Response } from 'express';
+import { UpdatePublicDataDto } from './dto/update-data.dto';
 
 @Controller('user')
 export class UsersController {
   constructor(
     private readonly userSevice: UserService,
     private readonly modService: ModService,
+    private readonly steamService: SteamService,
   ) {}
 
   @Get('me')
@@ -47,6 +54,52 @@ export class UsersController {
     @Session() session: UserSession,
   ) {
     return await this.userSevice.removeFromFavorites(session.user.id, id);
+  }
+
+  @Get('public-data/:id')
+  @OptionalAuth()
+  async getPublicData(@Param('id') id: string) {
+    return await this.userSevice.getPublicData(id);
+  }
+
+  @Put('public-data')
+  async setPublicData(
+    @Body() body: UpdatePublicDataDto,
+    @Session() session: UserSession,
+  ) {
+    return await this.userSevice.setPublicData(
+      {
+        ...body,
+        userId: session.user.id,
+      },
+      session,
+    );
+  }
+
+  @Get('steam')
+  async steam(@Res() res: Response) {
+    const url = await this.steamService.getRedirectUrl();
+    return res.redirect(url);
+  }
+
+  @Get('link-steam')
+  async linkSteam(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Session() session: UserRoleSession,
+  ) {
+    return await this.steamService.linkSteamId(req, res, session.user.id);
+  }
+
+  @Get('unlink-steam')
+  async unlinkSteam(@Session() session: UserRoleSession) {
+    return await this.steamService.unlinkSteamId(session.user.id);
+  }
+
+  @Get('s-id/:id')
+  @OptionalAuth()
+  async getBySteamId(@Param('id') id: string) {
+    return await this.userSevice.getUserBySteamId(id);
   }
 
   @Get(':id/favorites')

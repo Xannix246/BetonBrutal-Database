@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { Module } from '@nestjs/common';
 import { AuthModule } from '@thallesp/nestjs-better-auth';
 import { betterAuth } from 'better-auth';
@@ -6,8 +7,12 @@ import { PrismaClient } from '@prisma/client';
 import { env } from 'process';
 import { admin as BAdmin } from 'better-auth/plugins';
 import { createAccessControl } from 'better-auth/plugins/access';
+// import { env as prismaEnv } from 'prisma/config';
 
 const prisma = new PrismaClient();
+// {
+//   accelerateUrl: prismaEnv('DATABASE_URL'),
+// }
 
 const statement = {
   project: ['create', 'share', 'update', 'delete'],
@@ -62,6 +67,14 @@ export const auth = betterAuth({
     //     input: false,
     //   },
     // },
+    additionalFields: {
+      steamId: {
+        type: 'string',
+        defaultValue: null,
+        input: false,
+        required: false,
+      },
+    },
   },
   verification: {
     modelName: 'Verification',
@@ -72,7 +85,10 @@ export const auth = betterAuth({
   session: {
     modelName: 'Session',
   },
-  trustedOrigins: [env.CLIENT_URL || 'db.betonbrutal.com'],
+  trustedOrigins: [
+    env.CLIENT_URL || 'db.betonbrutal.com',
+    env.MIRROR_URL || 'ru-db.betonbrutal.com',
+  ],
 });
 
 @Module({

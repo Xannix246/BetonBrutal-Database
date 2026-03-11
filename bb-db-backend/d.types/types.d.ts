@@ -63,6 +63,7 @@ declare type User = {
   name: string;
   role?: string;
   image?: string | null | undefined;
+  steamId?: string | null;
 };
 
 declare type UserComment = {
@@ -117,6 +118,7 @@ declare type Collection = {
   description: string | null;
   mapsId: string[];
   showOnMain: boolean;
+  isPublic?: boolean;
   descColor: $Enums.Color;
 };
 
@@ -133,6 +135,7 @@ declare interface AuthRequest extends Request {
     banReason: null | string;
     banExpires: null | Date;
     id: string;
+    steamId: null | string;
   };
 }
 
@@ -161,3 +164,17 @@ declare type WokshopItemCreate = {
 }
 
 declare type WorkshopItemUpsert = WokshopItemCreate | WokshopItemUpdate;
+
+type Link = {
+  showName: string;
+  url: string;
+}
+
+declare type PublicData = {
+  id: string;
+  userId: string;
+  profilePicUrl?: string | null;
+  backgroundUrl?: string | null;
+  about?: string | null;
+  links?: Link[];
+}

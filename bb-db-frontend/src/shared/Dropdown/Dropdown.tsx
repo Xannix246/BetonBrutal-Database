@@ -49,13 +49,13 @@ const Dropdown = ({ button, className, menu }: Props) => {
         <div
           className={clsx(
             className,
-            "absolute right-0 mt-3 w-52 bg-black/70 text-white text-xl shadow-lg z-50"
+            "absolute right-0 mt-3 min-w-52 bg-black/70 text-white text-xl shadow-lg z-50"
           )}
         >
           {menu.map((item, i) => (
             <button
               key={i}
-              className={clsx(item.className, "flex w-full justify-start items-center gap-4 px-3 py-1.5 hover:bg-white/10")}
+              className={clsx(item.className, "flex w-full justify-start items-center gap-4 px-3 py-1.5 hover:bg-white/10 whitespace-nowrap")}
               onClick={() => {
                 item.onClick?.();
                 setOpen(false);

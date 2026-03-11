@@ -10,6 +10,7 @@ export default {
   // https://vike.dev/Layout
   Layout,
   port: 3001,
+  clientRouting: true,
 
   // https://vike.dev/head-tags
   title: "BETON BRUTAL Database",

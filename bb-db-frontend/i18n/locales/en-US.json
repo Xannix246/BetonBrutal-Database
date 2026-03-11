@@ -1,0 +1,111 @@
+{
+  "language": "en-US",
+  "localLanguage": "English",
+  "dataCheck": "Checking what's new...",
+  "header": {
+    "home": "Home",
+    "maps": "Maps",
+    "rankings": "Rankings",
+    "articles": "Articles",
+    "search": "Search",
+    "placeholder": "Search by name, author, id or url",
+    "login": "Log in",
+    "logout": "Log out",
+    "profile": "Profile",
+    "favorites": "Favorites",
+    "unlSteam": "Unlink Steam",
+    "lSteam": "Link Steam",
+    "deleteAcc": "Delete account"
+  },
+  "main": {
+    "yearMaps": "Maps of the year",
+    "newMaps": "Want to see some other maps? Here are a couple of them",
+    "discoverBtn": "Discover all maps ->"
+  },
+  "workshop": {
+    "deleteBtn": "Delete \"{{map}}\"",
+    "sort": "Sort by:",
+    "newest": "Newest",
+    "oldest": "Oldest",
+    "mostPopular": "Most popular",
+    "mostPlayed": "Most played",
+    "randomMap": "Random map"
+  },
+  "workshopItem": {
+    "upload": "Upload map",
+    "download": "Download map",
+    "favAdd": "Add to favorites",
+    "favRemove": "Femove from favorites",
+    "bblb": "Map on BBLB",
+    "release": "Release date:",
+    "time": "Median time:",
+    "comments": "Comments",
+    "commentsNoAuth": "You need to be logged in to leave comments",
+    "placeholder": "Type your comment here...",
+    "noComments": "Seems like still no one has left a comment here... Do you want to be first?",
+    "notFound": "Map not found"
+  },
+  "player": {
+    "maps": "Maps",
+    "runs": "Runs",
+    "by": "by",
+    "favorites": "Favorites",
+    "noMapsFound": "This player didn't post any maps yet...",
+    "noFavsFound": "This player don't have favorite maps yet...",
+    "title": "{{user}}'s ({{steamName}}) page",
+    "pfpPlaceholder": "Profile picture url",
+    "bgPlaceholder": "Background url",
+    "upload": "Upload image",
+    "aboutPlaceholder": "Write something about you",
+    "noDesc": "No description",
+    "links": "Links",
+    "deleteUrl": "Delete link",
+    "noLinks": "No links attached",
+    "linkName": "Visible name",
+    "linkUrl": "Url",
+    "add": "Add link",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit profile"
+  },
+  "favorites": {},
+  "leaderboard": {
+    "defaultComment": "No one has completed this map yet...",
+    "title": "Leaderboard",
+    "map": "Map",
+    "player": "Player",
+    "time": "Time",
+    "date": "Date"
+  },
+  "rankings": {
+    "delReplay": "Delete {{player}}'s replay",
+    "banReplay": "Ban {{player}}'s replay",
+    "bBrutal": "BETON BRUTAL rankings",
+    "bBath": "BETON BATH rankings",
+    "bBday": "BETON B-DAY rankings",
+    "placeholder": "Search by name",
+    "lbComment": "No players found"
+  },
+  "articles": {
+    "title": "Articles",
+    "allowWrite": "Hmm... Seems like you can write articles... Do you have something on your mind?",
+    "editorLink": "Click here",
+    "filters": "Filters",
+    "sortByDate": "Sort by date",
+    "none": "None",
+    "day": "Day",
+    "week": "Week",
+    "month": "Month",
+    "year": "Year",
+    "sortByTags": "Sort by tags",
+    "addTag": "Add tag",
+    "includeAllTags": "Include all tags",
+    "search": "Search",
+    "placeholder": "Search article"
+  },
+  "search": {
+    "results": "Search results",
+    "notFound": "Found nothing",
+    "tip": "Maybe try to search something else?"
+  }
+}

@@ -3,6 +3,8 @@ import Button from "../../shared/Button/Button";
 import { signIn } from "../../features/Auth";
 import Link from "../../shared/Link/Link";
 import { JSX, useEffect } from "react";
+import { Keys } from "../../../i18n/keys";
+import { t } from "i18next";
 
 type Props = {
   open: boolean;
@@ -15,6 +17,8 @@ type Props = {
     onClick?: () => void;
   }[]
 }
+
+const key = Keys.header;
 
 const MobileMenu = ({ open, setOpen, user, menu }: Props) => {
 
@@ -51,19 +55,19 @@ const MobileMenu = ({ open, setOpen, user, menu }: Props) => {
         </h1>
 
         <div className="text-white text-shadow-lg text-4xl flex flex-col gap-10 pl-8">
-          <Link className="w-fit" href="/">HOME</Link>
-          <Link className="w-fit" href="/workshop">MAPS</Link>
-          <Link className="w-fit" href="/rankings">RANKINGS</Link>
-          <Link className="w-fit" href="/articles">ARTICLES</Link>
+          <Link className="w-fit" href="/">{t(key.home)}</Link>
+          <Link className="w-fit" href="/workshop">{t(key.maps)}</Link>
+          <Link className="w-fit" href="/rankings">{t(key.rankings)}</Link>
+          <Link className="w-fit" href="/articles">{t(key.articles)}</Link>
         </div>
 
         {user ?
-          <div className="flex flex-col gap-4 place-items-center justify-center">
+          <div className="flex flex-col gap-4 justify-center">
             <div className="w-full flex flex-col-reverse gap-2">
               {menu.map((item, i) => (
                 <Button
                   key={i}
-                  className="text-2xl p-2 w-full bg-white/10 place-items-center text-nowrap"
+                  className="text-2xl p-2 w-full bg-white/10 place-items-center uppercase"
                   onClick={item.onClick}
                 >{item.name}</Button>
               ))}
@@ -75,9 +79,9 @@ const MobileMenu = ({ open, setOpen, user, menu }: Props) => {
           </div>
           :
           <Button
-            className="text-2xl w-full bg-white/10 place-items-center text-nowrap"
+            className="text-2xl w-full bg-white/10 place-items-center"
             onClick={() => signIn(window.location.pathname)}
-          >LOG IN</Button>
+          >{t(key.login)}</Button>
         }
       </div>
     </div>

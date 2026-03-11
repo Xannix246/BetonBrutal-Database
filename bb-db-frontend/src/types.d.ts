@@ -43,6 +43,7 @@ declare type User = {
   name: string;
   role?: string | null;
   image?: string | null | undefined;
+  steamId?: string | null | undefined;
 };
 
 declare type UserComment = {
@@ -74,4 +75,16 @@ declare type Collection = {
   mapsId: string[];
   showOnMain: boolean;
   descColor: "white" | "black" | "red" | "blue" | "green" | "yellow";
+}
+
+type Link = {
+  showName: string;
+  url: string;
+}
+
+declare type PublicData = {
+  profilePicUrl?: string;
+  backgroundUrl?: string;
+  about?: string;
+  links?: Link[];
 }

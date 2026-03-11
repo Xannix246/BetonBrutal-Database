@@ -3,3 +3,4 @@
 MapDownloader/settings.yaml
 *.pyc
 /MapDownloader
+/bb-db-backend/src/generated
