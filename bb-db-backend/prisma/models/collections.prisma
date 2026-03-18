@@ -15,6 +15,8 @@ model Collection {
   showOnMain  Boolean  @default(false)
   isPublic    Boolean  @default(false)
   descColor   Color    @default(black)
+  authorId    String?
+  user        User?    @relation(fields: [authorId], references: [id], onDelete: Cascade)
 }
 
 model Nominees {

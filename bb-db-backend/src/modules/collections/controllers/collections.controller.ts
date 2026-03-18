@@ -3,19 +3,21 @@ import {
   Body,
   Controller,
   Delete,
-  ForbiddenException,
   Get,
   Param,
   Post,
+  Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { CollectionsService } from '../services/collections.service';
 import { OptionalAuth } from '@thallesp/nestjs-better-auth';
-import { env } from 'process';
-import { ApiExcludeEndpoint } from '@nestjs/swagger';
 import { CollectionDto } from './collections.dto';
+import { CheckGuard } from '../guards/check.guard';
+import { Roles } from 'src/modules/auth/guards/role.guard';
 
 @Controller('collections')
+@Roles('admin', 'moderator')
 export class CollectionsConrtroller {
   constructor(private readonly collectionService: CollectionsService) {}
 
@@ -28,13 +30,7 @@ export class CollectionsConrtroller {
   }
 
   @Post('create')
-  @OptionalAuth()
-  @ApiExcludeEndpoint()
   async createCollection(@Body() body: CollectionDto): Promise<Collection> {
-    if (body.secret !== env.FORCE_UPDATE_SECRET) {
-      throw new ForbiddenException('Invalid secret');
-    }
-
     if (!body.title) {
       throw new BadRequestException('Title is required');
     }
@@ -45,42 +41,33 @@ export class CollectionsConrtroller {
       body.mapsId,
       body.showOnMain,
       body.descColor,
+      body.isPublic,
     );
   }
 
-  @Post('update')
-  @OptionalAuth()
-  @ApiExcludeEndpoint()
-  async updateCollection(@Body() body: CollectionDto): Promise<Collection> {
-    if (body.secret !== env.FORCE_UPDATE_SECRET) {
-      throw new ForbiddenException('Invalid secret');
-    }
+  // @Get(':id')
+  // async getCollection(@Param('id') id: string) {}
 
-    if (!body.id) {
-      throw new BadRequestException('ID is required');
-    }
-
+  @Put(':id/update')
+  @UseGuards(CheckGuard)
+  async updateCollection(
+    @Param('id') id: string,
+    @Body() body: CollectionDto,
+  ): Promise<Collection> {
     return await this.collectionService.updateCollection(
-      body.id,
+      id,
       body.title,
       body.description,
       body.mapsId,
       body.showOnMain,
       body.descColor,
+      body.isPublic,
     );
   }
 
-  @Delete('delete')
-  @OptionalAuth()
-  @ApiExcludeEndpoint()
-  async deleteCollection(
-    @Param('id') id: string,
-    @Body() body: { secret: string },
-  ) {
-    if (body.secret !== env.FORCE_UPDATE_SECRET) {
-      throw new ForbiddenException('Invalid secret');
-    }
-
+  @Delete(':id/delete')
+  @UseGuards(CheckGuard)
+  async deleteCollection(@Param('id') id: string) {
     return await this.collectionService.deleteCollection(id);
   }
 }

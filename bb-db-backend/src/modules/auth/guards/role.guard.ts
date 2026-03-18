@@ -5,6 +5,7 @@ import {
   SetMetadata,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { AuthRequest } from 'd.types/auth';
 import { Observable } from 'rxjs';
 
 export const Roles = (...roles: string[]) => SetMetadata('roles', roles);
@@ -16,7 +17,11 @@ export class AuthGuard implements CanActivate {
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    const roles = this.reflector.get<string[]>('roles', context.getHandler());
+    const roles =
+      this.reflector.getAllAndOverride<string[]>('roles', [
+        context.getHandler(),
+        context.getClass(),
+      ]) ?? [];
 
     const req = context.switchToHttp().getRequest<AuthRequest>();
 

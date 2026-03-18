@@ -5,7 +5,6 @@ export class CollectionDto {
   @ApiProperty({
     description: 'Collection object for creating or updating map collections',
     example: {
-      id: '68f2c28e4042a49a1cedba45',
       title: 'Some awesome title',
       description:
         'And some awesome description. MapsId can contain string or string[] btw',
@@ -14,12 +13,10 @@ export class CollectionDto {
       descColor: 'black',
     },
   })
-  id?: string;
   title?: string;
   description?: string;
   mapsId?: string[];
   showOnMain?: boolean;
   descColor?: $Enums.Color;
-  //
-  secret: string;
+  isPublic?: boolean;
 }

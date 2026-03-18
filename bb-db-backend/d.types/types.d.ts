@@ -122,23 +122,6 @@ declare type Collection = {
   descColor: $Enums.Color;
 };
 
-declare interface AuthRequest extends Request {
-  user?: {
-    name: string;
-    email: string;
-    emailVerified: boolean;
-    image: string;
-    createdAt: Date;
-    updatedAt: Date;
-    role: $Enums.Role;
-    banned: boolean;
-    banReason: null | string;
-    banExpires: null | Date;
-    id: string;
-    steamId: null | string;
-  };
-}
-
 declare type WokshopItemUpdate = {
   type: 'WorkshopItemUpdate',
   data: {

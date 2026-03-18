@@ -1,6 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { $Enums } from '@prisma/client';
-import { ObjectId } from 'mongodb';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 
 @Injectable()
@@ -8,7 +7,9 @@ export class CollectionsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getCollections(onlyMain: boolean = false): Promise<Collection[]> {
-    const collections: Collection[] = await this.prisma.collection.findMany({});
+    const collections: Collection[] = await this.prisma.collection.findMany({
+      where: { isPublic: true },
+    });
 
     if (onlyMain) {
       return collections.filter((collection) => collection.showOnMain);
@@ -17,12 +18,15 @@ export class CollectionsService {
     return collections;
   }
 
+  async getCollection() {}
+
   async createCollection(
     title: string,
     description?: string,
     mapsId: string[] = [],
     showOnMain: boolean = false,
     descColor: $Enums.Color = 'black',
+    isPublic: boolean = true,
   ): Promise<Collection> {
     if (!title) {
       throw new BadRequestException('Title is required');
@@ -35,6 +39,7 @@ export class CollectionsService {
         mapsId,
         showOnMain,
         descColor,
+        isPublic,
       },
     });
 
@@ -48,15 +53,8 @@ export class CollectionsService {
     mapsId?: string | string[],
     showOnMain?: boolean,
     descColor?: $Enums.Color,
+    isPublic?: boolean,
   ): Promise<Collection> {
-    if (!id) {
-      throw new BadRequestException('ID is required');
-    }
-
-    if (!ObjectId.isValid(id)) {
-      throw new BadRequestException('Invalid ID format');
-    }
-
     const collection = await this.prisma.collection.findUniqueOrThrow({
       where: { id },
     });
@@ -75,6 +73,7 @@ export class CollectionsService {
             : [],
         showOnMain,
         descColor,
+        isPublic: isPublic === undefined ? isPublic : collection.isPublic,
       },
     });
 
@@ -82,14 +81,6 @@ export class CollectionsService {
   }
 
   async deleteCollection(id: string): Promise<string> {
-    if (!id) {
-      throw new BadRequestException('ID is required');
-    }
-
-    if (!ObjectId.isValid(id)) {
-      throw new BadRequestException('Invalid ID format');
-    }
-
     const collection = await this.prisma.collection.delete({
       where: { id },
     });

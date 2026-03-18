@@ -23,6 +23,8 @@ model User {
   banExpires  DateTime?
   publicDatas PublicData[]
 
+  collections Collection[]
+
   @@unique([email])
   @@map("user")
 }
