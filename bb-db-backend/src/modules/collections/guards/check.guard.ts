@@ -43,7 +43,10 @@ export class CheckGuard implements CanActivate {
       throw new NotFoundException();
     }
 
-    if (req.user.id === collection?.authorId || roles.includes(req.user.role)) {
+    if (
+      req.user.id === collection?.authorId ||
+      roles.includes(String(req.user.role))
+    ) {
       return true;
     } else {
       return false;

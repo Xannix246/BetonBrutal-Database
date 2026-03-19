@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { $Enums } from '@prisma/client';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 
@@ -18,7 +18,13 @@ export class CollectionsService {
     return collections;
   }
 
-  async getCollection() {}
+  async getCollection(id: string): Promise<Collection | null> {
+    const collection = await this.prisma.collection.findUnique({
+      where: { id },
+    });
+
+    return collection;
+  }
 
   async createCollection(
     title: string,
@@ -28,10 +34,6 @@ export class CollectionsService {
     descColor: $Enums.Color = 'black',
     isPublic: boolean = true,
   ): Promise<Collection> {
-    if (!title) {
-      throw new BadRequestException('Title is required');
-    }
-
     const collection = await this.prisma.collection.create({
       data: {
         title,

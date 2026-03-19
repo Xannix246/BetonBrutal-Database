@@ -45,9 +45,6 @@ export class CollectionsConrtroller {
     );
   }
 
-  // @Get(':id')
-  // async getCollection(@Param('id') id: string) {}
-
   @Put(':id/update')
   @UseGuards(CheckGuard)
   async updateCollection(
@@ -69,5 +66,10 @@ export class CollectionsConrtroller {
   @UseGuards(CheckGuard)
   async deleteCollection(@Param('id') id: string) {
     return await this.collectionService.deleteCollection(id);
+  }
+
+  @Get(':id')
+  async getCollection(@Param('id') id: string) {
+    return await this.collectionService.getCollection(id);
   }
 }
