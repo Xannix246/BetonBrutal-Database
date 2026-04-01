@@ -94,12 +94,12 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
       const replays = (await getReplays(id)).sort((a, b) => a.score - b.score);
       if (map) {
         setMapData(map);
-        mapData?.tags.length === 0 && setReplays(replays);
+        setReplays(replays);
 
         if (map.previews.length > 0)
           setPreviewId(Math.floor(Math.random() * map.previews.length));
 
-        mapData?.tags.length === 0 && setComments(
+        setComments(
           (await getComments(id)).sort(
             (a, b) =>
               new Date(b.createdAt).valueOf() - new Date(a.createdAt).valueOf(),
