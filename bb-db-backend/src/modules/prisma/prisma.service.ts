@@ -18,11 +18,11 @@ export class PrismaService
     await this.$connect();
 
     // migration
-    // await this.leaderboardEntry.updateMany({
-    //   data: {
-    //     banned: false,
-    //   },
-    // });
+    await this.workshopItem.updateMany({
+      data: {
+        tags: [],
+      },
+    });
     // console.log('Migration done');
   }
 

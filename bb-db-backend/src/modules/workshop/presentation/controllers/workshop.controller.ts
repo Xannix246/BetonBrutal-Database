@@ -51,9 +51,9 @@ export class WorkshopController {
     @Query('quantity', ParseIntPipe) quantity: number,
     @Query('sendPreviews', new ParseBoolPipe({ optional: true }))
     sendPreviews: boolean,
+    @Query('tags', new ParseArrayPipe({ optional: true })) tags: string[],
     @Query('timeRange') timeRange?: 'day' | 'week' | 'month' | 'year',
     @Query('page', new ParseIntPipe({ optional: true })) page: number = 1,
-    @Query('tags', new ParseArrayPipe({ optional: true })) tags?: string[],
   ): Promise<WorkshopItemHeader[]> {
     if (!quantity) {
       throw new BadRequestException('Quantity is required');

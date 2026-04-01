@@ -94,12 +94,12 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
       const replays = (await getReplays(id)).sort((a, b) => a.score - b.score);
       if (map) {
         setMapData(map);
-        setReplays(replays);
+        mapData?.tags.length === 0 && setReplays(replays);
 
         if (map.previews.length > 0)
           setPreviewId(Math.floor(Math.random() * map.previews.length));
 
-        setComments(
+        mapData?.tags.length === 0 && setComments(
           (await getComments(id)).sort(
             (a, b) =>
               new Date(b.createdAt).valueOf() - new Date(a.createdAt).valueOf(),
@@ -214,7 +214,7 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                       className="uppercase bg-blue/60 text-2xl sm:text-4xl p-3 w-full"
                       onClick={() => fileInputRef.current?.click()}
                     >
-                      {t(key.upload)}
+                      {mapData?.tags.length === 0 ? t(key.upload) : t(key.prefupload)}
                     </Button>
                   </div>
                 )}
@@ -223,7 +223,7 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                     className="uppercase bg-green/60 text-2xl sm:text-4xl p-3 w-full flex justify-center text-white hover:text-pink transition duration-150"
                     href={`${config.serverUri}/db/download?id=${id}`}
                   >
-                    {t(key.download)}
+                    {mapData?.tags.length === 0 ? t(key.download) : t(key.prefdownload)}
                   </a>
                 )}
               </div>
@@ -266,14 +266,14 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                         : t(key.favAdd)}
                     </Button>
                   )}
-                  <a
+                  {mapData?.tags.length === 0 && <a
                     target="_blank"
                     href={`https://josiahshields.com/beton/leaderboard/?lb=${mapData?.id}`}
                     rel="noreferrer"
                     className="hover:text-white hover:underline uppercase"
                   >
                     {t(key.bblb)}
-                  </a>
+                  </a>}
                 </Container>
                 <Container className="flex flex-col gap-6 text-2xl lg:text-3xl text-white">
                   <div className="flex gap-4">
@@ -282,19 +282,19 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                       {mapData && new Date(mapData.createDate).toLocaleDateString()}
                     </h4>
                   </div>
-                  <div className="flex gap-4">
+                  {mapData?.tags.length === 0 && <div className="flex gap-4">
                     <h4 className="uppercase text-green">{t(key.time)}</h4>
                     <h4 className="uppercase">
                       {getMedianTime(replays) ? formatTime(getMedianTime(replays)!) : "N/A"}
                     </h4>
-                  </div>
+                  </div>}
                 </Container>
                 <Container className="text-2xl w-full">
                   <DescriptionFormatter content={mapData?.description} />
                 </Container>
               </div>
             </div>
-            <div className="flex flex-col-reverse gap-16 mt-16 md:mt-0 md:flex-row md:gap-2 w-full">
+            {mapData?.tags.length === 0 && <div className="flex flex-col-reverse gap-16 mt-16 md:mt-0 md:flex-row md:gap-2 w-full">
               <div className="flex flex-col gap-2 w-full uppercase">
                 <Container>
                   <h2 className="text-white tracking-wider text-xl">
@@ -328,7 +328,7 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                 )}
               </div>
               <LeaderboardTable replays={replays} />
-            </div>
+            </div>}
           </div>
         ) : (
           <div className="flex gap-2 pt-32 px-4 h-screen w-full">

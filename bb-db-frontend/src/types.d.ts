@@ -13,6 +13,7 @@ declare type WorkshopItem = {
   previewUrl: string;
   previews: string[];
   filename?: null | string;
+  tags: string[];
 };
 
 declare type Replay = {

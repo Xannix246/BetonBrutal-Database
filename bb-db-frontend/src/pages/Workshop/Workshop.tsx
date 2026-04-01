@@ -17,7 +17,7 @@ import { Keys } from "../../../i18n/keys";
 
 const key = Keys.workshop;
 
-const Workshop = () => {
+const Workshop = ({ tags }: { tags: string[] }) => {
   const [loaded, setLoaded] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const [items, setItems] = useState<WorkshopItem[]>([]);
@@ -49,7 +49,7 @@ const Workshop = () => {
     if (isLoadingMore.current) return;
     isLoadingMore.current = true;
 
-    const maps = await getMaps(sort, 50, pageNumber);
+    const maps = await getMaps(sort, 50, pageNumber, tags);
     if (maps.length < 50) setHasMore(false);
 
     setItems((prev) => (append ? [...prev, ...maps] : maps));
@@ -117,7 +117,7 @@ const Workshop = () => {
         <Container className="flex gap-10 text-2xl md:text-4xl tracking-wide md:justify-center place-items-center overflow-x-auto whitespace-nowrap">
           <h1 className="text-white uppercase">{t(key.sort)}</h1>
           <div className="flex gap-5">
-            {["newest", "oldest", "mostPopular", "mostPlayed"].map(
+            {(tags ? ["newest", "oldest"] : ["newest", "oldest", "mostPopular", "mostPlayed"]).map(
               (sortOption) => (
                 <Button
                   key={sortOption}
@@ -135,13 +135,13 @@ const Workshop = () => {
               ),
             )}
           </div>
-          <h1 className="text-white"> |</h1>
-          <Button
+          {!tags && <h1 className="text-white"> |</h1>}
+          {!tags && <Button
             className="bg-transparent p-0 uppercase"
             onClick={async () => navigate(`/workshop/${await getRandomMap()}`)}
           >
             {t(key.randomMap)}
-          </Button>
+          </Button>}
         </Container>
 
         {loaded ? (

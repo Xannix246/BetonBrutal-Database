@@ -14,6 +14,7 @@ import DeleteModal from "../../features/DeleteModal";
 import { config } from "../../../config/config";
 import { t } from "i18next";
 import { Keys } from "../../../i18n/keys";
+import List from "../../shared/List/List";
 
 const key = Keys.header;
 
@@ -23,6 +24,7 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
   const [width, setWidth] = useState<number | null>(null)
   const [mobileMenu, setMobileMenu] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
+  const [openItemsMenu, setOpenItemsMenu] = useState(false);
 
   const handleWindowResize = useCallback(() => {
     setWidth(window.innerWidth);
@@ -79,10 +81,24 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
       <DeleteModal open={deleteModal} setOpen={setDeleteModal} />
       <MobileMenu open={mobileMenu} setOpen={setMobileMenu} user={user} menu={menu} />
       {width > 1115 && <div className="h-full text-white text-shadow-lg text-4xl flex gap-10 place-items-center pl-8">
-        <Link className="hover:text-pink transition duration-150" href="/">{t("header.home")}</Link>
-        <Link className="hover:text-pink transition duration-150" href="/workshop">{t("header.maps")}</Link>
-        <Link className="hover:text-pink transition duration-150" href="/rankings">{t("header.rankings")}</Link>
-        <Link className="hover:text-pink transition duration-150" href="/articles">{t("header.articles")}</Link>
+        <Link className="hover:text-pink transition duration-150" href="/">{t(key.home)}</Link>
+        <div className="hover:text-pink transition duration-150"
+          onMouseEnter={() => setOpenItemsMenu(true)}
+          onMouseLeave={() => setOpenItemsMenu(false)}
+        >
+          <Link className="hover:text-pink transition duration-150" href="/workshop">{t(key.items)}</Link>
+          {openItemsMenu && <List
+            className="min-w-50 pt-3 h-auto"
+            data={[
+              {name: t(key.maps), tag: ""},
+              {name: t(key.prefabs), tag: "Prefabs"}
+            ]}
+            displayData={(item) => item.name}
+            onItemClick={(item) => window.location.href = `/workshop${item.tag && "?tags=" + item.tag}`}
+          />}
+        </div>
+        <Link className="hover:text-pink transition duration-150" href="/rankings">{t(key.rankings)}</Link>
+        <Link className="hover:text-pink transition duration-150" href="/articles">{t(key.articles)}</Link>
       </div>}
       {width < 1115 && <div className="w-12 flex place-items-center justify-baseline">
         <Bars3Icon
