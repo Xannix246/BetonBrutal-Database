@@ -18,11 +18,11 @@ export class PrismaService
     await this.$connect();
 
     // migration
-    await this.workshopItem.updateMany({
-      data: {
-        tags: [],
-      },
-    });
+    // await this.workshopItem.updateMany({
+    //   data: {
+    //     tags: [],
+    //   },
+    // });
     // console.log('Migration done');
   }
 
