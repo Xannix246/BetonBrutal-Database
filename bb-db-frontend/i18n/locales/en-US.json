@@ -4,7 +4,9 @@
   "dataCheck": "Checking what's new...",
   "header": {
     "home": "Home",
+    "items": "Items",
     "maps": "Maps",
+    "prefabs": "Prefabs",
     "rankings": "Rankings",
     "articles": "Articles",
     "search": "Search",
@@ -33,7 +35,9 @@
   },
   "workshopItem": {
     "upload": "Upload map",
+    "prefupload": "Upload prefab",
     "download": "Download map",
+    "prefdownload": "Download prefab",
     "favAdd": "Add to favorites",
     "favRemove": "Femove from favorites",
     "bblb": "Map on BBLB",
@@ -46,7 +50,7 @@
     "notFound": "Map not found"
   },
   "player": {
-    "maps": "Maps",
+    "maps": "Items",
     "runs": "Runs",
     "by": "by",
     "favorites": "Favorites",

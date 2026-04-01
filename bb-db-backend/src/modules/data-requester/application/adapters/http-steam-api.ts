@@ -37,6 +37,9 @@ export class SteamApiService {
         data.publishedfiledetails[0].previews
           ?.filter((preview) => preview?.url)
           .map((preview) => preview.url) || [],
+      tags: data.publishedfiledetails[0].tags
+        .map((item) => item.tag)
+        .filter((tag) => tag.toLowerCase() !== 'custommaps'),
     };
   }
 
@@ -83,6 +86,9 @@ export class SteamApiService {
             ?.filter((preview) => preview?.url)
             .map((preview) => preview.url) || [],
         filename: null,
+        tags: map.tags
+          .map((item) => item.tag)
+          .filter((tag) => tag.toLowerCase() !== 'custommaps'),
       });
     }
 
@@ -121,6 +127,9 @@ export class SteamApiService {
             ?.filter((preview) => preview?.url)
             .map((preview) => preview.url) || [],
         filename: null,
+        tags: map.tags
+          .map((item) => item.tag)
+          .filter((tag) => tag.toLowerCase() !== 'custommaps'),
       });
     }
     return returnedItems;

@@ -56,6 +56,7 @@ export class FetchItemUseCase {
         previewUrl: itemData.previewUrl,
         previews: itemData.previews,
         description: itemData.description,
+        tags: itemData.tags,
       },
       create: {
         steamId: itemData.steamId,
@@ -69,6 +70,7 @@ export class FetchItemUseCase {
         previews: itemData.previews,
         description: itemData.description,
         filename: null,
+        tags: itemData.tags,
       },
     });
 
@@ -85,6 +87,7 @@ export class FetchItemUseCase {
       previewUrl: itemData.previewUrl,
       previews: itemData.previews,
       filename: map.filename,
+      tags: itemData.tags,
     };
   }
 }

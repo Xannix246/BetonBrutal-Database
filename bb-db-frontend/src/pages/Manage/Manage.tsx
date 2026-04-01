@@ -41,6 +41,7 @@ const Manage = () => {
       previews: [],
       ratingUp: 0,
       ratingDown: 0,
+      tags: [],
     });
   }
 
