@@ -5,6 +5,7 @@ import {
   Get,
   HttpStatus,
   Param,
+  ParseArrayPipe,
   ParseBoolPipe,
   ParseIntPipe,
   Post,
@@ -52,6 +53,7 @@ export class WorkshopController {
     sendPreviews: boolean,
     @Query('timeRange') timeRange?: 'day' | 'week' | 'month' | 'year',
     @Query('page', new ParseIntPipe({ optional: true })) page: number = 1,
+    @Query('tags', new ParseArrayPipe({ optional: true })) tags?: string[],
   ): Promise<WorkshopItemHeader[]> {
     if (!quantity) {
       throw new BadRequestException('Quantity is required');
@@ -63,6 +65,7 @@ export class WorkshopController {
       sendPreviews,
       timeRange,
       page,
+      tags,
     );
   }
 

@@ -57,6 +57,7 @@ export class GetNewMapsScheduler {
           previews: item.previews,
           description: item.description,
           filename: isDownloaded ? isDownloaded : null,
+          tags: item.tags,
         },
         create: {
           steamId: item.steamId,
@@ -70,6 +71,7 @@ export class GetNewMapsScheduler {
           previews: item.previews,
           description: item.description,
           filename: isDownloaded ? isDownloaded : null,
+          tags: item.tags,
         },
       });
     }

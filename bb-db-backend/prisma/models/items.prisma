@@ -19,6 +19,7 @@ model WorkshopItem {
   previewUrl  String
   previews    String[]
   filename    String? // if map was uploaded
+  tags        String[] // for prefabs or other future items
 }
 
 model LeaderboardEntry {
