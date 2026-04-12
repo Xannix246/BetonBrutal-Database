@@ -8,9 +8,9 @@ import { MongoClient, GridFSBucket, ObjectId, Collection } from 'mongodb';
 
 @Injectable()
 export class GridFSService implements OnModuleInit {
-  private client: MongoClient;
-  private bucket: GridFSBucket;
-  private collection: Collection;
+  private client!: MongoClient;
+  private bucket!: GridFSBucket;
+  private collection!: Collection;
 
   async onModuleInit() {
     this.client = await MongoClient.connect(process.env.DATABASE_URL!);

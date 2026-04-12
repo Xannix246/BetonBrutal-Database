@@ -4,7 +4,7 @@ import { existsSync } from 'fs';
 import { createWriteStream, rmSync } from 'node:fs';
 import Path from 'node:path';
 import { env } from 'node:process';
-import { multerConfig } from 'src/modules/uploads/config/multer.config';
+import { multerConfig } from 'src/modules/storage/config/multer.config';
 import os from 'node:os';
 import * as pty from 'node-pty';
 
