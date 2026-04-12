@@ -66,7 +66,7 @@ export class FileController {
       file.buffer,
       type,
     );
-    const url = `${env.BETTER_AUTH_URL}/files/${id.toString()}`;
+    const url = `${env.BETTER_AUTH_URL}/api/files/${id.toString()}`;
 
     const publicData = await this.userService.setPublicData(
       {

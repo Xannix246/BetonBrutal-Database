@@ -5,8 +5,10 @@ export const getMaps = async (
   sortBy: SortBy = "newest",
   quantity: number = 50,
   page: number,
+  tags?: string[],
 ): Promise<WorkshopItem[]>  => {
-  return (await api.get(`${config.serverUri}/workshop/get-list?sortBy=${sortBy}&quantity=${quantity}&page=${page}`)).data;
+  console.log(tags);
+  return (await api.get(`${config.serverUri}/workshop/get-list?sortBy=${sortBy}&quantity=${quantity}&page=${page}${tags ? "&tags=" + tags.join(',') : ""}`)).data;
 }
 
 export const getRandomMap = async (): Promise<string> => {

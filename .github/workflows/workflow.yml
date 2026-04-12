@@ -22,7 +22,8 @@ jobs:
             source $NVM_DIR/nvm.sh
 
             cd ${{ secrets.REPO_PATH }}
-            git pull origin main
+            git fetch origin
+            git reset --hard origin/main
 
             cd bb-db-backend
             pnpm i --frozen-lockfile

@@ -18,9 +18,9 @@ export class PrismaService
     await this.$connect();
 
     // migration
-    // await this.leaderboardEntry.updateMany({
+    // await this.workshopItem.updateMany({
     //   data: {
-    //     banned: false,
+    //     tags: [],
     //   },
     // });
     // console.log('Migration done');

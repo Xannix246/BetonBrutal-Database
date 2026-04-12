@@ -5,7 +5,9 @@ export const Keys = {
 
   header: {
     home: "header.home",
+    items: "header.items",
     maps: "header.maps",
+    prefabs: "header.prefabs",
     rankings: "header.rankings",
     articles: "header.articles",
     search: "header.search",
@@ -37,7 +39,9 @@ export const Keys = {
 
   workshopItem: {
     upload: "workshopItem.upload",
+    prefupload: "workshopItem.prefupload",
     download: "workshopItem.download",
+    prefdownload: "workshopItem.prefdownload",
     favAdd: "workshopItem.favAdd",
     favRemove: "workshopItem.favRemove",
     bblb: "workshopItem.bblb",

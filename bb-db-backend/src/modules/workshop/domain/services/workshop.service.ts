@@ -54,11 +54,22 @@ export class WorkshopService {
     sendPreviews: boolean = false,
     timeRange?: 'day' | 'week' | 'month' | 'year',
     page: number = 1,
+    tags?: string[],
   ): Promise<WorkshopItemHeader[]> {
     let orderBy: {
       ratingUp?: 'asc' | 'desc';
       createDate?: 'asc' | 'desc';
     };
+
+    const where: {
+      createDate?: {
+        gte: Date;
+      };
+      tags?: {
+        hasSome?: string[];
+        equals?: string[];
+      };
+    } = {};
 
     let leaderboardsEntries: string[] | undefined;
 
@@ -107,7 +118,15 @@ export class WorkshopService {
       }
     }
 
-    const where = dateFilter ? { createDate: { gte: dateFilter } } : undefined;
+    if (dateFilter) {
+      where.createDate = { gte: dateFilter };
+    }
+
+    if (tags) {
+      where.tags = { hasSome: tags };
+    } else {
+      where.tags = { equals: [] };
+    }
 
     const items = leaderboardsEntries
       ? await this.prisma.workshopItem.findMany({
@@ -201,6 +220,7 @@ export class WorkshopService {
         previewUrl: item.previewUrl,
         previews: item.previews,
         filename: item.filename,
+        tags: item.tags,
       };
     } else {
       return null;
