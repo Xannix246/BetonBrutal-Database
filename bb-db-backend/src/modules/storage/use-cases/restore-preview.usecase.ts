@@ -19,7 +19,11 @@ export class RestorePreviewUseCase {
       where: { steamId },
     });
 
-    if (!map || map.previewUrl === '') {
+    if (
+      !map ||
+      map.previewUrl === '' ||
+      !new URL(map.previewUrl).hostname.includes('steam')
+    ) {
       return;
     }
 
@@ -27,12 +31,14 @@ export class RestorePreviewUseCase {
     let preview: Buffer | null = null;
 
     if (!extract) {
+      this.multer.clearTemp(steamId);
       return;
     }
 
     try {
       preview = await readFile(path.join('./temp', steamId, 'Thumbnail.png'));
     } catch {
+      this.multer.clearTemp(steamId);
       return;
     }
 
