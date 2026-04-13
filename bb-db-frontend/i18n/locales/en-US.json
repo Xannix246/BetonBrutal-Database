@@ -7,6 +7,7 @@
     "items": "Items",
     "maps": "Maps",
     "prefabs": "Prefabs",
+    "collections": "Collections",
     "rankings": "Rankings",
     "articles": "Articles",
     "search": "Search",
@@ -47,7 +48,8 @@
     "commentsNoAuth": "You need to be logged in to leave comments",
     "placeholder": "Type your comment here...",
     "noComments": "Seems like still no one has left a comment here... Do you want to be first?",
-    "notFound": "Map not found"
+    "notFound": "Map not found",
+    "noPreview": "Unable to find preview"
   },
   "player": {
     "maps": "Items",

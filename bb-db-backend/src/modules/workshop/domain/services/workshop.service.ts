@@ -187,7 +187,7 @@ export class WorkshopService {
   }
 
   async getItem(id: string): Promise<WorkshopItem | null> {
-    let item = await this.prisma.workshopItem.findUnique({
+    let item: WorkshopItem | null = await this.prisma.workshopItem.findUnique({
       where: { steamId: id },
     });
 

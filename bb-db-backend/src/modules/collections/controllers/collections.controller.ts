@@ -11,10 +11,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CollectionsService } from '../services/collections.service';
-import { OptionalAuth } from '@thallesp/nestjs-better-auth';
+import { OptionalAuth, Session } from '@thallesp/nestjs-better-auth';
 import { CollectionDto } from './collections.dto';
 import { CheckGuard } from '../guards/check.guard';
 import { Roles } from 'src/modules/auth/guards/role.guard';
+import { type UserRoleSession } from 'src/modules/auth/auth.module';
 
 @Controller('collections')
 @Roles('admin', 'moderator')
@@ -30,12 +31,16 @@ export class CollectionsConrtroller {
   }
 
   @Post('create')
-  async createCollection(@Body() body: CollectionDto): Promise<Collection> {
+  async createCollection(
+    @Body() body: CollectionDto,
+    @Session() session: UserRoleSession,
+  ): Promise<Collection> {
     if (!body.title) {
       throw new BadRequestException('Title is required');
     }
 
-    return await this.collectionService.createCollection(
+    return this.collectionService.createCollection(
+      session,
       body.title,
       body.description,
       body.mapsId,
@@ -43,6 +48,20 @@ export class CollectionsConrtroller {
       body.descColor,
       body.isPublic,
     );
+  }
+
+  @Get(':id/stats')
+  async getStats(@Param('id') id: string) {
+    return this.collectionService.getStats(id);
+  }
+
+  @Post(':id/vote')
+  async collectionVote(
+    @Param('id') id: string,
+    @Session() session: UserRoleSession,
+    @Body() body: { vote: 'upvote' | 'downvote' | 'neutral' },
+  ) {
+    return this.collectionService.vote(id, session.user.id, body.vote);
   }
 
   @Put(':id/update')

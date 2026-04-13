@@ -8,6 +8,7 @@ export const Keys = {
     items: "header.items",
     maps: "header.maps",
     prefabs: "header.prefabs",
+    collections: "header.collections",
     rankings: "header.rankings",
     articles: "header.articles",
     search: "header.search",
@@ -52,6 +53,7 @@ export const Keys = {
     placeholder: "workshopItem.placeholder",
     noComments: "workshopItem.noComments",
     notFound: "workshopItem.notFound",
+    noPreview: "workshopItem.noPreview",
   },
 
   player: {

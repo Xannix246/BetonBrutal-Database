@@ -91,7 +91,8 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
             className="min-w-50 pt-3 h-auto"
             data={[
               {name: t(key.maps), tag: ""},
-              {name: t(key.prefabs), tag: "Prefabs"}
+              {name: t(key.prefabs), tag: "Prefabs"},
+              {name: t(key.collections), tag: "Collections"}
             ]}
             displayData={(item) => item.name}
             onItemClick={(item) => window.location.href = `/workshop${item.tag && "?tags=" + item.tag}`}

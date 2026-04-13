@@ -8,15 +8,48 @@ enum Color {
 }
 
 model Collection {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  title       String
-  description String?
-  mapsId      String[]
-  showOnMain  Boolean  @default(false)
-  isPublic    Boolean  @default(false)
-  descColor   Color    @default(black)
-  authorId    String?
-  user        User?    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  title             String
+  description       String?
+  mapsId            String[]
+  showOnMain        Boolean  @default(false)
+  isPublic          Boolean  @default(false)
+  descColor         Color    @default(black)
+  previewUrl        String?
+  authorId          String?
+  user              User?    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  workshopItems WorkshopItem[]
+  stat          CollectionStats?
+}
+
+enum VoteType {
+  upvote
+  downvote
+  neutral
+}
+
+model Vote {
+  id     String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId String
+  type   VoteType
+  statId String   @unique
+  date   DateTime
+
+  stat CollectionStats @relation(fields: [statId], references: [id], onDelete: Cascade)
+  @@unique([userId, statId])
+}
+
+model CollectionStats {
+  id             String @id @default(auto()) @map("_id") @db.ObjectId
+  totalMaps      Int
+  totalReplays   Int
+  totalVotesUp   Int
+  totalVotesDown Int
+  collectionId   String @unique
+
+  collection Collection? @relation(fields: [collectionId], references: [id])
+  votes      Vote[]
 }
 
 model Nominees {
