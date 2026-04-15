@@ -3,21 +3,35 @@ import {
   Body,
   Controller,
   Delete,
-  ForbiddenException,
   Get,
+  MaxFileSizeValidator,
   Param,
+  ParseFilePipe,
   Post,
   Query,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CollectionsService } from '../services/collections.service';
-import { OptionalAuth } from '@thallesp/nestjs-better-auth';
-import { env } from 'process';
-import { ApiExcludeEndpoint } from '@nestjs/swagger';
+import { OptionalAuth, Session } from '@thallesp/nestjs-better-auth';
 import { CollectionDto } from './collections.dto';
+import { CheckGuard } from '../guards/check.guard';
+import { Roles } from 'src/modules/auth/guards/role.guard';
+import { type UserRoleSession } from 'src/modules/auth/auth.module';
+import { FileInterceptor } from '@nestjs/platform-express/multer';
+import { ImageFilePipe } from 'src/modules/storage/pipes/filetype.pipe';
+import { GridFSService } from 'src/modules/storage/services/gridfs.service';
+import { QuantityGuard } from '../guards/quantity.guard';
+import { CollectionStats, Vote } from '@prisma/client';
 
 @Controller('collections')
+@Roles('admin', 'moderator')
 export class CollectionsConrtroller {
-  constructor(private readonly collectionService: CollectionsService) {}
+  constructor(
+    private readonly collectionService: CollectionsService,
+    private readonly gridFs: GridFSService,
+  ) {}
 
   @Get('get')
   @OptionalAuth()
@@ -28,59 +42,104 @@ export class CollectionsConrtroller {
   }
 
   @Post('create')
-  @OptionalAuth()
-  @ApiExcludeEndpoint()
-  async createCollection(@Body() body: CollectionDto): Promise<Collection> {
-    if (body.secret !== env.FORCE_UPDATE_SECRET) {
-      throw new ForbiddenException('Invalid secret');
-    }
-
+  @UseGuards(QuantityGuard)
+  async createCollection(
+    @Body() body: CollectionDto,
+    @Session() session: UserRoleSession,
+  ): Promise<Collection> {
     if (!body.title) {
       throw new BadRequestException('Title is required');
     }
 
-    return await this.collectionService.createCollection(
+    if (!['admin', 'moderator'].includes(session.user.role!)) {
+      body.showOnMain = false;
+    }
+
+    return this.collectionService.createCollection(
+      session,
       body.title,
       body.description,
       body.mapsId,
       body.showOnMain,
       body.descColor,
+      body.isPublic,
+      body.previewUrl,
     );
   }
 
-  @Post('update')
+  @Get(':id/stats')
   @OptionalAuth()
-  @ApiExcludeEndpoint()
-  async updateCollection(@Body() body: CollectionDto): Promise<Collection> {
-    if (body.secret !== env.FORCE_UPDATE_SECRET) {
-      throw new ForbiddenException('Invalid secret');
-    }
-
-    if (!body.id) {
-      throw new BadRequestException('ID is required');
-    }
-
-    return await this.collectionService.updateCollection(
-      body.id,
-      body.title,
-      body.description,
-      body.mapsId,
-      body.showOnMain,
-      body.descColor,
-    );
+  async getStats(@Param('id') id: string): Promise<CollectionStats | null> {
+    return this.collectionService.getStats(id);
   }
 
-  @Delete('delete')
-  @OptionalAuth()
-  @ApiExcludeEndpoint()
-  async deleteCollection(
+  @Get(':id/vote')
+  async getCollectionVote(
     @Param('id') id: string,
-    @Body() body: { secret: string },
+    @Session() session: UserRoleSession,
   ) {
-    if (body.secret !== env.FORCE_UPDATE_SECRET) {
-      throw new ForbiddenException('Invalid secret');
-    }
+    return this.collectionService.getVote(id, session.user.id);
+  }
 
-    return await this.collectionService.deleteCollection(id);
+  @Post(':id/vote')
+  async collectionVote(
+    @Param('id') id: string,
+    @Session() session: UserRoleSession,
+    @Body() body: { vote: 'upvote' | 'downvote' | 'neutral' },
+  ): Promise<Vote> {
+    return this.collectionService.vote(id, session.user.id, body.vote);
+  }
+
+  @Post(':id/upload-preview')
+  @UseInterceptors(FileInterceptor('file'))
+  @UseGuards(CheckGuard)
+  async uploadCollectionFile(
+    @UploadedFile(
+      new ImageFilePipe(),
+      new ParseFilePipe({
+        validators: [new MaxFileSizeValidator({ maxSize: 2 * 1024 * 1024 })],
+      }),
+    )
+    file: Express.Multer.File,
+    @Session() session: UserRoleSession,
+    @Param('id') id: string,
+  ): Promise<string> {
+    const imageUrl = await this.gridFs.uploadCollectionFile(
+      session.user.id,
+      id,
+      file.buffer,
+    );
+
+    return imageUrl;
+  }
+
+  @Post(':id/update')
+  @UseGuards(CheckGuard)
+  async updateCollection(
+    @Param('id') id: string,
+    @Body() body: CollectionDto,
+  ): Promise<Collection> {
+    return await this.collectionService.updateCollection(
+      id,
+      body.title,
+      body.description,
+      body.mapsId,
+      body.showOnMain,
+      body.descColor,
+      body.isPublic,
+      body.previewUrl,
+    );
+  }
+
+  @Delete(':id/delete')
+  @UseGuards(CheckGuard)
+  async deleteCollection(@Param('id') id: string): Promise<string> {
+    return this.collectionService.deleteCollection(id);
+  }
+
+  @Get(':id')
+  @OptionalAuth()
+  async getCollection(@Param('id') id: string): Promise<Collection | null> {
+    return this.collectionService.getCollection(id);
   }
 }

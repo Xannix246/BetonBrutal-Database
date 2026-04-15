@@ -6,7 +6,7 @@ import {
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { PostArticleDto } from '../presentation/dto/articles.dto';
 import { UserRoleSession } from 'src/modules/auth/auth.module';
-import { GridFSService } from 'src/modules/uploads/services/gridfs.service';
+import { GridFSService } from 'src/modules/storage/services/gridfs.service';
 
 @Injectable()
 export class ArticlesService {

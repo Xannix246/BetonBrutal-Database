@@ -135,12 +135,18 @@ const Workshop = ({ tags }: { tags: string[] }) => {
               ),
             )}
           </div>
-          {!tags && <h1 className="text-white"> |</h1>}
+          {!tags?.includes("Prefabs") && <h1 className="text-white"> |</h1>}
           {!tags && <Button
             className="bg-transparent p-0 uppercase"
-            onClick={async () => navigate(`/workshop/${await getRandomMap()}`)}
+            onClick={async () => await navigate(`/workshop/${await getRandomMap()}`)}
           >
             {t(key.randomMap)}
+          </Button>}
+          {tags?.includes("Collection") && user && <Button
+            className="bg-transparent hover:bg-green/50 p-2 uppercase"
+            onClick={async () => await navigate(`/collection/create`)}
+          >
+            {t(key.create)}
           </Button>}
         </Container>
 

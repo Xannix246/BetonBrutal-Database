@@ -20,6 +20,10 @@ model WorkshopItem {
   previews    String[]
   filename    String? // if map was uploaded
   tags        String[] // for prefabs or other future items
+  isHidden    Boolean?
+
+  linkedCollection String?     @unique
+  collection       Collection? @relation(fields: [linkedCollection], references: [id], onDelete: Cascade) // if tag - collection
 }
 
 model LeaderboardEntry {

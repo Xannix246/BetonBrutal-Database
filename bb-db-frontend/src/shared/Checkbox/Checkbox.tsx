@@ -10,7 +10,7 @@ const Checkbox = ({ enabled, setEnabled }: Props) => {
     <HeadlessCheckbox
       checked={enabled}
       onChange={setEnabled}
-      className="group flex size-8 items-center justify-center border-3 border-[#fdeece] outline-none"
+      className="group flex size-8 items-center justify-center border-3 border-[#fdeece] outline-none aspect-square cursor-pointer"
     >
       <span className="invisible size-4 bg-[#fdeece] group-data-checked:visible" />
     </HeadlessCheckbox>

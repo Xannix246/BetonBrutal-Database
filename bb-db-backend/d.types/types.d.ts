@@ -5,7 +5,7 @@ declare type SortBy = 'mostPopular' | 'newest' | 'oldest' | 'mostPlayed';
 declare type WorkshopItem = {
   id: string;
   title: string;
-  description: string;
+  description: string | null;
   steamId: string;
   creator: string;
   creatorId: string;
@@ -16,6 +16,7 @@ declare type WorkshopItem = {
   previews: string[];
   filename: null | string;
   tags: string[];
+  linkedCollection?: null | string;
 };
 
 declare type WorkshopItemHeader = {
@@ -27,6 +28,8 @@ declare type WorkshopItemHeader = {
   ratingUp: number;
   ratingDown: number;
   previews?: string[];
+  linkedCollection?: string;
+  tags?: string[]
 };
 
 declare type Player = {
@@ -121,24 +124,8 @@ declare type Collection = {
   showOnMain: boolean;
   isPublic?: boolean;
   descColor: $Enums.Color;
+  authorId: string | null;
 };
-
-declare interface AuthRequest extends Request {
-  user?: {
-    name: string;
-    email: string;
-    emailVerified: boolean;
-    image: string;
-    createdAt: Date;
-    updatedAt: Date;
-    role: $Enums.Role;
-    banned: boolean;
-    banReason: null | string;
-    banExpires: null | Date;
-    id: string;
-    steamId: null | string;
-  };
-}
 
 declare type WokshopItemUpdate = {
   type: 'WorkshopItemUpdate',
@@ -148,6 +135,7 @@ declare type WokshopItemUpdate = {
     creator?: string;
     description?: string;
     previews?: string[];
+    isHidden?: boolean;
   }
 }
 
@@ -161,6 +149,9 @@ declare type WokshopItemCreate = {
     description?: string;
     previews?: string[];
     createDate?: Date;
+    tags?: string[];
+    linkedCollection?: string;
+    isHidden?: boolean;
   }
 }
 

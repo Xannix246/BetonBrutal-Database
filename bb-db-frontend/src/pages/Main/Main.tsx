@@ -96,7 +96,7 @@ const Main = () => {
 
         <div className="flex flex-col gap-4 place-items-center w-full mt-16">
           {collections.length > 0 && (
-            <div className="w-full mb-32">
+            <div className="grid gap-16 w-full mb-32">
               {collections.map((collection, i) => (
                 <CollectionContainer collection={collection} key={i} />
               ))}

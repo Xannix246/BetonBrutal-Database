@@ -69,6 +69,7 @@ export class WorkshopService {
         hasSome?: string[];
         equals?: string[];
       };
+      isHidden?: boolean;
     } = {};
 
     let leaderboardsEntries: string[] | undefined;
@@ -128,6 +129,8 @@ export class WorkshopService {
       where.tags = { equals: [] };
     }
 
+    where.isHidden = false;
+
     const items = leaderboardsEntries
       ? await this.prisma.workshopItem.findMany({
           where: { steamId: { in: leaderboardsEntries } },
@@ -156,16 +159,18 @@ export class WorkshopService {
       returnItems.push({
         id: item.steamId,
         title: item.title,
-        creator: (
-          await this.prisma.steamUser.findUnique({
-            where: { steamId: item.creatorId },
-          })
-        )?.username as string,
+        creator:
+          ((
+            await this.prisma.steamUser.findUnique({
+              where: { steamId: item.creatorId },
+            })
+          )?.username as string) || item.creator,
         createDate: item.createDate,
         ratingUp: item.ratingUp,
         ratingDown: item.ratingDown,
         previewUrl: item.previewUrl,
         previews: sendPreviews ? item.previews : [],
+        tags: item.tags,
       });
     }
 
@@ -187,7 +192,7 @@ export class WorkshopService {
   }
 
   async getItem(id: string): Promise<WorkshopItem | null> {
-    let item = await this.prisma.workshopItem.findUnique({
+    let item: WorkshopItem | null = await this.prisma.workshopItem.findUnique({
       where: { steamId: id },
     });
 
@@ -208,11 +213,12 @@ export class WorkshopService {
         title: item.title,
         description: item.description || 'Updating...',
         steamId: item.steamId,
-        creator: (
-          await this.prisma.steamUser.findUnique({
-            where: { steamId: item.creatorId },
-          })
-        )?.username as string,
+        creator:
+          ((
+            await this.prisma.steamUser.findUnique({
+              where: { steamId: item.creatorId },
+            })
+          )?.username as string) || item.creator,
         creatorId: item.creatorId,
         createDate: item.createDate,
         ratingUp: item.ratingUp,
@@ -259,8 +265,16 @@ export class WorkshopService {
   }
 
   async getPlayer(id: string): Promise<Player | null> {
+    let user: User | null = null;
+
+    if (!ObjectId.isValid(id)) {
+      user = await this.prisma.user.findUnique({
+        where: { id },
+      });
+    }
+
     const player = await this.prisma.steamUser.findUnique({
-      where: { steamId: id },
+      where: { steamId: user?.steamId || id },
     });
 
     if (player) {
@@ -558,9 +572,10 @@ export class WorkshopService {
               creatorId: workshopItem.data.creatorId ?? user?.steamId ?? '',
               creator:
                 user?.username ??
-                workshopItem.data.creatorId ??
                 workshopItem.data.creator ??
+                workshopItem.data.creatorId ??
                 'unknown',
+              isHidden: workshopItem.data.isHidden,
             },
           })
         : await this.prisma.workshopItem.update({

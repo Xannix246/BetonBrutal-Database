@@ -10,6 +10,7 @@ type Props = {
   ratingUp: number;
   ratingDown: number;
   disableSizeClass?: boolean;
+  tags?: string[];
 }
 
 const getTileSize = (title: string, ratingUp: number) => {
@@ -18,7 +19,7 @@ const getTileSize = (title: string, ratingUp: number) => {
   return "tile-normal";
 };
 
-const MapTile = ({ steamId, title, creator, previewUrl, ratingUp, id, disableSizeClass = false }: Props) => {
+const MapTile = ({ steamId, title, creator, previewUrl, ratingUp, id, disableSizeClass = false, tags }: Props) => {
   const sizeClass = getTileSize(title, ratingUp);
   const user = getUser();
 
@@ -29,9 +30,12 @@ const MapTile = ({ steamId, title, creator, previewUrl, ratingUp, id, disableSiz
         "relative shadow-md group cursor-pointer bg-black/70",
         !disableSizeClass ? sizeClass : "flex w-full h-full aspect-square"
       )}
-      href={`/workshop/${steamId === undefined ? id : steamId}`}
+      href={tags?.includes("Collection") ? `/collection/${id}` : `/workshop/${steamId === undefined ? id : steamId}`}
       onContextMenu={(e) => {
-        if (["moderator", "admin"].includes(user?.role as string)) {
+        if (
+          ["moderator", "admin"].includes(user?.role as string) ||
+          window.location.pathname.includes("collection/create")
+        ) {
           e.preventDefault();
           setTargetData({ id: id as string, name: title})
         }

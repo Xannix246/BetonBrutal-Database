@@ -18,8 +18,8 @@ import { type Response } from 'express';
 import { env } from 'node:process';
 import { AuthGuard, Roles } from 'src/modules/auth/guards/role.guard';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
-import { ImageFilePipe } from 'src/modules/uploads/pipes/filetype.pipe';
-import { GridFSService } from 'src/modules/uploads/services/gridfs.service';
+import { ImageFilePipe } from 'src/modules/storage/pipes/filetype.pipe';
+import { GridFSService } from 'src/modules/storage/services/gridfs.service';
 import { UserService } from 'src/modules/users/application/users.service';
 
 @Controller('files')

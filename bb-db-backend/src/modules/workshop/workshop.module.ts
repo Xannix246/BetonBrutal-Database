@@ -8,12 +8,14 @@ import { MapDownloaderProcessor } from './processors/map.processor';
 import { MapRequesterProcessor } from './processors/workshop.processor';
 import { BanReplayProcessor } from './processors/replay-ban.processor';
 import { DataRequesterModule } from '../data-requester/data-requester.module';
+import { StorageModule } from '../storage/storage.module';
 
 @Module({
   imports: [
     PrismaModule,
     WebsocketModule,
     DataRequesterModule,
+    StorageModule,
     BullModule.registerQueue(
       {
         name: 'map-downloading',
