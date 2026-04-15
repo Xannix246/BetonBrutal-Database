@@ -5,12 +5,16 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { MongoClient, GridFSBucket, ObjectId, Collection } from 'mongodb';
+import { PrismaService } from 'src/modules/prisma/prisma.service';
+import { env } from 'node:process';
 
 @Injectable()
 export class GridFSService implements OnModuleInit {
   private client!: MongoClient;
   private bucket!: GridFSBucket;
   private collection!: Collection;
+
+  constructor(private readonly prisma: PrismaService) {}
 
   async onModuleInit() {
     this.client = await MongoClient.connect(process.env.DATABASE_URL!);
@@ -58,6 +62,59 @@ export class GridFSService implements OnModuleInit {
       uploadStream.on('finish', () => resolve(uploadStream.id));
       uploadStream.on('error', reject);
     });
+  }
+
+  async uploadCollectionFile(
+    userId: string,
+    collectionId: string,
+    buffer: Buffer,
+  ) {
+    if (!userId || !buffer || !collectionId) {
+      throw new BadRequestException();
+    }
+
+    const existingFile = await this.collection.findOne({
+      'metadata.userId': userId,
+      'metadata.collectionId': collectionId,
+    });
+
+    if (existingFile) {
+      await this.bucket.delete(existingFile._id);
+    }
+
+    const uploadStream = this.bucket.openUploadStreamWithId(
+      existingFile?._id || new ObjectId(),
+      collectionId,
+      {
+        metadata: {
+          userId,
+          collectionId,
+        },
+      },
+    );
+
+    const id = await new Promise<ObjectId>((resolve, reject) => {
+      uploadStream.end(buffer);
+      uploadStream.on('finish', () => resolve(uploadStream.id));
+      uploadStream.on('error', reject);
+    });
+    const url = `${env.BETTER_AUTH_URL}/api/files/${id.toString()}`;
+
+    await this.prisma.collection.update({
+      where: { id: collectionId },
+      data: {
+        previewUrl: url,
+      },
+    });
+
+    await this.prisma.workshopItem.update({
+      where: { linkedCollection: collectionId },
+      data: {
+        previewUrl: url,
+      },
+    });
+
+    return url;
   }
 
   getFileStream(id: string) {

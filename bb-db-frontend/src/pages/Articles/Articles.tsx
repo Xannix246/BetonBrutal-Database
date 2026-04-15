@@ -70,7 +70,7 @@ const Articles = () => {
     let date: "day" | "week" | "month" | "year" | undefined = undefined;
 
     switch (selectedDate) {
-      case t(key.none):
+      case t(key.day):
         date = "day";
         break;
       case t(key.week):

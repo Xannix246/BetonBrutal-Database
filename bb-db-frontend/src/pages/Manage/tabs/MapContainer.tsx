@@ -18,7 +18,7 @@ const MapContainer = () => {
 
       const data = await handleSearch(search, true);
       if (data) setMaps(data);
-    }, 1000);
+    }, 500);
 
     return () => clearTimeout(timer);
   }, [search]);

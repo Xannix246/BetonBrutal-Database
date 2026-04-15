@@ -25,6 +25,7 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
   const [mobileMenu, setMobileMenu] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [openItemsMenu, setOpenItemsMenu] = useState(false);
+  const [foundMaps, setFoundMaps] = useState<WorkshopItem[]>([]);
 
   const handleWindowResize = useCallback(() => {
     setWidth(window.innerWidth);
@@ -36,6 +37,21 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
       window.removeEventListener("resize", handleWindowResize);
     };
   }, [handleWindowResize]);
+
+  useEffect(() => {
+    setFoundMaps([]);
+
+    const timer = setTimeout(async () => {
+      if (!search.trim()) {
+        return;
+      }
+
+      const data = await handleSearch(search, true);
+      if (data) setFoundMaps(data);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [search]);
 
   useEffect(() => {
     setWidth(window.innerWidth);
@@ -76,6 +92,12 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
     }
   ];
 
+  const onItemClick = async (item: WorkshopItem) => {
+    setSearch("");
+    setFoundMaps([]);
+    await navigate(`/workshop/${item.steamId ?? item.id}`);
+  };
+
   return (
     <header className="bg-black/80 w-full h-16 border-b-1 border-amber-200 flex p-2 justify-between uppercase">
       <DeleteModal open={deleteModal} setOpen={setDeleteModal} />
@@ -92,7 +114,7 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
             data={[
               {name: t(key.maps), tag: ""},
               {name: t(key.prefabs), tag: "Prefabs"},
-              {name: t(key.collections), tag: "Collections"}
+              {name: t(key.collections), tag: "Collection"}
             ]}
             displayData={(item) => item.name}
             onItemClick={(item) => window.location.href = `/workshop${item.tag && "?tags=" + item.tag}`}
@@ -111,23 +133,34 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
       </div>}
       {!hideSearch && <div
         className={clsx(
-          "flex items-center w-full md:mx-16 drop-shadow-md transition-all duration-500 ease-in-out overflow-hidden",
+          "relative flex items-center w-full md:mx-16 drop-shadow-md transition-all duration-500 ease-in-out",
           isAbsolute
             ? "opacity-100 translate-y-0 max-w-[1000px]"
             : "opacity-0 translate-y-[-10px] max-w-0"
         )}
       >
-        <Input
-          className="text-2xl w-full bg-white/10"
-          placeholder={t(key.placeholder)}
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          onKeyDown={(e) => handleEnterSearch(search, e)}
-        />
-        <Button
-          className="text-2xl bg-white/10 uppercase"
-          onClick={() => handleSearch(search)}
-        >{t(key.search)}</Button>
+        <div className="flex w-full">
+          <Input
+            className="text-2xl w-full bg-white/10 my-2"
+            placeholder={t(key.placeholder)}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => handleEnterSearch(search, e)}
+          />
+          <Button
+            className="text-2xl bg-white/10 uppercase py-2 px-4 my-2"
+            onClick={() => handleSearch(search)}
+          >{t(key.search)}</Button>
+        </div>
+        {foundMaps.length > 0 && (
+          <div className="absolute w-full h-full z-200 mt-24">
+            <List
+              data={foundMaps}
+              displayData={(map) => map.title}
+              onItemClick={onItemClick}
+            />
+          </div>
+        )}
       </div>}
       {additionalComponent}
       {width > 1115 && <div className="flex">

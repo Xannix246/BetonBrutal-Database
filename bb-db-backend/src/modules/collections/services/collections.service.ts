@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { $Enums, CollectionStats } from '@prisma/client';
+import { $Enums, CollectionStats, Vote } from '@prisma/client';
 import { UserRoleSession } from 'src/modules/auth/auth.module';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { WorkshopService } from 'src/modules/workshop/domain/services/workshop.service';
@@ -22,8 +22,6 @@ export class CollectionsService {
       totalMaps: data.totalMaps,
       totalReplays: data.totalReplays,
     });
-
-    console.log(updateData);
 
     const stats = await this.prisma.collectionStats.upsert({
       where: { collectionId: data.collectionId },
@@ -72,6 +70,14 @@ export class CollectionsService {
           totalVotesDown,
         },
       });
+
+      await this.prisma.workshopItem.update({
+        where: { linkedCollection: data.collectionId },
+        data: {
+          ratingUp: totalVotesUp,
+          ratingDown: totalVotesDown,
+        },
+      });
     }
   }
 
@@ -100,7 +106,7 @@ export class CollectionsService {
     collectionId: string,
     userId: string,
     vote: $Enums.VoteType,
-  ): Promise<void> {
+  ): Promise<Vote> {
     const stat = await this.prisma.collectionStats.findUnique({
       where: { collectionId },
     });
@@ -118,6 +124,24 @@ export class CollectionsService {
           statId: stat.id,
         },
       ],
+    });
+
+    return (await this.getVote(collectionId, userId)) as Vote;
+  }
+
+  async getVote(collectionId: string, userId: string): Promise<Vote | null> {
+    const statId = (
+      await this.prisma.collectionStats.findUnique({
+        where: { collectionId },
+      })
+    )?.id;
+
+    if (!statId) {
+      throw new NotFoundException('CollectionStat not found');
+    }
+
+    return this.prisma.vote.findUnique({
+      where: { userId_statId: { statId, userId } },
     });
   }
 
@@ -174,6 +198,7 @@ export class CollectionsService {
         tags: ['Collection'],
         createDate: new Date(),
         linkedCollection: collection.id,
+        isHidden: !isPublic,
       },
     });
 
@@ -186,10 +211,11 @@ export class CollectionsService {
     id: string,
     title?: string,
     description?: string,
-    mapsId?: string | string[],
+    mapsId?: string[],
     showOnMain?: boolean,
     descColor?: $Enums.Color,
     isPublic?: boolean,
+    previewUrl?: string,
   ): Promise<Collection> {
     const collection = await this.prisma.collection.findUniqueOrThrow({
       where: { id },
@@ -200,27 +226,50 @@ export class CollectionsService {
       data: {
         title,
         description,
-        mapsId: mapsId
-          ? typeof mapsId === 'string'
-            ? [...new Set([...collection.mapsId, mapsId])]
-            : [...new Set([...collection.mapsId, ...mapsId])]
-          : mapsId === undefined
-            ? collection.mapsId
-            : [],
+        // mapsId: mapsId
+        //   ? typeof mapsId === 'string'
+        //     ? [...new Set([...collection.mapsId, mapsId])]
+        //     : [...new Set([...collection.mapsId, ...mapsId])]
+        //   : mapsId === undefined
+        //     ? collection.mapsId
+        //     : [],
+        mapsId,
         showOnMain,
         descColor,
+        previewUrl,
         isPublic: isPublic === undefined ? collection.isPublic : isPublic,
       },
     });
 
-    await this.workshop.upsertItem(id, {
-      type: 'WorkshopItemUpdate',
-      data: {
-        title: updatedCollection.title,
-        previewUrl: updatedCollection.previewUrl || '',
-        description: updatedCollection.description || 'No description',
-      },
+    const item = await this.prisma.workshopItem.findUnique({
+      where: { linkedCollection: updatedCollection.id },
     });
+
+    if (item) {
+      await this.workshop.upsertItem(id, {
+        type: 'WorkshopItemUpdate',
+        data: {
+          title: updatedCollection.title,
+          previewUrl: updatedCollection.previewUrl || '',
+          description: updatedCollection.description || 'No description',
+        },
+      });
+    } else {
+      await this.workshop.upsertItem(collection.id, {
+        type: 'WorkshopItemCreate',
+        data: {
+          title: collection.title,
+          description: collection.description || 'No description',
+          previewUrl: collection.previewUrl || '',
+          creator: collection.authorId ?? 'unknown',
+          creatorId: collection.authorId ?? '',
+          tags: ['Collection'],
+          createDate: new Date(),
+          linkedCollection: collection.id,
+          isHidden: !isPublic,
+        },
+      });
+    }
 
     await this.updateMapRelatedStats(id, updatedCollection.mapsId);
 
@@ -228,12 +277,12 @@ export class CollectionsService {
   }
 
   async deleteCollection(id: string): Promise<string> {
-    const collection = await this.prisma.collection.delete({
-      where: { id },
+    const stats = await this.prisma.collectionStats.delete({
+      where: { collectionId: id },
     });
 
     await this.workshop.deleteItem(id);
 
-    return collection.id;
+    return stats.collectionId;
   }
 }

@@ -30,12 +30,13 @@ const PlayerPage = ({ id }: { id: string }) => {
 
     (async () => {
       const player = await getPlayer(id);
-      const user = await getUser(player.id);
-
       setPlayer(player);
-      setUser(user);
 
-      setReplays(await getPlayerReplays(player.replays));
+      if(player) {
+        const user = await getUser(player.id);
+        setUser(user);
+        setReplays(await getPlayerReplays(player.replays));
+      }
 
       setLoaded(true);
     })();
@@ -78,62 +79,76 @@ const PlayerPage = ({ id }: { id: string }) => {
 
       <div className="flex flex-col h-full justify-between">
         {loaded ?
-          <div className="flex gap-2 pt-32 w-full">
-            <div className="flex flex-col gap-2 w-full text-gray-300">
-              {user?.steamId && player && <UserProfile user={user} player={player} publicData={publicData} setPublicData={setPublicData} /> }
-              <Container className="flex justify-center gap-10 text-4xl tracking-wide place-items-center">
-                <div className="flex gap-3 uppercase">
-                  <div className="flex gap-3">
-                    <span
-                      className={clsx("transition duration-300 cursor-pointer hover:text-pink", page === "mapCreator" && "text-green")}
-                      onClick={() => setPage("mapCreator")}
-                    >{t(key.maps)}</span>
-                    |
-                    <span
-                      className={clsx("transition duration-300 cursor-pointer hover:text-pink", page === "run" && "text-green")}
-                      onClick={() => setPage("run")}
-                    >{t(key.runs)}</span>
-                    {!user?.steamId && <span>{t(key.by)}</span>}
-                  </div>
-                  {!user?.steamId && <a
-                    target="_blank"
-                    href={`https://steamcommunity.com/profiles/${player?.id}`}
-                    rel="noreferrer"
-                    className="hover:text-white hover:underline"
-                  >{player?.username}</a>}
-                  {user?.steamId && <>
-                    |
-                    <span
-                      className={clsx("transition duration-300 cursor-pointer hover:text-pink", page === "favorites" && "text-green")}
-                      onClick={() => setPage("favorites")}
-                    >{t(key.favorites)}</span>
-                  </>}
-                </div>
-              </Container>
-              <div className="px-4">
-                {["mapCreator", "favorites"].includes(page) ?
-                  <div className="flex w-full justify-center min-h-screen">
-                    {mapData.length > 0 && <div className="grid sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[200px] lg:auto-rows-[300px] gap-6 p-6 w-full">
-                      {mapData.map(m => (
-                        <MapTile key={m.id} {...m} />
-                      ))}
-                    </div>}
-                    {mapData.length === 0 && <Container className="w-5xl h-fit mt-16 uppercase">
-                      {page === "mapCreator" ? <h2 className="text-[#f1e4c7] tracking-wider text-xl text-center">{t(key.noMapsFound)}</h2> 
-                      : <h2 className="text-[#f1e4c7] tracking-wider text-xl text-center">{t(key.noFavsFound)}</h2>
-                      }
-                    </Container>}
-                  </div>
-                  :
-                  <div className="flex w-full justify-center min-h-screen">
-                    <div className="w-full md:w-5xl">
-                      <LeaderboardTable replays={replays} />
+          player ?
+            <div className="flex gap-2 pt-32 w-full">
+              <div className="flex flex-col gap-2 w-full text-gray-300">
+                {user?.steamId && player && <UserProfile user={user} player={player} publicData={publicData} setPublicData={setPublicData} /> }
+                <Container className="flex justify-center gap-10 text-4xl tracking-wide place-items-center">
+                  <div className="flex gap-3 uppercase">
+                    <div className="flex gap-3">
+                      <span
+                        className={clsx("transition duration-300 cursor-pointer hover:text-pink", page === "mapCreator" && "text-green")}
+                        onClick={() => setPage("mapCreator")}
+                      >{t(key.maps)}</span>
+                      |
+                      <span
+                        className={clsx("transition duration-300 cursor-pointer hover:text-pink", page === "run" && "text-green")}
+                        onClick={() => setPage("run")}
+                      >{t(key.runs)}</span>
+                      {!user?.steamId && <span>{t(key.by)}</span>}
                     </div>
+                    {!user?.steamId && <a
+                      target="_blank"
+                      href={`https://steamcommunity.com/profiles/${player?.id}`}
+                      rel="noreferrer"
+                      className="hover:text-white hover:underline"
+                    >{player?.username}</a>}
+                    {user?.steamId && <>
+                      |
+                      <span
+                        className={clsx("transition duration-300 cursor-pointer hover:text-pink", page === "favorites" && "text-green")}
+                        onClick={() => setPage("favorites")}
+                      >{t(key.favorites)}</span>
+                    </>}
                   </div>
-                }
+                </Container>
+                <div className="px-4">
+                  {["mapCreator", "favorites"].includes(page) ?
+                    <div className="flex w-full justify-center min-h-screen">
+                      {mapData.length > 0 && <div className="grid sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[200px] lg:auto-rows-[300px] gap-6 p-6 w-full">
+                        {mapData.map(m => (
+                          <MapTile key={m.id} {...m} />
+                        ))}
+                      </div>}
+                      {mapData.length === 0 && <Container className="w-5xl h-fit mt-16 uppercase">
+                        {page === "mapCreator" ? <h2 className="text-[#f1e4c7] tracking-wider text-xl text-center">{t(key.noMapsFound)}</h2> 
+                        : <h2 className="text-[#f1e4c7] tracking-wider text-xl text-center">{t(key.noFavsFound)}</h2>
+                        }
+                      </Container>}
+                    </div>
+                    :
+                    <div className="flex w-full justify-center min-h-screen">
+                      <div className="w-full md:w-5xl">
+                        <LeaderboardTable replays={replays} />
+                      </div>
+                    </div>
+                  }
+                </div>
               </div>
             </div>
-          </div>
+            :
+            <div className="min-h-screen">
+              <div className="flex flex-col h-full justify-between">
+                <div className="flex gap-2 pt-32 px-4 h-screen w-full">
+                  <div className="flex flex-col w-full text-white text-center place-items-center">
+                    <Container className="text-6xl w-full">Player not found</Container>
+                    <Container className="text-4xl w-full text-gray-300">
+                      This player isn't exist or didn't linked the steam account (if you're here from an collection)
+                    </Container>
+                  </div>
+                </div>
+              </div>
+            </div>
           :
           <div className="flex gap-2 pt-32 px-4 h-screen w-full">
             <div className="w-full text-white text-center">

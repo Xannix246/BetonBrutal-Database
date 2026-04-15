@@ -6,11 +6,12 @@ type Props<T> = {
   displayData: (item: T) => React.ReactNode;
   onItemClick?: (item: T) => void;
   className?: string;
+  containerClassName?: string;
 };
 
-const List = <T,>({ data, displayData, onItemClick, className }: Props<T>) => {
+const List = <T,>({ data, displayData, onItemClick, className, containerClassName }: Props<T>) => {
   return (
-    <div className="relative w-full">
+    <div className={clsx(containerClassName, "relative w-full z-20")}>
       <div className={clsx(className, "absolute flex flex-col h-100 overflow-auto w-full z-10")}>
         {data.map((item, index) => (
           <Container

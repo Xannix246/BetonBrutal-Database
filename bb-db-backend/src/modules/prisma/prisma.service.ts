@@ -20,7 +20,7 @@ export class PrismaService
     // migration
     // await this.workshopItem.updateMany({
     //   data: {
-    //     tags: [],
+    //     isHidden: false,
     //   },
     // });
     // console.log('Migration done');

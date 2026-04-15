@@ -14,6 +14,7 @@ declare type WorkshopItem = {
   previews: string[];
   filename?: null | string;
   tags: string[];
+  linkedCollection?: null | string;
 };
 
 declare type Replay = {
@@ -54,7 +55,7 @@ declare type UserComment = {
   username: string;
   data: string;
   createdAt: Date;
-}
+};
 
 declare type Article = {
   id: string;
@@ -67,7 +68,7 @@ declare type Article = {
   attachments: Attachment[];
   authorId: string;
   author: string;
-}
+};
 
 declare type Collection = {
   id: string;
@@ -75,17 +76,36 @@ declare type Collection = {
   description: string | null;
   mapsId: string[];
   showOnMain: boolean;
+  isPublic?: boolean;
   descColor: "white" | "black" | "red" | "blue" | "green" | "yellow";
+  authorId: string;
+};
+
+declare type CollectionStats = {
+  id: string;
+  collectionId: string;
+  totalMaps: number;
+  totalReplays: number;
+  totalVotesUp: number;
+  totalVotesDown: number;
+};
+
+declare type Vote = {
+  id: string;
+  userId: string;
+  type: "upvote" | "downvote" | "neutral";
+  statId: string;
+  date: Date;
 }
 
 type Link = {
   showName: string;
   url: string;
-}
+};
 
 declare type PublicData = {
   profilePicUrl?: string;
   backgroundUrl?: string;
   about?: string;
   links?: Link[];
-}
+};

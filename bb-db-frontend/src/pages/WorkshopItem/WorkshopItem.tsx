@@ -42,7 +42,7 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
   const [comments, setComments] = useState<UserComment[]>([]);
   const [replays, setReplays] = useState<Replay[]>([]);
   const [value, setValue] = useState("");
-  const [preivewId, setPreviewId] = useState<number | null>(null);
+  const [previewId, setPreviewId] = useState<number | null>(null);
   const favorites = getFavorites();
   const [openCMenu, setOpenCMenu] = useState(false);
   const targetData = getTargetData();
@@ -156,9 +156,9 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
 
   return (
     <div className="w-full min-h-screen h-full">
-      {preivewId !== null && mapData ? (
+      {previewId !== null && mapData ? (
         <img
-          src={mapData.previews[preivewId]}
+          src={mapData.previews[previewId]}
           className="fixed inset-0 -z-10 w-full h-full object-cover blur-md"
         />
       ) : (

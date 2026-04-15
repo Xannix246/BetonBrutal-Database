@@ -29,6 +29,7 @@ declare type WorkshopItemHeader = {
   ratingDown: number;
   previews?: string[];
   linkedCollection?: string;
+  tags?: string[]
 };
 
 declare type Player = {
@@ -123,6 +124,7 @@ declare type Collection = {
   showOnMain: boolean;
   isPublic?: boolean;
   descColor: $Enums.Color;
+  authorId: string | null;
 };
 
 declare type WokshopItemUpdate = {
@@ -133,6 +135,7 @@ declare type WokshopItemUpdate = {
     creator?: string;
     description?: string;
     previews?: string[];
+    isHidden?: boolean;
   }
 }
 
@@ -148,6 +151,7 @@ declare type WokshopItemCreate = {
     createDate?: Date;
     tags?: string[];
     linkedCollection?: string;
+    isHidden?: boolean;
   }
 }
 

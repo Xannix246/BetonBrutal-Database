@@ -15,6 +15,6 @@ import { RestorePreviewUseCase } from './use-cases/restore-preview.usecase';
     MulterInternalService,
     RestorePreviewUseCase,
   ],
-  exports: [RestorePreviewUseCase],
+  exports: [GridFSService, RestorePreviewUseCase],
 })
 export class StorageModule {}

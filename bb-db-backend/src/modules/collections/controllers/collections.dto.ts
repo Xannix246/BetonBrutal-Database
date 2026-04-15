@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { $Enums } from '@prisma/client';
 
 export class CollectionDto {
   @ApiProperty({
@@ -17,6 +16,7 @@ export class CollectionDto {
   description?: string;
   mapsId?: string[];
   showOnMain?: boolean;
-  descColor?: $Enums.Color;
+  descColor?: 'white' | 'black' | 'red' | 'blue' | 'green' | 'yellow';
   isPublic?: boolean;
+  previewUrl?: string;
 }
