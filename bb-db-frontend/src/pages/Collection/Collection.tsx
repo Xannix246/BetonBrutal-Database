@@ -15,7 +15,7 @@ import MapTile from "../../entities/MapTile";
 import { v4 } from "uuid";
 import { navigate } from "vike/client/router";
 
-const key = Keys.workshopItem;
+const key = Keys.collection.item;
 
 const Collection = ({ id }: { id: string }) => {
   const [loaded, setLoaded] = useState(false);
@@ -95,23 +95,23 @@ const Collection = ({ id }: { id: string }) => {
                     className="p-2 text-4xl w-full uppercase bg-green/50"
                     disabled={vote?.type === "upvote"}
                     onClick={() => onVote("upvote")}
-                  >{vote?.type === "upvote" ? "Voted" : "Vote Up"}</Button>
+                  >{vote?.type === "upvote" ? t(key.voted) : t(key.voteUp)}</Button>
                   <Button
                     className="p-2 text-4xl w-full uppercase bg-white/20"
                     disabled={vote?.type === "neutral"}
                     onClick={() => onVote("neutral")}
-                  >{vote?.type === "neutral" ? "Voted" : "Clear vote"}</Button>
+                  >{vote?.type === "neutral" ? t(key.voted) : t(key.clearVote)}</Button>
                   <Button
                     className="p-2 text-4xl w-full uppercase bg-red/50"
                     disabled={vote?.type === "downvote"}
                     onClick={() => onVote("downvote")}
-                  >{vote?.type === "downvote" ? "Voted" : "Vote Down"}</Button>
+                  >{vote?.type === "downvote" ? t(key.voted) : t(key.voteDown)}</Button>
                 </div>}
                 {user?.role && (user?.id === collection?.authorId || ["moderator", "admin"].includes(user?.role)) &&
                   <Button
                     className="p-2 text-4xl w-full uppercase bg-yellow/50"
                     onClick={async () => await navigate(`/collection/${id}/update`)}
-                  >Edit collection</Button>}
+                  >{t(key.edit)}</Button>}
               </div>
               <div className="flex flex-col w-full gap-2">
                 <Container className="text-white text-5xl lg:text-8xl w-full text-center">
@@ -126,7 +126,7 @@ const Collection = ({ id }: { id: string }) => {
                     onPointerDown={() => $prevLink.set("mapCreator")}
                     className="hover:text-white hover:underline uppercase"
                   >
-                    BY {item?.creator ?? item?.creatorId}
+                    {t(key.by)} {item?.creator ?? item?.creatorId}
                   </a>
                   {user && (
                     <Button
@@ -157,15 +157,15 @@ const Collection = ({ id }: { id: string }) => {
                     </h4>
                   </div>
                   <div className="flex gap-4">
-                    <h4 className="uppercase text-green">Total played:</h4>
+                    <h4 className="uppercase text-green">{t(key.played)}</h4>
                     <h4 className="uppercase">
-                      {stats?.totalReplays} Replays
+                      {stats?.totalReplays} {t(key.replays)}
                     </h4>
                   </div>
                   <div className="flex gap-4">
-                    <h4 className="uppercase text-red">Total Maps:</h4>
+                    <h4 className="uppercase text-red">{t(key.totalMaps)}</h4>
                     <h4 className="uppercase">
-                      {stats?.totalMaps} Maps
+                      {stats?.totalMaps} {t(key.maps)}
                     </h4>
                   </div>
                 </Container>

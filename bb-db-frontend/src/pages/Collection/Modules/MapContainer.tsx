@@ -6,6 +6,8 @@ import clsx from "clsx";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import Textarea from "../../../shared/Textarea/Textarea";
 import Button from "../../../shared/Button/Button";
+import { Keys } from "../../../../i18n/keys";
+import { t } from "i18next";
 
 type MapContainer = {
   maps: WorkshopItem[];
@@ -17,6 +19,8 @@ type MapContainer = {
   setDescription: (description: string) => void;
   setPreview: (file: File | string) => void;
 }
+
+const key = Keys.collection.editor;
 
 const MapContainer = ({ maps, title, description, preview, setMaps, setTitle, setDescription, setPreview }: MapContainer) => {
   const [foundMaps, setFoundMaps] = useState<WorkshopItem[]>([]);
@@ -59,12 +63,12 @@ const MapContainer = ({ maps, title, description, preview, setMaps, setTitle, se
     <div className="max-w-5xl w-full">
       <div className="place-items-center">
         <h1 className="tracking-wider text-6xl text-white uppercase pb-2">
-          Make new collection
+          {t(key.newCollection)}
         </h1>
         <div className="flex flex-col gap-4 w-full">
           <Input
             className="text-2xl w-full bg-black/60"
-            placeholder="Title"
+            placeholder={t(key.title)}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
@@ -85,13 +89,13 @@ const MapContainer = ({ maps, title, description, preview, setMaps, setTitle, se
                   descWindow ? "rotate-90" : "rotate-0",
                 )}
               />
-              <h2 className="text-2xl tracking-wider text-white p-2 select-none">
-                DESCRIPTION (OPTIONAL)
+              <h2 className="text-2xl tracking-wider text-white p-2 select-none uppercase">
+                {t(key.desc)}
               </h2>
             </div>
 
             <Textarea
-              placeholder="Type description here"
+              placeholder={t(key.descPh)}
               className={clsx(
                 "text-xl text-gray-300 bg-transparent transition-all duration-300 pl-1 pr-2",
                 descWindow ? "opacity-100 h-full pb-2" : "opacity-0 h-0 pb-0",
@@ -112,7 +116,7 @@ const MapContainer = ({ maps, title, description, preview, setMaps, setTitle, se
           <div className="flex gap-2">
             <Input
               className="text-3xl w-full bg-black/60"
-              placeholder="Preview"
+              placeholder={t(key.previewPh)}
               value={preview as string}
               onChange={(e) => setPreview(e.target.value)}
             />
@@ -121,11 +125,11 @@ const MapContainer = ({ maps, title, description, preview, setMaps, setTitle, se
               onClick={() => {
                 imageRef.current?.click();
               }}
-            >Or upload</Button>
+            >{t(key.upload)}</Button>
           </div>
           <Input
             className="text-2xl w-full bg-black/80"
-            placeholder="Search by name, author, id or url"
+            placeholder={t(key.searchPh)}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />

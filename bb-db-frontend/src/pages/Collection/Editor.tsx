@@ -13,6 +13,10 @@ import Button from "../../shared/Button/Button";
 import { signIn } from "../../features/Auth";
 import { getCollection, getItem, getItemData, postCollection, uploadPreview } from "./requests";
 import { navigate } from "vike/client/router";
+import { Keys } from "../../../i18n/keys";
+import { t } from "i18next";
+
+const key = Keys.collection.editor;
 
 const CollectionEditor = ({ id }: { id?: string }) => {
   const [maps, setMaps] = useState<WorkshopItem[]>([]);
@@ -28,7 +32,7 @@ const CollectionEditor = ({ id }: { id?: string }) => {
 
   const menuItems = [
     {
-      name: "Remove item",
+      name: t(key.removeItem).toUpperCase(),
       onClick: () => {
         if (!targetData) return;
 
@@ -145,14 +149,14 @@ const CollectionEditor = ({ id }: { id?: string }) => {
           <div className="flex flex-col h-full justify-between">
              <div className="flex gap-2 pt-32 px-4 h-screen w-full">
                <div className="flex flex-col w-full text-white text-center place-items-center">
-                 <Container className="text-6xl w-full">Account required</Container>
+                 <Container className="text-6xl w-full">{t(key.accountReq)}</Container>
                  <Container className="text-4xl w-full text-gray-300">
-                   If you want to create your own collection, please log in
+                   {t(key.accountReqDesc)}
                  </Container>
                  <Button
                     className="bg-green/50 uppercase p-2 w-128 mt-8"
                     onClick={() => signIn(window.location.pathname)}
-                  >Log in</Button>
+                  >{t(key.login)}</Button>
                </div>
              </div>
            </div>

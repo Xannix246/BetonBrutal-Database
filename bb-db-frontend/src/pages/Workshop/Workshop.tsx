@@ -146,7 +146,7 @@ const Workshop = ({ tags }: { tags: string[] }) => {
             className="bg-transparent hover:bg-green/50 p-2 uppercase"
             onClick={async () => await navigate(`/collection/create`)}
           >
-            Create new collection
+            {t(key.create)}
           </Button>}
         </Container>
 

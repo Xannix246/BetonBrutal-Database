@@ -36,6 +36,7 @@ export const Keys = {
     mostPopular: "workshop.mostPopular",
     mostPlayed: "workshop.mostPlayed",
     randomMap: "workshop.randomMap",
+    create: "workshop.create",
   },
 
   workshopItem: {
@@ -122,4 +123,46 @@ export const Keys = {
     notFound: "search.notFound",
     tip: "search.tip",
   },
+
+  collection: {
+    editor: {
+      removeItem: "collection.editor.removeItem",
+      accountReq: "collection.editor.accountReq",
+      accountReqDesc: "collection.editor.accountReqDesc",
+      login: "collection.editor.login",
+      settings: "collection.editor.settings",
+      private: "collection.editor.private",
+      privateTip: "collection.editor.privateTip",
+      mainPage: "collection.editor.mainPage",
+      preview: "collection.editor.preview",
+      delete: "collection.editor.delete",
+      update: "collection.editor.update",
+      publish: "collection.editor.publish",
+      newCollection: "collection.editor.newCollection",
+      title: "collection.editor.title",
+      desc: "collection.editor.desc",
+      descPh: "collection.editor.descPh",
+      previewPh: "collection.editor.previewPh",
+      upload: "collection.editor.upload",
+      searchPh: "collection.editor.searchPh",
+    },
+
+    item: {
+      edit: "collection.item.edit",
+      voted: "collection.item.voted",
+      voteUp: "collection.item.voteUp",
+      voteDown: "collection.item.voteDown",
+      clearVote: "collection.item.clearVote",
+      by: "collection.item.by",
+      favAdd: "collection.item.favAdd",
+      favRemove: "collection.item.favRemove",
+      release: "collection.item.release",
+      played: "collection.item.played",
+      replays: "collection.item.replays",
+      totalMaps: "collection.item.totalMaps",
+      maps: "collection.item.maps",
+      notFound: "collection.item.notFound",
+      dataCheck: "collection.item.dataCheck",
+    }
+  }
 } as const;

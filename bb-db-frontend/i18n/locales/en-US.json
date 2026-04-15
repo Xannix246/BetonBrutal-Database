@@ -32,7 +32,8 @@
     "oldest": "Oldest",
     "mostPopular": "Most popular",
     "mostPlayed": "Most played",
-    "randomMap": "Random map"
+    "randomMap": "Random map",
+    "create": "Create new collection"
   },
   "workshopItem": {
     "upload": "Upload map",
@@ -113,5 +114,45 @@
     "results": "Search results",
     "notFound": "Found nothing",
     "tip": "Maybe try to search something else?"
+  },
+  "collection": {
+    "editor": {
+      "removeItem": "Remove item",
+      "accountReq": "Account required",
+      "accountReqDesc": "If you want to create your own collection, please log in",
+      "login": "Log in",
+      "settings": "Settings",
+      "private": "Make collection private*",
+      "privateTip": "* Private collections won't be visible in search, but still be avaiable with direct link",
+      "mainPage": "Main page collection?",
+      "preview": "Preview image",
+      "delete": "Delete collection",
+      "update": "Update",
+      "publish": "Publish",
+      "newCollection": "Make new collection",
+      "title": "Title",
+      "desc": "Description (optional)",
+      "descPh": "Type description here",
+      "previewPh": "Preview",
+      "upload": "Or upload",
+      "searchPh": "Search by name, author, id or url"
+    },
+    "item": {
+      "edit": "Edit collection",
+      "voted": "Voted",
+      "voteUp": "Vote up",
+      "voteDown": "Vote down",
+      "clearVote": "Clear vote",
+      "by": "By",
+      "favAdd": "Add to favorites",
+      "favRemove": "Femove from favorites",
+      "release": "Release date:",
+      "played": "Total played:",
+      "replays": "Replays",
+      "totalMaps": "Total maps:",
+      "maps": "Maps",
+      "notFound": "Collection not found",
+      "dataCheck": "Checking what's new..."
+    }
   }
 }
