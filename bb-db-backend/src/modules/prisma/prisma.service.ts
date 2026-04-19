@@ -18,12 +18,12 @@ export class PrismaService
     await this.$connect();
 
     // migration
-    await this.workshopItem.updateMany({
-      data: {
-        isHidden: false,
-      },
-    });
-    console.log('Migration done');
+    // await this.workshopItem.updateMany({
+    //   data: {
+    //     isHidden: false,
+    //   },
+    // });
+    // console.log('Migration done');
   }
 
   async onModuleDestroy() {
