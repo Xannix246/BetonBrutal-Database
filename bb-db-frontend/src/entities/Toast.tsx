@@ -48,7 +48,7 @@ const Toast = ({ toast }: { toast: ToastType }) => {
   };
 
   const handleDragEnd = (_: PointerEvent, info: PanInfo) => {
-    if (info.offset.x > 120) {
+    if (info.offset.x > 10) {
       removeToast(toast.id);
     }
   };
@@ -73,13 +73,13 @@ const Toast = ({ toast }: { toast: ToastType }) => {
       exit={{ opacity: 0, x: 100 }}
       transition={{ duration: 0.2 }}
       drag="x"
-      dragConstraints={{ left: 0, right: 300 }}
+      dragConstraints={{ left: 0, right: 100 }}
       style={{ x }}
       onDragEnd={handleDragEnd}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <Container className="bg-black/90 relative overflow-hidden text-white w-full md:w-100">
+      <Container className="bg-black/90 relative cursor-grabbing text-white w-full md:w-100">
         <motion.div
           style={{ width }}
           className={clsx(

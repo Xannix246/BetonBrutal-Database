@@ -20,8 +20,11 @@ export const getToast = (id: string) =>
   $toasts.get().find((toast) => toast.id === id);
 
 export const clearToasts = () => $toasts.set([]);
-export const addToast = (toast: Toast) =>
-  $toasts.set([...$toasts.get(), toast]);
+export const addToast = (toast: Toast) => {
+  const current = $toasts.get();
+  const next = [...current, toast];
+  $toasts.set(next.slice(-5));
+};
 export const removeToast = (id: string) =>
   $toasts.set($toasts.get().filter((toast) => toast.id !== id));
 
@@ -31,7 +34,7 @@ api.interceptors.response.use(
     const types: Toast["type"][] = ["info", "error", "warn", "success"];
     addToast({
       id: id,
-      time: 50000,
+      time: 500000,
       type: types[Math.floor(Math.random() * 4)],
       title: `Test ${id}`,
       description: "Notification was added succesfully"

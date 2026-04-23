@@ -2,12 +2,7 @@ import clsx from "clsx";
 import Modal from "../shared/Modal/Modal";
 import { useState } from "react";
 import TierLabel from "../entities/TierLabel";
-
-const getColor = (value: number, max: number) => {
-  const percent = value / max;
-  const hue = 120 * (1 - percent);
-  return [hue, `hsl(${hue}, 100%, 50%)`];
-};
+import { getColor } from "./GetColor";
 
 const RateTierModal = ({
   open,

@@ -7,25 +7,23 @@ const Toasts = () => {
   const toasts = getToasts();
 
   return (
-    <div className="fixed bottom-0 right-0 w-fit h-[90%] z-100 m-4">
-      <div className="w-full h-full flex flex-col gap-2 justify-end place-items-end">
-        <div className="overflow-y-auto overflow-x-hidden flex flex-col gap-2 toasts">
+    <div className="fixed bottom-0 right-0 w-fit max-h-[90%] z-100 m-4">
+      <div className="w-full h-full flex flex-col justify-end gap-2 place-items-end">
+        <div className="max-h-[80vh] flex flex-col gap-2 toasts">
           <AnimatePresence>
             {toasts.map((toast) => (
               <Toast toast={toast} key={toast.id} />
             ))}
           </AnimatePresence>
         </div>
-        <div className="flex">
-          {toasts.length > 1 && (
-            <Button 
-              className="h-full uppercase"
-              onClick={clearToasts}
-            >
-              Clear notifications
-            </Button>
-          )}
-        </div>
+        {toasts.length > 1 && (
+          <Button 
+            className="h-fit uppercase"
+            onClick={clearToasts}
+          >
+            Clear notifications
+          </Button>
+        )}
       </div>
     </div>
   );
