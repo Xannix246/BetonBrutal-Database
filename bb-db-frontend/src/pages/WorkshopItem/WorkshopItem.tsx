@@ -33,6 +33,7 @@ import getMedianTime from "./getMedianTime";
 import formatTime from "../../features/FormatTime";
 import { t } from "i18next";
 import { Keys } from "../../../i18n/keys";
+import MapTier from "../../widgets/MapTier/MapTier";
 
 const WorkshopItemPage = ({ id }: { id: string }) => {
   const [mapData, setMapData] = useState<WorkshopItem | null>();
@@ -227,6 +228,7 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                   </a>
                 )}
               </div>
+              <MapTier/>
               <div className="flex flex-col w-full gap-2">
                 <Container className="text-white text-5xl lg:text-8xl w-full text-center">
                   <a

@@ -15,7 +15,7 @@ const List = <T,>({ data, displayData, onItemClick, className, containerClassNam
       <div className={clsx(className, "absolute flex flex-col h-100 overflow-auto w-full z-10")}>
         {data.map((item, index) => (
           <Container
-            className="hover:bg-[#474747] transition text-white uppercase text-xl cursor-pointer"
+            className="hover:bg-[#303030]/80 hover:text-pink transition duration-150 text-white uppercase text-xl cursor-pointer"
             key={index}
             onClick={() => onItemClick?.(item)}
           >

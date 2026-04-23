@@ -74,6 +74,8 @@ const CollectionEditor = ({ id }: { id?: string }) => {
   useEffect(() => {
     (async () => {
       if (id) {
+        setHydrated(window && true);
+        
         const collection = await getCollection(id);
 
         if (
@@ -94,8 +96,6 @@ const CollectionEditor = ({ id }: { id?: string }) => {
           return window.location.href = `/collection/${id}`;
         }
       }
-
-      setHydrated(window && true);
     })();
   }, []);
 
