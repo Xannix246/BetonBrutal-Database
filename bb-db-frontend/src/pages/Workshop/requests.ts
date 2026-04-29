@@ -6,8 +6,7 @@ export const getMaps = async (
   quantity: number = 50,
   page: number,
   tags?: string[],
-): Promise<WorkshopItem[]>  => {
-  console.log(tags);
+): Promise<WorkshopItemHeader[]>  => {
   return (await api.get(`${config.serverUri}/workshop/get-list?sortBy=${sortBy}&quantity=${quantity}&page=${page}${tags ? "&tags=" + tags.join(',') : ""}`)).data;
 }
 

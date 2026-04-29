@@ -25,7 +25,7 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
   const [mobileMenu, setMobileMenu] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [openItemsMenu, setOpenItemsMenu] = useState(false);
-  const [foundMaps, setFoundMaps] = useState<WorkshopItem[]>([]);
+  const [foundMaps, setFoundMaps] = useState<WorkshopItemHeader[]>([]);
 
   const handleWindowResize = useCallback(() => {
     setWidth(window.innerWidth);
@@ -92,10 +92,10 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
     }
   ];
 
-  const onItemClick = async (item: WorkshopItem) => {
+  const onItemClick = async (item: WorkshopItemHeader) => {
     setSearch("");
     setFoundMaps([]);
-    await navigate(`/workshop/${item.steamId ?? item.id}`);
+    window.location.href = `/workshop/${item.id}`;
   };
 
   return (

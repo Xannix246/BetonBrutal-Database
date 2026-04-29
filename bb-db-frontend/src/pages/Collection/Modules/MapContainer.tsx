@@ -10,11 +10,11 @@ import { Keys } from "../../../../i18n/keys";
 import { t } from "i18next";
 
 type MapContainer = {
-  maps: WorkshopItem[];
+  maps: WorkshopItemHeader[];
   title: string;
   description: string;
   preview?: File | string;
-  setMaps: (maps: WorkshopItem[]) => void;
+  setMaps: (maps: WorkshopItemHeader[]) => void;
   setTitle: (title: string) => void;
   setDescription: (description: string) => void;
   setPreview: (file: File | string) => void;
@@ -23,7 +23,7 @@ type MapContainer = {
 const key = Keys.collection.editor;
 
 const MapContainer = ({ maps, title, description, preview, setMaps, setTitle, setDescription, setPreview }: MapContainer) => {
-  const [foundMaps, setFoundMaps] = useState<WorkshopItem[]>([]);
+  const [foundMaps, setFoundMaps] = useState<WorkshopItemHeader[]>([]);
   const [search, setSearch] = useState("");
   const [descWindow, descWindowOpen] = useState(false);;
   const imageRef = useRef<HTMLInputElement | null>(null);
@@ -43,7 +43,7 @@ const MapContainer = ({ maps, title, description, preview, setMaps, setTitle, se
     return () => clearTimeout(timer);
   }, [search]);
 
-  const onItemClick = (item: WorkshopItem) => {
+  const onItemClick = (item: WorkshopItemHeader) => {
     const mapsIds = maps.map((map) => map.id);
 
     if (mapsIds.includes(item.id)) return;

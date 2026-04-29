@@ -16,7 +16,7 @@ const key = Keys.player;
 
 const PlayerPage = ({ id }: { id: string }) => {
   const [player, setPlayer] = useState<Player>();
-  const [mapData, setMapData] = useState<WorkshopItem[]>([]);
+  const [mapData, setMapData] = useState<WorkshopItemHeader[]>([]);
   const [replays, setReplays] = useState<Replay[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [hydrated, setHydrated] = useState(false);
@@ -117,7 +117,7 @@ const PlayerPage = ({ id }: { id: string }) => {
                     <div className="flex w-full justify-center min-h-screen">
                       {mapData.length > 0 && <div className="grid sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[200px] lg:auto-rows-[300px] gap-6 p-6 w-full">
                         {mapData.map(m => (
-                          <MapTile key={m.id} {...m} />
+                          <MapTile key={m.id} item={m} />
                         ))}
                       </div>}
                       {mapData.length === 0 && <Container className="w-5xl h-fit mt-16 uppercase">

@@ -19,7 +19,7 @@ import { t } from "i18next";
 const key = Keys.collection.editor;
 
 const CollectionEditor = ({ id }: { id?: string }) => {
-  const [maps, setMaps] = useState<WorkshopItem[]>([]);
+  const [maps, setMaps] = useState<WorkshopItemHeader[]>([]);
   const [openCMenu, setOpenCMenu] = useState(false);
   const targetData = getTargetData();
   const [title, setTitle] = useState("");
@@ -59,7 +59,7 @@ const CollectionEditor = ({ id }: { id?: string }) => {
         isPublic: !isPrivate,
         showOnMain: isMain,
         previewUrl: typeof preview === "string" ? preview : undefined,
-        mapsId: maps.map((map) => map.steamId || map.id),
+        mapsId: maps.map((map) => map.id),
       },
       id,
     );
@@ -138,7 +138,7 @@ const CollectionEditor = ({ id }: { id?: string }) => {
             <div className="flex gap-2 w-full">
               <div className="grid sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[200px] lg:auto-rows-[300px] gap-6 w-full">
                 {maps.map((m) => (
-                  <MapTile key={`${v4()}`} {...m} />
+                  <MapTile key={`${v4()}`} item={m} />
                 ))}
               </div>
             </div>

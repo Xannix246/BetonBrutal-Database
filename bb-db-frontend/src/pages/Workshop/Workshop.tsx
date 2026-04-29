@@ -20,7 +20,7 @@ const key = Keys.workshop;
 const Workshop = ({ tags }: { tags: string[] }) => {
   const [loaded, setLoaded] = useState(false);
   const [hydrated, setHydrated] = useState(false);
-  const [items, setItems] = useState<WorkshopItem[]>([]);
+  const [items, setItems] = useState<WorkshopItemHeader[]>([]);
   const [activeSort, setActiveSort] = useState<SortBy>("newest");
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -151,10 +151,10 @@ const Workshop = ({ tags }: { tags: string[] }) => {
         </Container>
 
         {loaded ? (
-          <div className="flex gap-2 w-full">
+          <div className="flex gap-2 w-full min-h-screen">
             <div className="grid sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[200px] lg:auto-rows-[300px] gap-6 p-6 w-full">
               {items.map((m) => (
-                <MapTile key={`${v4()}`} {...m} />
+                <MapTile key={`${v4()}`} item={m} />
               ))}
             </div>
           </div>

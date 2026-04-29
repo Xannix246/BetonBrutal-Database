@@ -19,7 +19,7 @@ const key = Keys.collection.item;
 
 const Collection = ({ id }: { id: string }) => {
   const [loaded, setLoaded] = useState(false);
-  const [itemData, setItemData] = useState<WorkshopItem[]>([]);
+  const [itemData, setItemData] = useState<WorkshopItemHeader[]>([]);
   const [item, setItem] = useState<WorkshopItem>();
   const [collection, setCollection] = useState<Collection>();
   const [stats, setStats] = useState<CollectionStats>();
@@ -177,7 +177,7 @@ const Collection = ({ id }: { id: string }) => {
 
             <div className="grid sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[200px] lg:auto-rows-[300px] gap-6 py-4 w-full">
               {itemData.map((m) => (
-                <MapTile key={`${v4()}`} {...m} />
+                <MapTile key={`${v4()}`} item={m} />
               ))}
             </div>
           </div>

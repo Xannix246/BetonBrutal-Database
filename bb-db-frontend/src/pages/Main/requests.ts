@@ -6,7 +6,7 @@ export const getFollowedMaps = async (
   quantity: number = 3, 
   sendPreviews: boolean = false,
   timeRange?: 'day' | 'week' | 'month' | 'year'
-): Promise<WorkshopItem[]>  => {
+): Promise<WorkshopItemHeader[]>  => {
   const data = (await api.get(`${config.serverUri}/workshop/get-list?sortBy=${sortBy}&quantity=${quantity}&sendPreviews=${sendPreviews}${timeRange && "&timeRange=" + timeRange}`)).data;
   return data;
 }

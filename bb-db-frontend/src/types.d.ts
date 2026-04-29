@@ -17,6 +17,20 @@ declare type WorkshopItem = {
   linkedCollection?: null | string;
 };
 
+declare type WorkshopItemHeader = {
+  id: string;
+  title: string;
+  creator: string;
+  previewUrl: string;
+  createDate: Date;
+  ratingUp: number;
+  ratingDown: number;
+  previews?: string[];
+  linkedCollection?: string;
+  tags?: string[];
+  rating?: string;
+};
+
 declare type Replay = {
   id: string;
   place: number;

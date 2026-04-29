@@ -12,7 +12,7 @@ const CommentsContainer = () => {
     if (activeMap) {
       (async () => {
         setComments(
-          (await getComments(activeMap.steamId)).sort(
+          (await getComments(activeMap.id)).sort(
             (a, b) => new Date(b.createdAt).valueOf() - new Date(a.createdAt).valueOf(),
           ),
         );

@@ -4,7 +4,7 @@ export const getCollection = async (id: string): Promise<Collection> => {
   return (await api.get(`collections/${id}`)).data;
 };
 
-export const getItemData = async (ids: string[]): Promise<WorkshopItem[]> => {
+export const getItemData = async (ids: string[]): Promise<WorkshopItemHeader[]> => {
   return (await api.post(`/workshop/get-query-list`, { ids })).data;
 };
 

@@ -3,7 +3,7 @@ import { api } from "../../features/Auth";
 
 export const getMaps = async (
   searchQuery: string,
-): Promise<WorkshopItem[]> => {
+): Promise<WorkshopItemHeader[]> => {
   return (
     await api.get(
       `${config.serverUri}/workshop/search?q=${encodeURIComponent(
@@ -11,6 +11,10 @@ export const getMaps = async (
       )}`,
     )
   ).data;
+};
+
+export const getMap = async (id: string): Promise<WorkshopItem | null> => {
+  return (await api.get(`${config.serverUri}/workshop/${id}`)).data;
 };
 
 export const getReplays = async (id: string): Promise<Replay[]> => {
