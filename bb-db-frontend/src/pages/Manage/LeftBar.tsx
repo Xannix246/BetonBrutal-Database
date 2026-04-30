@@ -28,6 +28,12 @@ const LeftBar = () => {
           >
             Comments
           </a>
+          <a
+            className="uppercase hover:text-pink duration-150 cursor-pointer"
+            href="#tier"
+          >
+            Tier requests
+          </a>
           {/* <Button className="uppercase">Articles</Button> */}
         </div>
       </div>

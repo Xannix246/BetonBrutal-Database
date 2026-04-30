@@ -1,12 +1,14 @@
+import { v4 } from "uuid";
 import { config } from "../../../config/config";
 import { api } from "../../features/Auth";
+import { addToast } from "../../store/toast-manager";
 
 export const getMaps = async (
   searchQuery: string,
 ): Promise<WorkshopItemHeader[]> => {
   return (
     await api.get(
-      `${config.serverUri}/workshop/search?q=${encodeURIComponent(
+      `/workshop/search?q=${encodeURIComponent(
         searchQuery,
       )}`,
     )
@@ -14,15 +16,15 @@ export const getMaps = async (
 };
 
 export const getMap = async (id: string): Promise<WorkshopItem | null> => {
-  return (await api.get(`${config.serverUri}/workshop/${id}`)).data;
+  return (await api.get(`/workshop/${id}`)).data;
 };
 
 export const getReplays = async (id: string): Promise<Replay[]> => {
-  return (await api.get(`${config.serverUri}/workshop/${id}/replays?hideBanned=false`)).data;
+  return (await api.get(`/workshop/${id}/replays?hideBanned=false`)).data;
 };
 
 export const getReplayById = async (id: string): Promise<Replay> => {
-  return (await api.post(`${config.serverUri}/workshop/get-query-replays`, {
+  return (await api.post(`/workshop/get-query-replays`, {
     ids: [id],
     hideBanned: false,
   })).data[0];
@@ -33,7 +35,7 @@ export const uploadImage = async (image: File): Promise<string> => {
   formData.append("file", image);
 
   const { data } = await api.post(
-    `${config.serverUri}/files/upload`,
+    `/files/upload`,
     formData,
     {
       headers: { "Content-Type": "multipart/form-data" },
@@ -50,7 +52,7 @@ export const updateMap = async (id: string, data: {
   description?: string;
   previews?: string[];
 }): Promise<WorkshopItem> => {
-  const response = await api.put(`${config.serverUri}/manage/workshop/${id}/upsert`, {
+  const response = await api.put(`/manage/workshop/${id}/upsert`, {
     type: "WorkshopItemUpdate",
     data,
   });
@@ -68,7 +70,7 @@ export const createMap = async (data: {
   previews?: string[];
   createDate?: Date;
 }): Promise<WorkshopItem> => {
-  const response = await api.put(`${config.serverUri}/manage/workshop/${data.steamId}/upsert`, {
+  const response = await api.put(`/manage/workshop/${data.steamId}/upsert`, {
     type: "WorkshopItemCreate",
     data,
   });
@@ -77,9 +79,53 @@ export const createMap = async (data: {
 };
 
 export const getComments = async (mapId: string): Promise<UserComment[]> => {
-  return (await api.get(`${config.serverUri}/comments?id=${mapId}`)).data;
+  return (await api.get(`/comments?id=${mapId}`)).data;
 };
 
 export const deleteComment = async (id: string): Promise<void> => {
-  await api.delete(`${config.serverUri}/comments?id=${id}`);
+  await api.delete(`/comments?id=${id}`);
+};
+
+export const getTierData = async (mapId: string): Promise<TierData | null> => {
+  return (await api.get(`/workshop/${mapId}/tier`)).data;
+}
+
+export const setMapTierData = async (
+  mapId: string,
+  tier: number,
+  labels?: Labels[],
+): Promise<TierData | null> => {
+  const response = await api.post(`/manage/workshop/${mapId}/tier`, {
+    tier,
+    labels,
+  }).then((data) => {
+    addToast({
+      id: v4(),
+      time: 5000,
+      type: "success",
+      title: "Tier was edited",
+      description: `Tier was edited to ${tier}`,
+    });
+    return data;
+  });
+
+  return response.data;
+}
+
+export const getTierVoteRequests = async (mapId?: string): Promise<TierEntry[]> => {
+  return (await api.get(`/workshop/get-tier-entries?type=pending${mapId ? `&mapId=${mapId}` : ""}`)).data;
+}
+
+export const updateTierEntry = async (
+  entry: TierEntry,
+  type: "accepted" | "denied",
+): Promise<TierEntry> => {
+  return (await api.put(`/manage/tier/entries/${entry.id}`, {
+    tier: entry.tier,
+    type,
+  })).data;
+}
+
+export const getItems = async (ids: string[]): Promise<WorkshopItemHeader[]> => {
+  return (await api.post(`/workshop/get-query-list`, { ids })).data;
 };

@@ -11,6 +11,7 @@ import { FetchItemUseCase } from 'src/modules/data-requester/application/use-cas
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { WebsocketGateway } from 'src/modules/websocket/presentation/websocket.gateway';
 import { parseSearchInput } from 'src/shared/parseSearchUriData';
+import { MapTierService } from './map-tier.service';
 
 @Injectable()
 export class WorkshopService {
@@ -21,6 +22,7 @@ export class WorkshopService {
     private readonly fetchItems: FetchItemUseCase,
     private readonly steamApi: SteamApiService,
     private readonly websocket: WebsocketGateway,
+    private readonly tierService: MapTierService,
     @InjectQueue('map-downloading') private readonly downloadQueue: Queue,
     @InjectQueue('request-map') private readonly reqQueue: Queue,
   ) {}
@@ -171,6 +173,7 @@ export class WorkshopService {
         previewUrl: item.previewUrl,
         previews: sendPreviews ? item.previews : [],
         tags: item.tags,
+        rating: (await this.tierService.getTierData(item.steamId))?.avgTier,
       });
     }
 
@@ -258,6 +261,7 @@ export class WorkshopService {
         ratingDown: item.ratingDown,
         previewUrl: item.previewUrl,
         previews: sendPreviews ? item.previews : [],
+        rating: (await this.tierService.getTierData(item.steamId))?.avgTier,
       });
     }
 
@@ -385,16 +389,25 @@ export class WorkshopService {
     return [...new Set([...fixedLeaderboards, ...leaderboards])];
   }
 
-  async searchWorkshopItems(input: string) {
+  async searchWorkshopItems(
+    input: string,
+  ): Promise<WorkshopItem | WorkshopItemHeader[] | null> {
     const parsed = parseSearchInput(input);
 
     if (parsed.id) {
-      return this.prisma.workshopItem.findMany({
+      const item = await this.prisma.workshopItem.findUnique({
         where: { steamId: parsed.id },
       });
+
+      if (!item) return null;
+
+      return {
+        ...item,
+        id: item.steamId,
+      };
     }
 
-    return this.prisma.workshopItem.findMany({
+    const items = await this.prisma.workshopItem.findMany({
       where: {
         OR: [
           { title: { contains: parsed.text, mode: 'insensitive' } },
@@ -408,6 +421,28 @@ export class WorkshopService {
       },
       take: 50,
     });
+
+    const returnItems: WorkshopItemHeader[] = [];
+
+    for (const item of items) {
+      returnItems.push({
+        id: item.steamId,
+        title: item.title,
+        creator:
+          ((
+            await this.prisma.steamUser.findUnique({
+              where: { steamId: item.creatorId },
+            })
+          )?.username as string) || item.creator,
+        createDate: item.createDate,
+        ratingUp: item.ratingUp,
+        ratingDown: item.ratingDown,
+        previewUrl: item.previewUrl,
+        rating: (await this.tierService.getTierData(item.steamId))?.modTier,
+      });
+    }
+
+    return returnItems;
   }
 
   async deleteItem(steamId: string): Promise<void> {

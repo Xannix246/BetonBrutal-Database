@@ -28,7 +28,7 @@ declare type WorkshopItemHeader = {
   previews?: string[];
   linkedCollection?: string;
   tags?: string[];
-  rating?: string;
+  rating?: number;
 };
 
 declare type Replay = {
@@ -123,3 +123,27 @@ declare type PublicData = {
   about?: string;
   links?: Link[];
 };
+
+enum Labels {
+  "label1",
+  "label2",
+  "label3"
+}
+
+declare type TierData = {
+  id: string;
+  mapId: string;
+  modTier: number;
+  avgTier: number;
+  labels: Labels[];
+  isPossible?: boolean;
+}
+
+declare type TierEntry = {
+  id: string;
+  tier: number;
+  userId: string;
+  tierId: string;
+  mapId: string;
+  status: "accepted" | "denied" | "pending";
+}

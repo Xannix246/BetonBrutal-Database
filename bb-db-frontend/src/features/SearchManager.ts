@@ -4,13 +4,14 @@ import { api } from "./Auth";
 import { config } from "../../config/config";
 
 export const handleSearch = async (searchQuery: string, returnOnlyData?: boolean) => {
-  const result: WorkshopItem[] = (
+  const result: WorkshopItemHeader[] = (
     await api.get(
       `${config.serverUri}/workshop/search?q=${encodeURIComponent(
         searchQuery
       )}`
     )
   ).data;
+  console.log(result);
   $searchData.set(result);
 
   if (returnOnlyData) {
@@ -18,7 +19,7 @@ export const handleSearch = async (searchQuery: string, returnOnlyData?: boolean
   }
 
   if (result.length === 1) {
-    window.location.replace(`/workshop/${result[0].steamId}`);
+    window.location.replace(`/workshop/${result[0].id}`);
   } else {
     navigate(`/search`);
   }

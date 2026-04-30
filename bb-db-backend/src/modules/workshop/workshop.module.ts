@@ -9,6 +9,7 @@ import { MapRequesterProcessor } from './processors/workshop.processor';
 import { BanReplayProcessor } from './processors/replay-ban.processor';
 import { DataRequesterModule } from '../data-requester/data-requester.module';
 import { StorageModule } from '../storage/storage.module';
+import { MapTierService } from './domain/services/map-tier.service';
 
 @Module({
   imports: [
@@ -28,10 +29,11 @@ import { StorageModule } from '../storage/storage.module';
   controllers: [WorkshopController],
   providers: [
     WorkshopService,
+    MapTierService,
     MapDownloaderProcessor,
     MapRequesterProcessor,
     BanReplayProcessor,
   ],
-  exports: [WorkshopService],
+  exports: [WorkshopService, MapTierService],
 })
 export class WorkshopModule {}

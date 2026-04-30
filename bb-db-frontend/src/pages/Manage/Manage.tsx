@@ -9,6 +9,7 @@ import UpsertMapContainer from "./tabs/UpsertMapContainer";
 import ReplaysContainer from "./tabs/ReplaysContainer";
 import Button from "../../shared/Button/Button";
 import CommentsContainer from "./tabs/CommentsContainer";
+import TiersContainer from "./tabs/TiersContainer";
 
 const Manage = () => {
   const [allow, setAllow] = useState(false);
@@ -58,6 +59,7 @@ const Manage = () => {
               {activeMap && <UpsertMapContainer createNewMap={isNewMap} />}
               {activeMap && <ReplaysContainer />}
               {activeMap && <CommentsContainer />}
+              <TiersContainer mapId={activeMap?.steamId}/>
             </div>
           </section>
         </div>

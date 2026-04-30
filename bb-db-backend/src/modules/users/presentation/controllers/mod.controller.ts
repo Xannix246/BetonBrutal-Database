@@ -20,6 +20,8 @@ import {
   UpdateMapDataDto,
   UpsertMapDto,
 } from './dto/mod.dto';
+import { MapTierService } from 'src/modules/workshop/domain/services/map-tier.service';
+import { Labels, TierData, TierEntry } from '@prisma/client';
 
 @Controller('manage')
 @Roles('admin', 'moderator')
@@ -29,6 +31,7 @@ export class ModController {
     private readonly userSevice: UserService,
     private readonly modService: ModService,
     private readonly workshopService: WorkshopService,
+    private readonly tierService: MapTierService,
     @InjectQueue('ban-replay') private readonly banQueue: Queue,
   ) {}
 
@@ -86,6 +89,26 @@ export class ModController {
       id,
       unban: true,
       deleteReplay: false,
+    });
+  }
+
+  @Post('workshop/:id/tier')
+  async upsertTier(
+    @Param('id') id: string,
+    @Body() body: { tier: number; labels?: Labels[] },
+  ): Promise<TierData> {
+    return this.tierService.setTier(id, body.tier, body.labels);
+  }
+
+  @Put('tier/entries/:id')
+  async updateTierEntry(
+    @Param('id') id: string,
+    @Body() body: { tier?: number; type?: 'accepted' | 'denied' | 'pending' },
+  ): Promise<TierEntry> {
+    return this.tierService.updateTierEntry({
+      entryId: id,
+      tier: body.tier,
+      type: body.type,
     });
   }
 

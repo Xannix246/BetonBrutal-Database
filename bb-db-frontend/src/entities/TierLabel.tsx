@@ -16,14 +16,14 @@ const TierLabel = ({icon, tooltip, bgColor = "gray"}: TierLabel) => {
         onMouseEnter={() => setVisibleTip(true)}
         onMouseLeave={() => setVisibleTip(false)}
       >{icon}</div>
-      {visibleTip && <div
+      {visibleTip && <span
         className={clsx(
-          "absolute p-2 mt-2 ml-2 z-10 text-2xl text-gray-300 max-w-100 w-max whitespace-normal break-words",
+          "absolute p-2 mt-2 ml-2 z-10 text-2xl text-gray-300 max-w-100 w-max whitespace-pre-line break-words",
           bgColor === "gray" && "bg-[#202020]/90",
           bgColor === "black" && "bg-black/80",
           !["gray", "black"].includes(bgColor) && bgColor,
         )}
-      >{tooltip}</div>}
+      >{tooltip}</span>}
     </div>
   );
 }

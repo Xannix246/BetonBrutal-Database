@@ -3,8 +3,10 @@ import Input from "../../../shared/Input/Input";
 import { getActiveMap, setActiveMap } from "../../../store/store";
 import Button from "../../../shared/Button/Button";
 import Textarea from "../../../shared/Textarea/Textarea";
-import { createMap, updateMap, uploadImage } from "../requests";
+import { createMap, getTierData, setMapTierData, updateMap, uploadImage } from "../requests";
 import { DeleteMap } from "../../../features/DataManager";
+import RateTierModal from "../../../features/RateTierModal";
+import { v4 } from "uuid";
 
 const UpsertMapContainer = ({createNewMap = false}: { createNewMap?: boolean }) => {
   const activeMap = getActiveMap();
@@ -17,6 +19,8 @@ const UpsertMapContainer = ({createNewMap = false}: { createNewMap?: boolean }) 
   const [preview, setPreview] = useState("");
   const [previews, setPreviews] = useState<string[]>([]);
   const previewRef = useRef<HTMLInputElement | null>(null);
+  const [tierData, setTierData] = useState<TierData | null>();
+  const [openModal, setOpenModal] = useState(false);
 
   useEffect(() => {
     if (activeMap) {
@@ -28,6 +32,9 @@ const UpsertMapContainer = ({createNewMap = false}: { createNewMap?: boolean }) 
       setCreator(activeMap.creator);
       setPreview(activeMap.previewUrl);
       setPreviews(activeMap.previews);
+      (async () => {
+        setTierData(await getTierData(activeMap.steamId));
+      })();
     }
   }, [activeMap]);
 
@@ -96,8 +103,16 @@ const UpsertMapContainer = ({createNewMap = false}: { createNewMap?: boolean }) 
     setActiveMap(map);
   };
 
+  const handleTierSubmit = async (tier: number, labels?: Labels[]) => {
+    if (!activeMap) return;
+
+    const newData = await setMapTierData(activeMap.steamId, tier, labels);
+    setTierData(newData);
+  }
+
   return (
     <div className="flex flex-col gap-2">
+      <RateTierModal open={openModal} setOpen={setOpenModal} handleSubmit={handleTierSubmit} currentTier={tierData?.modTier} bg="black"/>
       <Input
         className="text-2xl w-full bg-black/60"
         placeholder="Title (required)"
@@ -175,6 +190,7 @@ const UpsertMapContainer = ({createNewMap = false}: { createNewMap?: boolean }) 
         <Button className="uppercase w-full text-white hover:bg-yellow/50" onClick={handleUpdate}>Update map</Button>
         <Button className="uppercase w-full text-white hover:bg-red/50" onClick={handleDelete}>Delete map</Button>
         <Button className="uppercase w-full text-white hover:bg-green/50" onClick={onCreate}>Create new</Button>
+        <Button className="uppercase w-full text-white bg-green/30 hover:bg-green/50" onClick={() => setOpenModal(true)}>Set tier</Button>
       </div> : <div className="flex gap-2 w-full">
           <Button className="uppercase w-full text-white hover:bg-red/50" onClick={onCancelCreate}>Cancel</Button>
           <Button 

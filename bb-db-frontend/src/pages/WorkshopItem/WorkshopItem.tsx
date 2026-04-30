@@ -5,6 +5,8 @@ import {
   getComments,
   getMap,
   getReplays,
+  getTierData,
+  getUserTierEntry,
   postComment,
   uploadMap,
 } from "./requests";
@@ -48,6 +50,8 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
   const [openCMenu, setOpenCMenu] = useState(false);
   const targetData = getTargetData();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [tierData, setTierData] = useState<TierData | null>(null);
+  const [userVote, setUserVote] = useState<TierEntry | undefined>(undefined);
 
   const key = Keys.workshopItem;
 
@@ -96,6 +100,10 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
       if (map) {
         setMapData(map);
         setReplays(replays);
+        setTierData(await getTierData(id));
+        if (user) {
+          setUserVote(await getUserTierEntry(id, user.id));
+        }
 
         if (map.previews.length > 0)
           setPreviewId(Math.floor(Math.random() * map.previews.length));
@@ -228,7 +236,7 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                   </a>
                 )}
               </div>
-              <MapTier/>
+              {tierData && <MapTier tierData={tierData} userVote={userVote}/>}
               <div className="flex flex-col w-full gap-2">
                 <Container className="text-white text-5xl lg:text-8xl w-full text-center">
                   <a

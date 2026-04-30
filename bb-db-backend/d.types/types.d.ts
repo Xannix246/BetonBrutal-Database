@@ -30,7 +30,7 @@ declare type WorkshopItemHeader = {
   previews?: string[];
   linkedCollection?: string;
   tags?: string[];
-  rating?: string;
+  rating?: number;
 };
 
 declare type Player = {

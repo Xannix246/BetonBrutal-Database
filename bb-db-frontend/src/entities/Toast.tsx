@@ -4,6 +4,21 @@ import Container from "../shared/Containter/Container";
 import { Toast as ToastType, removeToast } from "../store/toast-manager";
 import clsx from "clsx";
 
+  const getColor = (type: string) => {
+    switch(type) {
+      case "error":
+        return "red";
+      case "warn":
+        return "yellow";
+      case "success":
+        return "green";
+      case "info":
+      default:
+        return "blue";
+    }
+  }
+
+
 const Toast = ({ toast }: { toast: ToastType }) => {
   const [isPaused, setIsPaused] = useState(false);
   const startTime = useRef(Date.now());
@@ -11,10 +26,12 @@ const Toast = ({ toast }: { toast: ToastType }) => {
   const progress = useMotionValue(100);
   const width = useTransform(progress, (v) => `${v}%`);
   const x = useMotionValue(0);
+  const [color, setColor] = useState<"red" | "yellow" | "green" | "blue">("blue");
 
   useEffect(() => {
     if (!toast.time) return;
 
+    setColor(getColor(toast.type));
     let frame: number;
 
     const tick = () => {
@@ -53,19 +70,6 @@ const Toast = ({ toast }: { toast: ToastType }) => {
     }
   };
 
-  const getColor = () => {
-    switch(toast.type) {
-      case "error":
-        return "red";
-      case "warn":
-        return "yellow";
-      case "success":
-        return "green";
-      case "info":
-        return "blue";
-    }
-  }
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 50, scale: 0.95 }}
@@ -84,12 +88,12 @@ const Toast = ({ toast }: { toast: ToastType }) => {
           style={{ width }}
           className={clsx(
             "absolute top-0 left-0 h-1",
-            `bg-${getColor()}`,
+            `bg-${color}`,
           )}
         />
 
         <div className="p-3">
-          <div className={clsx("uppercase text-2xl", `text-${getColor()}`)}>{toast.title}</div>
+          <div className={clsx("uppercase text-2xl", `text-${color}`)}>{toast.title}</div>
           {toast.description && (
             <div className="text-lg text-gray-300">{toast.description}</div>
           )}

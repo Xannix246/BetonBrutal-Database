@@ -2,9 +2,17 @@ import { AnimatePresence } from "motion/react";
 import Toast from "../../entities/Toast";
 import Button from "../../shared/Button/Button";
 import { clearToasts, getToasts } from "../../store/toast-manager";
+import { useEffect, useState } from "react";
 
 const Toasts = () => {
   const toasts = getToasts();
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    setHydrated(window && true);
+  }, []);
+
+  if (!hydrated) return;
 
   return (
     <div className="fixed bottom-0 right-0 w-fit max-h-[90%] z-100 m-4">

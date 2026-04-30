@@ -30,18 +30,16 @@ export const removeToast = (id: string) =>
 
 api.interceptors.response.use(
   (response) => {
-    const id = v4();
-    const types: Toast["type"][] = ["info", "error", "warn", "success"];
-    addToast({
-      id: id,
-      time: 500000,
-      type: types[Math.floor(Math.random() * 4)],
-      title: `Test ${id}`,
-      description: "Notification was added succesfully"
-    });
     return response;
   },
   (error: AxiosError) => {
+    addToast({
+      id: v4(),
+      time: 5000,
+      type: "error",
+      title: "An error occured",
+      description: `${error.message} (${(error.response?.data as { message: string }).message})`,
+    });
     return Promise.reject(error);
   },
 );
