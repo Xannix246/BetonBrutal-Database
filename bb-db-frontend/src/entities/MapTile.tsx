@@ -55,7 +55,7 @@ const MapTile = ({ item, disableSizeClass = false }: Props) => {
                 style={{
                   "--h": color[0],
                 } as React.CSSProperties}
-              >{item.rating === -1 ? "P/I" : item.rating}</p>}
+              >{item.rating === -1 ? "P/I" : item.rating.toFixed(0)}</p>}
             </div>
           </div>
         </div>
