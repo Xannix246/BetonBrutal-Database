@@ -20,7 +20,7 @@ const Manage = () => {
     (async () => {
       const user = (await authClient.getSession()).data?.user;
 
-      if (!["writer", "admin"].includes(user?.role as string)) {
+      if (!["moderator", "admin"].includes(user?.role as string)) {
         return navigate("/");
       } else {
         setAllow(true);
