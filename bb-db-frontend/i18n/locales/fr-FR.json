@@ -18,7 +18,8 @@
     "favorites": "Favoris",
     "unlSteam": "Délier Steam",
     "lSteam": "Lier Steam",
-    "deleteAcc": "Supprimer le compte"
+    "deleteAcc": "Supprimer le compte",
+    "votes": ""
   },
   "main": {
     "yearMaps": "Map de l'année",
@@ -153,6 +154,49 @@
       "maps": "Maps",
       "notFound": "Collection non trouvée :'(",
       "dataCheck": "Vérificaiton du nouveau contenu..."
+    }
+  },
+  "mapTiers": {
+    "tierTooltip": "",
+    "cardTier": "",
+    "cardStatus": "",
+    "accepted": "",
+    "pending": "",
+    "denied": "",
+    "rateMap": "",
+    "selected": "",
+    "votes": "",
+    "tooltips": {
+      "tier-1": "",
+      "tier0": "",
+      "tier1": "",
+      "tier2": "",
+      "tier3": "",
+      "tier4": "",
+      "tier5": "",
+      "tier6": "",
+      "tier7": "",
+      "tier8": "",
+      "tier9": "",
+      "tier10": ""
+    },
+    "labels": {
+      "grapples": "",
+      "wallruns": "",
+      "trampolines": "",
+      "ice": "",
+      "nerveControl": "",
+      "xxl": "",
+      "coyotes": "",
+      "pfp": "",
+      "gimicky": "",
+      "puzzle": "",
+      "moving": "",
+      "showcase": "",
+      "overall": "",
+      "nonLinear": "",
+      "chockepoints": "",
+      "shitpost": ""
     }
   }
 }

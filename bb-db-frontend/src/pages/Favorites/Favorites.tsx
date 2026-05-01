@@ -11,7 +11,7 @@ import { t } from "i18next";
 
 const Favorites = ({ id }: { id: string }) => {
   const [user, setUser] = useState<User>();
-  const [mapData, setMapData] = useState<WorkshopItem[]>([]);
+  const [mapData, setMapData] = useState<WorkshopItemHeader[]>([]);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -53,7 +53,7 @@ const Favorites = ({ id }: { id: string }) => {
               <div className="px-4">
                 <div className="grid sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[200px] lg:auto-rows-[300px] gap-6 p-6 w-full">
                   {mapData.map(m => (
-                    <MapTile key={m.id} {...m} />
+                    <MapTile key={m.id} item={m} />
                   ))}
                 </div>
               </div>

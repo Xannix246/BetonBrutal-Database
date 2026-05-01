@@ -17,6 +17,20 @@ declare type WorkshopItem = {
   linkedCollection?: null | string;
 };
 
+declare type WorkshopItemHeader = {
+  id: string;
+  title: string;
+  creator: string;
+  previewUrl: string;
+  createDate: Date;
+  ratingUp: number;
+  ratingDown: number;
+  previews?: string[];
+  linkedCollection?: string;
+  tags?: string[];
+  rating?: number;
+};
+
 declare type Replay = {
   id: string;
   place: number;
@@ -109,3 +123,40 @@ declare type PublicData = {
   about?: string;
   links?: Link[];
 };
+
+declare enum Labels {
+  grapples = "grapples",
+  wallruns = "wallruns",
+  trampolines = "trampolines",
+  ice = "ice",
+  nerveControl = "nerveControl",
+  xxl = "xxl",
+  coyotes = "coyotes",
+  pfp = "pfp",
+  gimicky = "gimicky",
+  puzzle = "puzzle",
+  moving = "moving",
+  showcase = "showcase",
+  overall = "overall",
+  nonLinear = "nonLinear",
+  chockepoints = "chockepoints",
+  shitpost = "shitpost",
+}
+
+declare type TierData = {
+  id: string;
+  mapId: string;
+  modTier: number;
+  avgTier: number;
+  labels: Labels[];
+  isPossible?: boolean;
+}
+
+declare type TierEntry = {
+  id: string;
+  tier: number;
+  userId: string;
+  tierId: string;
+  mapId: string;
+  status: "accepted" | "denied" | "pending";
+}

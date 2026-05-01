@@ -24,6 +24,7 @@ model WorkshopItem {
 
   linkedCollection String?     @unique
   collection       Collection? @relation(fields: [linkedCollection], references: [id], onDelete: Cascade) // if tag - collection
+  tierData         TierData?
 }
 
 model LeaderboardEntry {
@@ -53,4 +54,56 @@ model Comment {
   userId    String
   data      String
   createdAt DateTime @default(now())
+}
+
+enum Labels {
+  grapples
+  wallruns
+  trampolines
+  ice
+  nerveControl
+  xxl
+  coyotes
+  pfp
+  gimicky
+  puzzle
+  moving
+  showcase
+  overall
+  nonLinear
+  chockepoints
+  shitpost
+}
+
+enum TierStatus {
+  accepted
+  denied
+  pending
+}
+
+model TierEntry {
+  id     String     @id @default(auto()) @map("_id") @db.ObjectId
+  tier   Int
+  userId String
+  tierId String
+  mapId  String
+  status TierStatus @default(pending)
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tierData TierData @relation(fields: [tierId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tierId])
+}
+
+model TierData {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  modTier    Float    @default(-1)
+  avgTier    Float    @default(-1)
+  qalTier    Float    @default(0) @ignore
+  labels     Labels[]
+  isPossible Boolean?
+
+  mapId       String       @unique
+  map         WorkshopItem @relation(fields: [mapId], references: [steamId], onDelete: Cascade)
+  tierEntries TierEntry[]
 }

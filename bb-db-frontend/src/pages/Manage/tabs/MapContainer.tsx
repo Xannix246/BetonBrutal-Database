@@ -3,9 +3,10 @@ import { handleSearch } from "../../../features/SearchManager";
 import Input from "../../../shared/Input/Input";
 import List from "../../../shared/List/List";
 import { setActiveMap } from "../../../store/store";
+import { getMap } from "../requests";
 
 const MapContainer = () => {
-  const [maps, setMaps] = useState<WorkshopItem[]>([]);
+  const [maps, setMaps] = useState<WorkshopItemHeader[]>([]);
   const [search, setSearch] = useState("");
 
   useEffect(() => {
@@ -23,8 +24,8 @@ const MapContainer = () => {
     return () => clearTimeout(timer);
   }, [search]);
 
-  const onItemClick = (item: WorkshopItem) => {
-    setActiveMap(item);
+  const onItemClick = async (item: WorkshopItemHeader) => {
+    setActiveMap(await getMap(item.id));
     setSearch("");
     setMaps([]);
   };

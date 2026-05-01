@@ -57,6 +57,7 @@ export class FetchItemUseCase {
         previews: itemData.previews,
         description: itemData.description,
         tags: itemData.tags,
+        isHidden: false,
       },
       create: {
         steamId: itemData.steamId,
@@ -71,6 +72,7 @@ export class FetchItemUseCase {
         description: itemData.description,
         filename: null,
         tags: itemData.tags,
+        isHidden: false,
       },
     });
 

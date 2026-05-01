@@ -6,7 +6,7 @@ import { JSX, useCallback, useEffect, useState } from "react";
 import { handleEnterSearch, handleSearch } from "../../features/SearchManager";
 import { logOut, signIn, unlinkSteam } from "../../features/Auth";
 import Dropdown from "../../shared/Dropdown/Dropdown";
-import { ArrowLeftEndOnRectangleIcon, StarIcon, Bars3Icon, TrashIcon, LinkIcon, LinkSlashIcon, UserIcon } from "@heroicons/react/24/outline";
+import { ArrowLeftEndOnRectangleIcon, StarIcon, Bars3Icon, TrashIcon, LinkIcon, LinkSlashIcon, UserIcon, ChartBarIcon } from "@heroicons/react/24/outline";
 import { navigate } from "vike/client/router";
 import MobileMenu from "./MobileMenu";
 import { getUser, setUser } from "../../store/store";
@@ -25,7 +25,7 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
   const [mobileMenu, setMobileMenu] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [openItemsMenu, setOpenItemsMenu] = useState(false);
-  const [foundMaps, setFoundMaps] = useState<WorkshopItem[]>([]);
+  const [foundMaps, setFoundMaps] = useState<WorkshopItemHeader[]>([]);
 
   const handleWindowResize = useCallback(() => {
     setWidth(window.innerWidth);
@@ -74,6 +74,11 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
       onClick: () => navigate(`/user/${user?.id}/favorites`)
     },
     {
+      name: t(key.votes).toUpperCase(),
+      icon: <ChartBarIcon width={24} />,
+      onClick: () => navigate(`/user/${user?.id}/votes`)
+    },
+    {
       name: user?.steamId ? t(key.unlSteam).toUpperCase() : t(key.lSteam).toUpperCase(),
       icon: user?.steamId ? <LinkSlashIcon width={24} /> : <LinkIcon width={24} />,
       onClick: async () => {
@@ -92,10 +97,10 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
     }
   ];
 
-  const onItemClick = async (item: WorkshopItem) => {
+  const onItemClick = async (item: WorkshopItemHeader) => {
     setSearch("");
     setFoundMaps([]);
-    await navigate(`/workshop/${item.steamId ?? item.id}`);
+    window.location.href = `/workshop/${item.id}`;
   };
 
   return (

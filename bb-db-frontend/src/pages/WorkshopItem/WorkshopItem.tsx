@@ -5,6 +5,8 @@ import {
   getComments,
   getMap,
   getReplays,
+  getTierData,
+  getUserTierEntry,
   postComment,
   uploadMap,
 } from "./requests";
@@ -18,7 +20,6 @@ import {
   $prevLink,
   getFavorites,
   getTargetData,
-  getUser,
   setTargetData,
 } from "../../store/store";
 import { navigate } from "vike/client/router";
@@ -33,12 +34,14 @@ import getMedianTime from "./getMedianTime";
 import formatTime from "../../features/FormatTime";
 import { t } from "i18next";
 import { Keys } from "../../../i18n/keys";
+import MapTier from "../../widgets/MapTier/MapTier";
+import { authClient } from "../../features/Auth";
 
 const WorkshopItemPage = ({ id }: { id: string }) => {
   const [mapData, setMapData] = useState<WorkshopItem | null>();
   const [loaded, setLoaded] = useState(false);
   const [hydrated, setHydrated] = useState(false);
-  const user = getUser();
+  const [user, setUser] = useState<User | null>(null);
   const [comments, setComments] = useState<UserComment[]>([]);
   const [replays, setReplays] = useState<Replay[]>([]);
   const [value, setValue] = useState("");
@@ -47,6 +50,8 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
   const [openCMenu, setOpenCMenu] = useState(false);
   const targetData = getTargetData();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [tierData, setTierData] = useState<TierData | null>(null);
+  const [userVote, setUserVote] = useState<TierEntry | undefined>(undefined);
 
   const key = Keys.workshopItem;
 
@@ -90,11 +95,17 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
       if (["TimeMS", "TimeDLC1", "TimeBirthday"].includes(id)) {
         return navigate("/");
       }
+      const user = (await authClient.getSession()).data?.user;
       const map = await getMap(id);
       const replays = (await getReplays(id)).sort((a, b) => a.score - b.score);
       if (map) {
         setMapData(map);
         setReplays(replays);
+        setUser(user ?? null);
+        setTierData(await getTierData(id));
+        if (user) {
+          setUserVote(await getUserTierEntry(id, user.id));
+        }
 
         if (map.previews.length > 0)
           setPreviewId(Math.floor(Math.random() * map.previews.length));
@@ -227,6 +238,7 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                   </a>
                 )}
               </div>
+              {tierData && <MapTier tierData={tierData} userVote={userVote}/>}
               <div className="flex flex-col w-full gap-2">
                 <Container className="text-white text-5xl lg:text-8xl w-full text-center">
                   <a

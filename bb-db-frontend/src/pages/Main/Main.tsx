@@ -17,8 +17,8 @@ import { Keys } from "../../../i18n/keys";
 const key = Keys.main;
 
 const Main = () => {
-  const [followedMaps, setFollowedMaps] = useState<WorkshopItem[]>([]);
-  const [lastestMaps, setLastestMaps] = useState<WorkshopItem[]>([]);
+  const [followedMaps, setFollowedMaps] = useState<WorkshopItemHeader[]>([]);
+  const [lastestMaps, setLastestMaps] = useState<WorkshopItemHeader[]>([]);
   const [collections, setCollections] = useState<Collection[]>([]);
   const [isSticky, setIsSticky] = useState(false);
   const [search, setSearch] = useState("");
@@ -129,7 +129,7 @@ const Main = () => {
           <div className="flex justify-center w-full">
             <div className="grid sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[200px] lg:auto-rows-[300px] gap-6 p-6 w-full">
               {lastestMaps.map((m) => (
-                <MapTile key={m.id} {...m} />
+                <MapTile key={m.id} item={m} />
               ))}
             </div>
           </div>

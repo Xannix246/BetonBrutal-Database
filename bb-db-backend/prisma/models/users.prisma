@@ -24,6 +24,7 @@ model User {
   publicDatas PublicData[]
 
   collections Collection[]
+  tierEntries TierEntry[]
 
   @@unique([email])
   @@map("user")

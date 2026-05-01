@@ -33,5 +33,7 @@ export const unlinkSteam = async () => {
 
 export const api = axios.create({
     baseURL: `${config.serverUri}`,
-    withCredentials: true
-})
+    withCredentials: true,
+});
+
+

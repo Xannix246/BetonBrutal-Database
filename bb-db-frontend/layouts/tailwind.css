@@ -76,3 +76,12 @@ body {
   max-width: 100%;
   overflow-x: hidden;
 }
+
+.toasts::-webkit-scrollbar {
+  display: none;
+}
+
+.toasts {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

@@ -1,3 +1,5 @@
+import { setActiveMap } from "../../store/store";
+
 const LeftBar = () => {
   return (
     <div className="w-[320px]">
@@ -13,6 +15,7 @@ const LeftBar = () => {
           <a
             className="uppercase hover:text-pink duration-150 cursor-pointer"
             href="#maps"
+            onClick={() => setActiveMap(null)}
           >
             Maps
           </a>
@@ -27,6 +30,12 @@ const LeftBar = () => {
             href="#comments"
           >
             Comments
+          </a>
+          <a
+            className="uppercase hover:text-pink duration-150 cursor-pointer"
+            href="#tier"
+          >
+            Tier requests
           </a>
           {/* <Button className="uppercase">Articles</Button> */}
         </div>

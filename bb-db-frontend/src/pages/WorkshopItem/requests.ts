@@ -1,5 +1,6 @@
 import { config } from "../../../config/config";
 import { api } from "../../features/Auth";
+import { getUser } from "../../store/store";
 
 export const getMap = async (id: string): Promise<WorkshopItem | null> => {
   return (await api.get(`${config.serverUri}/workshop/${id}`)).data;
@@ -31,3 +32,17 @@ export const uploadMap = async (mapId: string, file: Blob) => {
 
   return (await api.post(`db/upload?id=${mapId}`, formData)).data;
 };
+
+export const getTierData = async (mapId: string): Promise<TierData | null> => {
+  return (await api.get(`/workshop/${mapId}/tier`)).data;
+}
+
+export const getUserTierEntry = async (
+  mapId: string,
+  userId: string,
+): Promise<TierEntry | undefined> => {
+  return (await api.get(
+    `/workshop/get-tier-entries?userId=${userId}&mapId=${mapId}&type=accepted`
+  )).data[0] ?? undefined;
+}
+

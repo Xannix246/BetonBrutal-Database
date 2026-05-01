@@ -5,7 +5,7 @@ import clsx from "clsx";
 import MapTile from "../../entities/MapTile";
 
 const CollectionContainer = ({ collection }: { collection: Collection }) => {
-  const [maps, setMaps] = useState<WorkshopItem[]>([]);
+  const [maps, setMaps] = useState<WorkshopItemHeader[]>([]);
   const [width, setWidth] = useState(0);
 
   useEffect(() => {
@@ -62,7 +62,7 @@ const CollectionContainer = ({ collection }: { collection: Collection }) => {
               key={map.id}
             />
             :
-            <MapTile key={map.id} {...map} disableSizeClass={width < 640} />
+            <MapTile key={map.id} item={map} disableSizeClass={width < 640} />
         ))}
       </div>
     </div>

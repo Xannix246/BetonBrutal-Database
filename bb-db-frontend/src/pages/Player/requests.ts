@@ -4,7 +4,7 @@ export const getUser = async (id: string): Promise<User> => {
   return (await api.get(`/user/s-id/${id}`)).data;
 };
 
-export const getUserFavorites = async (id: string): Promise<WorkshopItem[]> => {
+export const getUserFavorites = async (id: string): Promise<WorkshopItemHeader[]> => {
   return (await api.get(`/user/${id}/favorites`)).data;
 };
 
@@ -12,7 +12,7 @@ export const getPlayer = async (id: string): Promise<Player> => {
   return (await api.get(`/workshop/player/${id}`)).data;
 };
 
-export const getPlayerMaps = async (ids: string[]): Promise<WorkshopItem[]> => {
+export const getPlayerMaps = async (ids: string[]): Promise<WorkshopItemHeader[]> => {
   return (
     await api.post(`/workshop/get-query-list`, {
       ids: ids,
@@ -52,4 +52,12 @@ export const setUserPublicData = async (
   return (await api.put(`/user/public-data`, {
     ...data
   })).data;
+};
+
+export const getTierVoteRequests = async (id: string): Promise<TierEntry[]> => {
+  return (await api.get(`/workshop/get-tier-entries?userId=${id}`)).data;
+}
+
+export const getItems = async (ids: string[]): Promise<WorkshopItemHeader[]> => {
+  return (await api.post(`/workshop/get-query-list`, { ids })).data;
 };

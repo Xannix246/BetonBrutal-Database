@@ -9,8 +9,10 @@ import {
   ParseBoolPipe,
   ParseIntPipe,
   Post,
+  Put,
   Query,
   Res,
+  Session,
 } from '@nestjs/common';
 import { ApiExcludeEndpoint, ApiQuery } from '@nestjs/swagger';
 import { OptionalAuth } from '@thallesp/nestjs-better-auth';
@@ -19,7 +21,10 @@ import { env } from 'process';
 import { FetchBBLBUseCase } from 'src/modules/data-requester/application/use-cases/fetch-bblb.usecase';
 import { RefreshDatabaseUseCase } from 'src/modules/data-requester/application/use-cases/refresh-database.usecase';
 import { WorkshopService } from 'src/modules/workshop/domain/services/workshop.service';
-import { GetQueryListDto, GetQueryReplaysDto } from './workshop.dto';
+import { GetQueryListDto, GetQueryReplaysDto } from '../dto/workshop.dto';
+import { MapTierService } from '../../domain/services/map-tier.service';
+import { TierData, TierEntry } from '@prisma/client';
+import { type UserRoleSession } from 'src/modules/auth/auth.module';
 
 @Controller('workshop')
 export class WorkshopController {
@@ -27,6 +32,7 @@ export class WorkshopController {
     private readonly workshopService: WorkshopService,
     private readonly refreshDb: RefreshDatabaseUseCase,
     private readonly fetchBblb: FetchBBLBUseCase,
+    private readonly tierService: MapTierService,
   ) {}
 
   @Get()
@@ -121,6 +127,17 @@ export class WorkshopController {
     return leaderboard;
   }
 
+  @Get('get-tier-entries')
+  @OptionalAuth()
+  async getTierEntries(
+    @Query('mapId') mapId: string,
+    @Query('userId') userId: string,
+    @Query('tierId') tierId: string,
+    @Query('type') type: 'accepted' | 'denied' | 'pending',
+  ) {
+    return this.tierService.getTierEntries({ userId, tierId, mapId, type });
+  }
+
   @Get('force-update')
   @OptionalAuth()
   @ApiExcludeEndpoint()
@@ -164,5 +181,29 @@ export class WorkshopController {
     );
 
     return replays;
+  }
+
+  @Get(':id/tier')
+  @OptionalAuth()
+  async getTier(@Param('id') id: string): Promise<TierData | null> {
+    return this.tierService.getTierData(id);
+  }
+
+  @Post(':id/tier')
+  async postTier(
+    @Param('id') id: string,
+    @Session() session: UserRoleSession,
+    @Body() body: { tier: number },
+  ): Promise<TierEntry> {
+    return this.tierService.createTierEntry(session.user.id, id, body.tier);
+  }
+
+  @Put(':id/tier')
+  async updateTier(
+    @Param('id') id: string,
+    @Session() session: UserRoleSession,
+    @Body() body: { tier: number },
+  ): Promise<TierEntry> {
+    return this.tierService.updateUserEntry(session.user.id, id, body.tier);
   }
 }

@@ -7,6 +7,7 @@ import { authClient } from "../src/features/Auth";
 import { usePageContext } from "vike-react/usePageContext";
 import i18n from "../i18n/config";
 import { config } from "../config/config";
+import Toasts from "../src/widgets/Header/Toasts";
 // import Snowfall from "react-snowfall";
 
 export const LayoutDefault = ({ children }: { children: React.ReactNode }) => {
@@ -40,6 +41,7 @@ export const LayoutDefault = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className={"w-full h-full"}>
+      <Toasts/>
       {/* <Snowfall
         style={{
           zIndex: 100,

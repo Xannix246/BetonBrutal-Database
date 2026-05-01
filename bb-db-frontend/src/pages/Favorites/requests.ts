@@ -5,7 +5,7 @@ export const getUser = async (id: string): Promise<User> => {
   return (await api.get(`${config.serverUri}/user/${id}`)).data;
 };
 
-export const getUserFavorites = async (id: string): Promise<WorkshopItem[]> => {
+export const getUserFavorites = async (id: string): Promise<WorkshopItemHeader[]> => {
   return (await api.get(`${config.serverUri}/user/${id}/favorites`)).data;
 };
 

@@ -29,7 +29,8 @@ declare type WorkshopItemHeader = {
   ratingDown: number;
   previews?: string[];
   linkedCollection?: string;
-  tags?: string[]
+  tags?: string[];
+  rating?: number;
 };
 
 declare type Player = {
