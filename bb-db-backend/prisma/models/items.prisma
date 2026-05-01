@@ -57,10 +57,22 @@ model Comment {
 }
 
 enum Labels {
-  label1
-  label2
-  label3
-  label4
+  grapples
+  wallruns
+  trampolines
+  ice
+  nerveControl
+  xxl
+  coyotes
+  pfp
+  gimicky
+  puzzle
+  moving
+  showcase
+  overall
+  nonLinear
+  chockepoints
+  shitpost
 }
 
 enum TierStatus {

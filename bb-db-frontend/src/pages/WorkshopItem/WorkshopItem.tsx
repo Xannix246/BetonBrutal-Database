@@ -20,7 +20,6 @@ import {
   $prevLink,
   getFavorites,
   getTargetData,
-  getUser,
   setTargetData,
 } from "../../store/store";
 import { navigate } from "vike/client/router";
@@ -36,12 +35,13 @@ import formatTime from "../../features/FormatTime";
 import { t } from "i18next";
 import { Keys } from "../../../i18n/keys";
 import MapTier from "../../widgets/MapTier/MapTier";
+import { authClient } from "../../features/Auth";
 
 const WorkshopItemPage = ({ id }: { id: string }) => {
   const [mapData, setMapData] = useState<WorkshopItem | null>();
   const [loaded, setLoaded] = useState(false);
   const [hydrated, setHydrated] = useState(false);
-  const user = getUser();
+  const [user, setUser] = useState<User | null>(null);
   const [comments, setComments] = useState<UserComment[]>([]);
   const [replays, setReplays] = useState<Replay[]>([]);
   const [value, setValue] = useState("");
@@ -95,11 +95,13 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
       if (["TimeMS", "TimeDLC1", "TimeBirthday"].includes(id)) {
         return navigate("/");
       }
+      const user = (await authClient.getSession()).data?.user;
       const map = await getMap(id);
       const replays = (await getReplays(id)).sort((a, b) => a.score - b.score);
       if (map) {
         setMapData(map);
         setReplays(replays);
+        setUser(user ?? null);
         setTierData(await getTierData(id));
         if (user) {
           setUserVote(await getUserTierEntry(id, user.id));

@@ -65,7 +65,11 @@ const CollectionEditor = ({ id }: { id?: string }) => {
     );
 
     if (!(typeof preview === "string")) {
-      await uploadPreview(preview, publishedCollection.id);
+      try {
+        await uploadPreview(preview, publishedCollection.id);
+      } catch (err) {
+        console.log(err);
+      }
     }
 
     await navigate(`/collection/${publishedCollection.id}`);

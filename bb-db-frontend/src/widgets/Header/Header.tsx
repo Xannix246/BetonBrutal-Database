@@ -6,7 +6,7 @@ import { JSX, useCallback, useEffect, useState } from "react";
 import { handleEnterSearch, handleSearch } from "../../features/SearchManager";
 import { logOut, signIn, unlinkSteam } from "../../features/Auth";
 import Dropdown from "../../shared/Dropdown/Dropdown";
-import { ArrowLeftEndOnRectangleIcon, StarIcon, Bars3Icon, TrashIcon, LinkIcon, LinkSlashIcon, UserIcon } from "@heroicons/react/24/outline";
+import { ArrowLeftEndOnRectangleIcon, StarIcon, Bars3Icon, TrashIcon, LinkIcon, LinkSlashIcon, UserIcon, ChartBarIcon } from "@heroicons/react/24/outline";
 import { navigate } from "vike/client/router";
 import MobileMenu from "./MobileMenu";
 import { getUser, setUser } from "../../store/store";
@@ -72,6 +72,11 @@ const Header = ({ isAbsolute, additionalComponent, hideSearch }: { isAbsolute?: 
       name: user?.steamId ? t(key.profile).toUpperCase() : t(key.favorites).toUpperCase(),
       icon: user?.steamId ? <UserIcon width={24}/> : <StarIcon width={24} />,
       onClick: () => navigate(`/user/${user?.id}/favorites`)
+    },
+    {
+      name: t(key.votes).toUpperCase(),
+      icon: <ChartBarIcon width={24} />,
+      onClick: () => navigate(`/user/${user?.id}/votes`)
     },
     {
       name: user?.steamId ? t(key.unlSteam).toUpperCase() : t(key.lSteam).toUpperCase(),

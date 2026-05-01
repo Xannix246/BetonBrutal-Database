@@ -16,7 +16,7 @@ const getTileSize = (title: string, ratingUp: number) => {
 const MapTile = ({ item, disableSizeClass = false }: Props) => {
   const sizeClass = getTileSize(item.title, item.ratingUp);
   const user = getUser();
-  const color = getColor(item.rating ?? 0, 10);
+  const color = getColor(item.rating ?? 0, 12);
 
   return (
     <a

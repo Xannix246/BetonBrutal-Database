@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -23,11 +24,12 @@ export class MapTierService {
     mapId: string;
     modTier?: number;
     avgTier?: number;
-    labels?: string[];
+    labels?: Labels[];
   }): Promise<TierData> {
     const updateData = assignDefined({
       modTier: data.modTier,
       avgTier: data.avgTier,
+      labels: data.labels,
     });
 
     const map = await this.prisma.workshopItem.findUniqueOrThrow({
@@ -44,7 +46,7 @@ export class MapTierService {
       create: {
         modTier: data.modTier ?? -1,
         avgTier: data.avgTier ?? data.modTier ?? -1,
-        labels: [],
+        labels: data.labels ?? [],
         map: { connect: { id: map.id } },
       },
     });
@@ -101,6 +103,10 @@ export class MapTierService {
 
     if (!data) {
       throw new NotFoundException('Tier data not found');
+    }
+
+    if (data.modTier === -1) {
+      throw new ForbiddenException('User voting was disabled on this map');
     }
 
     const existingEntry = await this.prisma.tierEntry.findUnique({

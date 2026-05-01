@@ -7,6 +7,7 @@ import { createMap, getTierData, setMapTierData, updateMap, uploadImage } from "
 import { DeleteMap } from "../../../features/DataManager";
 import RateTierModal from "../../../features/RateTierModal";
 import { v4 } from "uuid";
+import { Labels } from "../../../widgets/MapTier/labels";
 
 const UpsertMapContainer = ({createNewMap = false}: { createNewMap?: boolean }) => {
   const activeMap = getActiveMap();
@@ -112,7 +113,15 @@ const UpsertMapContainer = ({createNewMap = false}: { createNewMap?: boolean }) 
 
   return (
     <div className="flex flex-col gap-2">
-      <RateTierModal open={openModal} setOpen={setOpenModal} handleSubmit={handleTierSubmit} currentTier={tierData?.modTier} bg="black"/>
+      <RateTierModal
+        open={openModal}
+        setOpen={setOpenModal}
+        handleSubmit={handleTierSubmit}
+        currentTier={tierData?.modTier}
+        bg="black"
+        showLabels={true}
+        currentLabels={tierData?.labels}
+      />
       <Input
         className="text-2xl w-full bg-black/60"
         placeholder="Title (required)"

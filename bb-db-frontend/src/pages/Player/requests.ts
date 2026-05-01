@@ -53,3 +53,11 @@ export const setUserPublicData = async (
     ...data
   })).data;
 };
+
+export const getTierVoteRequests = async (id: string): Promise<TierEntry[]> => {
+  return (await api.get(`/workshop/get-tier-entries?userId=${id}`)).data;
+}
+
+export const getItems = async (ids: string[]): Promise<WorkshopItemHeader[]> => {
+  return (await api.post(`/workshop/get-query-list`, { ids })).data;
+};
