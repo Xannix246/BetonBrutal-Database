@@ -76,10 +76,10 @@ const CollectionEditor = ({ id }: { id?: string }) => {
   }
 
   useEffect(() => {
+    setHydrated(window && true);
+
     (async () => {
       if (id) {
-        setHydrated(window && true);
-        
         const collection = await getCollection(id);
 
         if (

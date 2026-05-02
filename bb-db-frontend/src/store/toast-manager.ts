@@ -38,7 +38,7 @@ api.interceptors.response.use(
       time: 5000,
       type: "error",
       title: "An error occured",
-      description: `${(error.response?.data as { message: string }).message || error.message}`,
+      description: `${(error.response?.data as { message: string })?.message || error.message}`,
     });
     return Promise.reject(error);
   },
