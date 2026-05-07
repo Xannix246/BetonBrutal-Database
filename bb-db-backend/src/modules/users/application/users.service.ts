@@ -70,7 +70,7 @@ export class UserService {
 
     if (
       userData.lastUpdated &&
-      userData.lastUpdated.valueOf() + 1000 * 60 * 60 > new Date().valueOf()
+      Date.now() - userData.lastUpdated.valueOf() < 1000 * 60 * 60
     ) {
       return null;
     }
@@ -86,7 +86,7 @@ export class UserService {
             client_id: env.DISCORD_CLIENT_ID!,
             client_secret: env.DISCORD_CLIENT_SECRET!,
             grant_type: 'refresh_token',
-            refreshToken: userData.refreshToken!,
+            refresh_token: userData.refreshToken!,
           }),
           {
             headers: {
@@ -102,9 +102,8 @@ export class UserService {
           accessToken: data.access_token,
           refreshToken: data.refresh_token,
           accessTokenExpiresAt: new Date(
-            new Date().valueOf() + data.expires_in,
+            new Date().valueOf() + data.expires_in * 1000,
           ),
-          lastUpdated: new Date(),
         },
       });
     }
