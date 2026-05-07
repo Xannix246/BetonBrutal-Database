@@ -4,19 +4,24 @@ import Container from "../shared/Containter/Container";
 import { Toast as ToastType, removeToast } from "../store/toast-manager";
 import clsx from "clsx";
 
-  const getColor = (type: string) => {
-    switch(type) {
-      case "error":
-        return "red";
-      case "warn":
-        return "yellow";
-      case "success":
-        return "green";
-      case "info":
-      default:
-        return "blue";
-    }
-  }
+const colors = {
+  error: {
+    bg: "bg-red",
+    text: "text-red",
+  },
+  warn: {
+    bg: "bg-yellow",
+    text: "text-yellow",
+  },
+  success: {
+    bg: "bg-green",
+    text: "text-green",
+  },
+  info: {
+    bg: "bg-blue",
+    text: "text-blue",
+  },
+};
 
 
 const Toast = ({ toast }: { toast: ToastType }) => {
@@ -26,12 +31,11 @@ const Toast = ({ toast }: { toast: ToastType }) => {
   const progress = useMotionValue(100);
   const width = useTransform(progress, (v) => `${v}%`);
   const x = useMotionValue(0);
-  const [color, setColor] = useState<"red" | "yellow" | "green" | "blue">("blue");
+  const currentColor = colors[toast.type];
 
   useEffect(() => {
     if (!toast.time) return;
 
-    setColor(getColor(toast.type));
     let frame: number;
 
     const tick = () => {
@@ -88,12 +92,12 @@ const Toast = ({ toast }: { toast: ToastType }) => {
           style={{ width }}
           className={clsx(
             "absolute top-0 left-0 h-1",
-            `bg-${color}`,
+            currentColor.bg,
           )}
         />
 
         <div className="p-3">
-          <div className={clsx("uppercase text-2xl", `text-${color}`)}>{toast.title}</div>
+          <div className={clsx("uppercase text-2xl", currentColor.text)}>{toast.title}</div>
           {toast.description && (
             <div className="text-lg text-gray-300">{toast.description}</div>
           )}

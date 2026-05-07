@@ -14,6 +14,8 @@ import { DeleteMap } from "../../features/DataManager";
 import { v4 } from "uuid";
 import { t } from "i18next";
 import { Keys } from "../../../i18n/keys";
+import Dropdown from "../../shared/Dropdown/Dropdown";
+import RateTierModal from "../../features/RateTierModal";
 
 const key = Keys.workshop;
 
@@ -22,6 +24,8 @@ const Workshop = ({ tags }: { tags: string[] }) => {
   const [hydrated, setHydrated] = useState(false);
   const [items, setItems] = useState<WorkshopItemHeader[]>([]);
   const [activeSort, setActiveSort] = useState<SortBy>("newest");
+  const [tier, setTier] = useState<number>();
+  const [showTierModal, setShowTierModal] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const isLoadingMore = useRef(false);
@@ -29,6 +33,7 @@ const Workshop = ({ tags }: { tags: string[] }) => {
   const [openCMenu, setOpenCMenu] = useState(false);
   const targetData = getTargetData();
   const user = getUser();
+  const [width, setWidth] = useState(0);
 
   const menuItems = [
     {
@@ -45,11 +50,11 @@ const Workshop = ({ tags }: { tags: string[] }) => {
     },
   ];
 
-  const loadMaps = async (sort: SortBy, pageNumber: number, append = false) => {
+  const loadMaps = async (sort: SortBy, pageNumber: number, append = false, tier?: number) => {
     if (isLoadingMore.current) return;
     isLoadingMore.current = true;
 
-    const maps = await getMaps(sort, 50, pageNumber, tags);
+    const maps = await getMaps(sort, 50, pageNumber, tags, tier);
     if (maps.length < 50) setHasMore(false);
 
     setItems((prev) => (append ? [...prev, ...maps] : maps));
@@ -62,11 +67,19 @@ const Workshop = ({ tags }: { tags: string[] }) => {
   }, [page]);
 
   useEffect(() => {
+    setTier(undefined);
     setPage(1);
     setHasMore(true);
     setItems([]);
     loadMaps(activeSort, 1, false);
   }, [activeSort]);
+
+  useEffect(() => {
+    setPage(1);
+    setHasMore(true);
+    setItems([]);
+    loadMaps(activeSort, 1, false, tier);
+  }, [tier]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -95,6 +108,7 @@ const Workshop = ({ tags }: { tags: string[] }) => {
 
   useEffect(() => {
     setHydrated(window && true);
+    setWidth(window.innerWidth);
   }, []);
 
   if (!hydrated) return;
@@ -114,7 +128,7 @@ const Workshop = ({ tags }: { tags: string[] }) => {
         <Header isAbsolute={true} />
       </div>
       <div className="flex flex-col min-h-screen justify-between pt-32">
-        <Container className="flex gap-10 text-2xl md:text-4xl tracking-wide md:justify-center place-items-center overflow-x-auto whitespace-nowrap">
+        <Container className="flex gap-10 text-2xl md:text-4xl tracking-wide md:justify-center place-items-center overflow-x-auto md:overflow-x-visible whitespace-nowrap">
           <h1 className="text-white uppercase">{t(key.sort)}</h1>
           <div className="flex gap-5">
             {(tags ? ["newest", "oldest"] : ["newest", "oldest", "mostPopular", "mostPlayed"]).map(
@@ -135,6 +149,36 @@ const Workshop = ({ tags }: { tags: string[] }) => {
               ),
             )}
           </div>
+          {!tags && width > 768 && <div className="relative">
+            <RateTierModal
+              open={showTierModal}
+              setOpen={setShowTierModal}
+              handleSubmit={(tier) => setTier(tier)}
+              currentTier={tier}
+              customTitle={t(key.selectTier)}
+            />
+            <Dropdown
+              button={<>...</>}
+              menu={[
+                {
+                  name: t(key.tierUp),
+                  className: clsx("uppercase", activeSort === "topTier" && "text-green"),
+                  onClick: () => setActiveSort("topTier"),
+                },
+                {
+                  name: t(key.tierDown),
+                  className: clsx("uppercase", activeSort === "lowTier" && "text-green"),
+                  onClick: () => setActiveSort("lowTier"),
+                },
+                {
+                  name: t(key.setTier),
+                  className: "uppercase",
+                  onClick: () => setShowTierModal(true),
+                }
+              ]}
+              className="mt-5.5 -left-24"
+            />
+          </div>}
           {!tags?.includes("Prefabs") && <h1 className="text-white"> |</h1>}
           {!tags && <Button
             className="bg-transparent p-0 uppercase"

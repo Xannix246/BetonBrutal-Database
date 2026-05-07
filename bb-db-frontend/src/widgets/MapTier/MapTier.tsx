@@ -16,7 +16,7 @@ const key = Keys.mapTiers;
 const MapTier = ({ tierData, userVote }: { tierData: TierData, userVote?: TierEntry }) => {
   const user = getUser();
   const [open, setOpen] = useState(false);
-  const color = getColor(tierData.avgTier, 12);
+  const color = getColor(tierData.avgTier, 13);
 
   const handleSubmit = (tier: number) => {
     if (userVote) {
@@ -27,7 +27,7 @@ const MapTier = ({ tierData, userVote }: { tierData: TierData, userVote?: TierEn
   }
 
   return (
-    <Container className="w-full md:min-w-18 md:w-18 text-white flex md:flex-col gap-4 place-items-center justify-center md:justify-start h-fit md:h-fit md:min-h-146">
+    <Container className="w-full md:min-w-18 md:w-18 text-white flex flex-wrap md:flex-nowrap md:flex-col gap-2 place-items-center justify-center md:justify-start h-fit md:h-fit md:min-h-146">
       <TierLabel
         icon={
           <div

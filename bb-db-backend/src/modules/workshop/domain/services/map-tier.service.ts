@@ -15,7 +15,7 @@ export class MapTierService {
   constructor(private readonly prisma: PrismaService) {}
 
   private validateTier(tier: number): void {
-    if (tier < -1 || tier > 10) {
+    if (tier < -1 || tier > 11) {
       throw new BadRequestException('Tier number too small or too large');
     }
   }

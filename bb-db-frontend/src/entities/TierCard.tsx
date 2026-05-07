@@ -25,7 +25,7 @@ const TierCard = ({ entry, mapName }: TierCard) => {
           <p
             className="text-[hsl(var(--h)_80_40)]"
             style={{
-              "--h": getColor(entry.tier, 12)[0],
+              "--h": getColor(entry.tier, 13)[0],
             } as React.CSSProperties}
           >{entry.tier}</p>
         </div>

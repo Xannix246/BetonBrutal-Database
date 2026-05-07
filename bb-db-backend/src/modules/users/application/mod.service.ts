@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Role } from '@prisma/client';
-import { auth, UserRoleSession } from 'src/modules/auth/auth.module';
+import { auth, UserRoleSession } from '../../auth/services/auth.shared';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { WorkshopService } from 'src/modules/workshop/domain/services/workshop.service';
 

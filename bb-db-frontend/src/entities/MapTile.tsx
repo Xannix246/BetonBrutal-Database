@@ -16,7 +16,7 @@ const getTileSize = (title: string, ratingUp: number) => {
 const MapTile = ({ item, disableSizeClass = false }: Props) => {
   const sizeClass = getTileSize(item.title, item.ratingUp);
   const user = getUser();
-  const color = getColor(item.rating ?? 0, 12);
+  const color = getColor(item.rating ?? 0, 13);
 
   return (
     <a
@@ -50,7 +50,7 @@ const MapTile = ({ item, disableSizeClass = false }: Props) => {
             </h2>
             <div className="flex justify-between place-items-center">
               <p className="text-lg text-gray-300 truncate text-ellipsis whitespace-nowrap">BY {item.creator?.toUpperCase() || "UNKNOWN"}</p>
-              {item.rating && <p 
+              {item.rating !== undefined && <p 
                 className={clsx("text-xl", item.rating === -1 ? "text-gray-400" : "text-[hsl(var(--h)_80_40)]" )}
                 style={{
                   "--h": color[0],

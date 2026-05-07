@@ -60,6 +60,7 @@ export class WorkshopController {
     @Query('tags', new ParseArrayPipe({ optional: true })) tags: string[],
     @Query('timeRange') timeRange?: 'day' | 'week' | 'month' | 'year',
     @Query('page', new ParseIntPipe({ optional: true })) page: number = 1,
+    @Query('tier', new ParseIntPipe({ optional: true })) tier?: number,
   ): Promise<WorkshopItemHeader[]> {
     if (!quantity) {
       throw new BadRequestException('Quantity is required');
@@ -72,6 +73,7 @@ export class WorkshopController {
       timeRange,
       page,
       tags,
+      tier,
     );
   }
 

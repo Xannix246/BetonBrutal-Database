@@ -9,6 +9,8 @@ import { env } from 'process';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { setEventEmitter } from './shared/event-emitter';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -22,6 +24,8 @@ async function bootstrap() {
 
     bodyParser.json()(req, res, next);
   });
+
+  setEventEmitter(app.get(EventEmitter2));
 
   app.enableCors({
     origin: [env.CLIENT_URL, env.MIRROR_URL],

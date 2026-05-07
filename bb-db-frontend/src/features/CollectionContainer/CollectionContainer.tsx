@@ -49,8 +49,8 @@ const CollectionContainer = ({ collection }: { collection: Collection }) => {
       <div className={clsx(
         "justify-center gap-8 w-full",
         maps.length <= 3 && "flex flex-col lg:flex-row h-156 lg:h-196 overflow-clip",
-        maps.length > 3 && maps.length <= 6 && "flex flex-wrap justify-center max-w-[1400px] mx-auto h-306 overflow-clip",
-        maps.length > 6 && "flex flex-col w-full h-full sm:grid sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[200px] lg:auto-rows-[300px]"
+        maps.length > 3 && maps.length <= 6 && "flex flex-wrap justify-center max-w-[1400px] mx-auto",
+        maps.length > 6 && "flex flex-col sm:grid sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[200px] lg:auto-rows-[300px]"
       )}>
         {maps.map((map) => (
           maps.length <= 6 ?

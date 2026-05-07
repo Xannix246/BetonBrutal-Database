@@ -73,6 +73,9 @@ enum Labels {
   nonLinear
   chockepoints
   shitpost
+  bath
+  random
+  precision
 }
 
 enum TierStatus {

@@ -18,6 +18,7 @@ const RateTierModal = ({
   handleSubmit,
   bg,
   showLabels,
+  customTitle,
 }: {
   open: boolean;
   setOpen: (val: boolean) => void;
@@ -26,6 +27,7 @@ const RateTierModal = ({
   handleSubmit: (tier: number, labels?: Labels[]) => void;
   bg?: "black" | "gray";
   showLabels?: boolean;
+  customTitle?: string;
 }) => {
   const [selectedLabels, setSelectedLabels] = useState<Labels[]>([]);
   const labels: Labels[] = [
@@ -45,8 +47,11 @@ const RateTierModal = ({
     Labels.nonLinear,
     Labels.chockepoints,
     Labels.shitpost,
+    Labels.bath,
+    Labels.random,
+    Labels.precision,
   ];
-  const max = 12;
+  const max = 13;
 
   useEffect(() => {
     setSelectedLabels(currentLabels ?? []);
@@ -65,11 +70,11 @@ const RateTierModal = ({
     >
       <div
         className={clsx(
-          "p-5 md:p-10 w-full h-full flex flex-col gap-6 place-items-center",
+          "p-5 md:p-10 w-full h-full flex flex-col gap-6 place-items-center max-w-5xl",
           bg !== "black" && "bg-white/10",
         )}
       >
-        <h1 className="text-2xl md:text-4xl uppercase">{t(key.rateMap)}</h1>
+        <h1 className="text-2xl md:text-4xl uppercase">{customTitle ?? t(key.rateMap)}</h1>
 
         <div className="flex gap-3 justify-items-center">
           {Array.from({ length: max }, (_, i) => {
@@ -106,7 +111,7 @@ const RateTierModal = ({
           })}
         </div>
 
-        {showLabels && <div className="flex gap-3 justify-items-center">
+        {showLabels && <div className="flex gap-3 justify-items-center w-full flex-wrap justify-center">
           {labels.map((label) => (
             <TierLabel
               key={label}
@@ -135,7 +140,7 @@ const RateTierModal = ({
           ))}
         </div>}
 
-        {currentTier && (
+        {currentTier !== undefined && (
           <div className="text-center text-gray-300 text-2xl">
             {t(key.selected)} <span className="text-2xl">{currentTier}</span>
           </div>

@@ -9,13 +9,14 @@ import {
   PiEye,
   PiCheck,
   PiArrowsSplit,
+  PiTarget,
 } from "react-icons/pi";
 import { GiHook } from "react-icons/gi";
 import { CgArrowsShrinkH } from "react-icons/cg";
 import { ImMoveUp } from "react-icons/im";
-import { FaRegFaceAngry } from "react-icons/fa6";
+import { FaRegFaceAngry, FaFaucetDrip } from "react-icons/fa6";
 import { TbArrowBounce } from "react-icons/tb";
-import { LiaPoopSolid } from "react-icons/lia";
+import { LiaPoopSolid, LiaDiceD6Solid } from "react-icons/lia";
 import { Keys } from "../../../i18n/keys";
 import { t } from "i18next";
 
@@ -34,7 +35,8 @@ export const tiersTooltips: Record<string, string> = {
   "tier7": t(tips.tier7),
   "tier8": t(tips.tier8),
   "tier9": t(tips.tier9),
-  "tier10":t(tips.tier10),
+  "tier10": t(tips.tier10),
+  "tier11": t(tips.tier11),
 };
 
 export const tiersLabels: Record<Labels, { icon: React.ReactNode, tooltip: string, color?: string }> = {
@@ -117,5 +119,20 @@ export const tiersLabels: Record<Labels, { icon: React.ReactNode, tooltip: strin
     icon: <LiaPoopSolid className="w-14 h-auto"/>,
     tooltip: t(lbs.shitpost),
     color: "bg-white/10",
-  }
+  },
+  bath: {
+    icon: <FaFaucetDrip className="w-14 h-auto"/>,
+    tooltip: t(lbs.bath),
+    color: "bg-white/10",
+  },
+  random: {
+    icon: <LiaDiceD6Solid className="w-14 h-auto"/>,
+    tooltip: t(lbs.random),
+    color: "bg-white/10",
+  },
+  precision: {
+    icon: <PiTarget className="w-14 h-auto"/>,
+    tooltip: t(lbs.precision),
+    color: "bg-white/10",
+  },
 };

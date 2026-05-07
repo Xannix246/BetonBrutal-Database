@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 
-declare type SortBy = 'mostPopular' | 'newest' | 'oldest' | 'mostPlayed';
+declare type SortBy = 'mostPopular' | 'newest' | 'oldest' | 'mostPlayed' | 'topTier' | 'lowTier';
 
 declare type WorkshopItem = {
   id: string;

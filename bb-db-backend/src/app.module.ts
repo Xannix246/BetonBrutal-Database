@@ -12,6 +12,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { CollectionsModule } from './modules/collections/collections.module';
 import { BullModule } from '@nestjs/bullmq';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Controller()
 class AppController {
@@ -43,6 +44,7 @@ class AppController {
         port: 6379,
       },
     }),
+    EventEmitterModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [],

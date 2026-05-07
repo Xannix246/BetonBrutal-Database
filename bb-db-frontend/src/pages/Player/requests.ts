@@ -1,4 +1,7 @@
+import { v4 } from "uuid";
 import { api } from "../../features/Auth";
+import { setUser } from "../../store/store";
+import { addToast } from "../../store/toast-manager";
 
 export const getUser = async (id: string): Promise<User> => {
   return (await api.get(`/user/s-id/${id}`)).data;
@@ -60,4 +63,26 @@ export const getTierVoteRequests = async (id: string): Promise<TierEntry[]> => {
 
 export const getItems = async (ids: string[]): Promise<WorkshopItemHeader[]> => {
   return (await api.post(`/workshop/get-query-list`, { ids })).data;
+};
+
+export const syncDiscordData = async (): Promise<void> => {
+  const data = (await api.get("/user/me/update")).data;
+  console.log(data);
+  if(data) {
+    setUser(data);
+    addToast({
+      id: v4(),
+      title: "Data was updated successfully",
+      time: 5000,
+      type: "success",
+    });
+  } else {
+    addToast({
+      id: v4(),
+      title: "Sync cooldown",
+      description: "Seems like you already synced data recently. Please try again a bit later",
+      time: 5000,
+      type: "info",
+    });
+  }
 };
