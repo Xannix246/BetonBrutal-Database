@@ -47,6 +47,16 @@ export class WorkshopService {
     await this.reqQueue.add('update-map', { id });
   }
 
+  async clearQueue(): Promise<void> {
+    await this.downloadQueue.pause();
+    await this.downloadQueue.obliterate({ force: true });
+    await this.downloadQueue.resume();
+
+    await this.reqQueue.pause();
+    await this.reqQueue.obliterate({ force: true });
+    await this.reqQueue.resume();
+  }
+
   async getTotal(): Promise<number> {
     return await this.steamApi.getTotal();
   }

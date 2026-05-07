@@ -143,13 +143,35 @@ export class WorkshopController {
   @Get('force-update')
   @OptionalAuth()
   @ApiExcludeEndpoint()
-  async forceUpdate(@Query('secret') secret: string, @Res() res: Response) {
+  async forceUpdate(
+    @Query('secret') secret: string,
+    @Query('refreshDb', new ParseBoolPipe({ optional: true }))
+    refreshDb: boolean,
+    @Query('fetchBblb', new ParseBoolPipe({ optional: true }))
+    fetchBblb: boolean,
+    @Query('clearQueue', new ParseBoolPipe({ optional: true }))
+    clearQueue: boolean,
+    @Res() res: Response,
+  ) {
     if (secret !== env.FORCE_UPDATE_SECRET) {
       return res.status(HttpStatus.FORBIDDEN).send();
     }
 
-    void (await this.refreshDb.execute());
-    void (await this.fetchBblb.execute());
+    if (refreshDb) {
+      console.log('db refreshing...');
+      void (await this.refreshDb.execute());
+    }
+
+    if (fetchBblb) {
+      console.log('bblb fetching...');
+      void (await this.fetchBblb.execute());
+    }
+
+    if (clearQueue) {
+      console.log('clearing queue...');
+      void this.workshopService.clearQueue();
+    }
+
     return res.status(HttpStatus.OK).json({ message: 'done' }).send();
   }
 
