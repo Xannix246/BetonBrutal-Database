@@ -51,10 +51,12 @@ export class WorkshopService {
     await this.downloadQueue.pause();
     await this.downloadQueue.obliterate({ force: true });
     await this.downloadQueue.resume();
+    await this.downloadQueue.clean(0, 10000);
 
     await this.reqQueue.pause();
     await this.reqQueue.obliterate({ force: true });
     await this.reqQueue.resume();
+    await this.reqQueue.clean(0, 10000);
   }
 
   async getTotal(): Promise<number> {
