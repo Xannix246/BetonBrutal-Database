@@ -310,7 +310,7 @@ export class WorkshopService {
         previewUrl: item.previewUrl,
         previews: sendPreviews ? item.previews : [],
         rating: (await this.tierService.getTierData(item.steamId))?.avgTier,
-        isHidden: item.isHidden ? item.isHidden : undefined,
+        isHidden: item.isHidden !== null ? item.isHidden : undefined,
       });
     }
 
