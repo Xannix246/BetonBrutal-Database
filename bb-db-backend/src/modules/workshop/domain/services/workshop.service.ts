@@ -92,7 +92,10 @@ export class WorkshopService {
     } = {};
 
     const tierWhere: {
-      modTier?: number;
+      modTier?: {
+        not?: number;
+        equals?: number;
+      };
     } = {};
 
     let leaderboardsEntries: string[] | undefined;
@@ -122,7 +125,11 @@ export class WorkshopService {
       case 'topTier':
       case 'lowTier':
         orderBy = {};
-        if (tier !== undefined) tierWhere.modTier = tier;
+        if (tier !== undefined) {
+          tierWhere.modTier = { equals: tier };
+        } else {
+          tierWhere.modTier = { not: -1 };
+        }
         tierEntries = await this.prisma.tierData.findMany({
           take: quantity,
           skip: (page - 1) * quantity,
@@ -310,7 +317,6 @@ export class WorkshopService {
         previewUrl: item.previewUrl,
         previews: sendPreviews ? item.previews : [],
         rating: (await this.tierService.getTierData(item.steamId))?.avgTier,
-        isHidden: item.isHidden !== null ? item.isHidden : undefined,
       });
     }
 
