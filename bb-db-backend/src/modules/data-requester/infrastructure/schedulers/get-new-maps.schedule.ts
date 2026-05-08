@@ -15,7 +15,7 @@ export class GetNewMapsScheduler {
     private readonly steamCmd: SteamCmdService,
   ) {}
 
-  @Cron(CronExpression.EVERY_10_SECONDS)
+  @Cron(CronExpression.EVERY_10_MINUTES)
   async handleCron() {
     this.logger.log('Checking for new maps in Steam Workshop...');
 
