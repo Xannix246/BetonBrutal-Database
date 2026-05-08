@@ -15,7 +15,7 @@ export class GetNewMapsScheduler {
     private readonly steamCmd: SteamCmdService,
   ) {}
 
-  @Cron(CronExpression.EVERY_10_MINUTES)
+  @Cron(CronExpression.EVERY_10_SECONDS)
   async handleCron() {
     this.logger.log('Checking for new maps in Steam Workshop...');
 
@@ -34,6 +34,8 @@ export class GetNewMapsScheduler {
     const newItems = items.filter(
       (i) => Math.floor(i.createDate.getTime() / 1000) > lastTimestamp,
     );
+
+    console.log(lastMap, lastTimestamp, newItems);
 
     newItemsCount = newItems.length;
 

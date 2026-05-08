@@ -31,6 +31,7 @@ declare type WorkshopItemHeader = {
   linkedCollection?: string;
   tags?: string[];
   rating?: number;
+  isHidden?: boolean;
 };
 
 declare type Player = {
