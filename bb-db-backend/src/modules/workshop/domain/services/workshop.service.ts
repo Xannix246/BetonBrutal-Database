@@ -439,7 +439,7 @@ export class WorkshopService {
 
   async searchWorkshopItems(
     input: string,
-  ): Promise<WorkshopItem | WorkshopItemHeader[] | null> {
+  ): Promise<WorkshopItem[] | WorkshopItemHeader[] | null> {
     const parsed = parseSearchInput(input);
 
     if (parsed.id) {
@@ -449,10 +449,12 @@ export class WorkshopService {
 
       if (!item) return null;
 
-      return {
-        ...item,
-        id: item.steamId,
-      };
+      return [
+        {
+          ...item,
+          id: item.steamId,
+        },
+      ];
     }
 
     const items = await this.prisma.workshopItem.findMany({
