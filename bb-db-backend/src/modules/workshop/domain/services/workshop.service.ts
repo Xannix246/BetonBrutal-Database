@@ -12,6 +12,7 @@ import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { WebsocketGateway } from 'src/modules/websocket/presentation/websocket.gateway';
 import { parseSearchInput } from 'src/shared/parseSearchUriData';
 import { MapTierService } from './map-tier.service';
+import { TierData } from '@prisma/client';
 
 @Injectable()
 export class WorkshopService {
@@ -46,6 +47,18 @@ export class WorkshopService {
     await this.reqQueue.add('update-map', { id });
   }
 
+  async clearQueue(): Promise<void> {
+    await this.downloadQueue.pause();
+    await this.downloadQueue.obliterate({ force: true });
+    await this.downloadQueue.resume();
+    await this.downloadQueue.clean(0, 10000);
+
+    await this.reqQueue.pause();
+    await this.reqQueue.obliterate({ force: true });
+    await this.reqQueue.resume();
+    await this.reqQueue.clean(0, 10000);
+  }
+
   async getTotal(): Promise<number> {
     return await this.steamApi.getTotal();
   }
@@ -57,6 +70,7 @@ export class WorkshopService {
     timeRange?: 'day' | 'week' | 'month' | 'year',
     page: number = 1,
     tags?: string[],
+    tier?: number,
   ): Promise<WorkshopItemHeader[]> {
     let orderBy: {
       ratingUp?: 'asc' | 'desc';
@@ -71,10 +85,21 @@ export class WorkshopService {
         hasSome?: string[];
         equals?: string[];
       };
+      steamId?: {
+        in: string[];
+      };
       isHidden?: boolean;
     } = {};
 
+    const tierWhere: {
+      modTier?: {
+        not?: number;
+        equals?: number;
+      };
+    } = {};
+
     let leaderboardsEntries: string[] | undefined;
+    let tierEntries: TierData[] | undefined;
 
     switch (sortBy) {
       case 'mostPopular':
@@ -96,6 +121,21 @@ export class WorkshopService {
             where: { mapId: { notIn: this.mainMaps } },
           })
         ).map((entry) => entry.mapId);
+        break;
+      case 'topTier':
+      case 'lowTier':
+        orderBy = {};
+        if (tier !== undefined) {
+          tierWhere.modTier = { equals: tier };
+        } else {
+          tierWhere.modTier = { not: -1 };
+        }
+        tierEntries = await this.prisma.tierData.findMany({
+          take: quantity,
+          skip: (page - 1) * quantity,
+          orderBy: { avgTier: sortBy === 'lowTier' ? 'asc' : 'desc' },
+          where: tierWhere,
+        });
         break;
       default:
         orderBy = { createDate: 'desc' };
@@ -133,20 +173,35 @@ export class WorkshopService {
 
     where.isHidden = false;
 
-    const items = leaderboardsEntries
-      ? await this.prisma.workshopItem.findMany({
-          where: { steamId: { in: leaderboardsEntries } },
-        })
-      : await this.prisma.workshopItem.findMany({
-          take: quantity,
-          skip: (page - 1) * quantity,
-          orderBy,
-          where,
-        });
+    if (leaderboardsEntries) {
+      where.steamId = { in: leaderboardsEntries };
+    }
+
+    if (tierEntries) {
+      where.steamId = { in: tierEntries.map((data) => data.mapId) };
+    }
+
+    const items = await this.prisma.workshopItem.findMany({
+      take: quantity,
+      skip: tierEntries ? 0 : (page - 1) * quantity,
+      orderBy,
+      where,
+    });
 
     if (leaderboardsEntries) {
       const orderMap = new Map(
         leaderboardsEntries.map((id, index) => [id, index]),
+      );
+
+      items.sort(
+        (a, b) =>
+          (orderMap.get(a.steamId) ?? 0) - (orderMap.get(b.steamId) ?? 0),
+      );
+    }
+
+    if (tierEntries) {
+      const orderMap = new Map(
+        tierEntries.map((data, index) => [data.mapId, index]),
       );
 
       items.sort(
@@ -391,7 +446,7 @@ export class WorkshopService {
 
   async searchWorkshopItems(
     input: string,
-  ): Promise<WorkshopItem | WorkshopItemHeader[] | null> {
+  ): Promise<WorkshopItem[] | WorkshopItemHeader[] | null> {
     const parsed = parseSearchInput(input);
 
     if (parsed.id) {
@@ -401,10 +456,12 @@ export class WorkshopService {
 
       if (!item) return null;
 
-      return {
-        ...item,
-        id: item.steamId,
-      };
+      return [
+        {
+          ...item,
+          id: item.steamId,
+        },
+      ];
     }
 
     const items = await this.prisma.workshopItem.findMany({

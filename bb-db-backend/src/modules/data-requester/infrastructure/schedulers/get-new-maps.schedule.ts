@@ -35,6 +35,8 @@ export class GetNewMapsScheduler {
       (i) => Math.floor(i.createDate.getTime() / 1000) > lastTimestamp,
     );
 
+    console.log(lastMap, lastTimestamp, newItems);
+
     newItemsCount = newItems.length;
 
     for (const item of newItems) {
@@ -58,6 +60,7 @@ export class GetNewMapsScheduler {
           description: item.description,
           filename: isDownloaded ? isDownloaded : null,
           tags: item.tags,
+          isHidden: false,
         },
         create: {
           steamId: item.steamId,

@@ -34,7 +34,11 @@
     "mostPopular": "Most popular",
     "mostPlayed": "Most played",
     "randomMap": "Random map",
-    "create": "Create new collection"
+    "create": "Create new collection",
+    "selectTier": "Select tier",
+    "tierUp": "Sort from highest to lowest tier",
+    "tierDown": "Sort from lowest to highest tier",
+    "setTier": "Set tier"
   },
   "workshopItem": {
     "upload": "Upload map",
@@ -74,7 +78,8 @@
     "add": "Add link",
     "cancel": "Cancel",
     "save": "Save",
-    "edit": "Edit profile"
+    "edit": "Edit profile",
+    "syncData": "Sync Discord data"
   },
   "favorites": {},
   "leaderboard": {
@@ -178,25 +183,29 @@
       "tier7": "This map is challenging, requiring highly advanced skill and time investment to complete. In general, such maps may be compared to the most difficult spots of BETON BATH DLC.",
       "tier8": "This map is highly difficult, usually involving complex mechanics and long chains of dangerous and difficult jumps at most spots. The gameplay of such maps can be compared to the hardest sections of BETON BIRTHDAY official map.",
       "tier9": "This map classifies as insanely difficult, with gameplay demand being significantly higher than in any of official maps. Such maps are no longer available to most players of the game and may require multiple hours of practicing and attempting to complete.",
-      "tier10": "This map is extremely difficult, accessible to only the best players of BETON BRUTAL. The gameplay requires extreme precision and skill to be able to play through it comfortably. This tier is given to the hardest legitimately verified custom maps at the whole game."
+      "tier10": "This map is extremely difficult, accessible to only the best players of BETON BRUTAL. The gameplay requires extreme precision and skill to be able to play through it comfortably. This tier is given to the hardest legitimately verified custom maps at the whole game.",
+      "tier11": "This map is so difficult, that this tier was created specifically to place it into alongside few other such maps. In general, this tier is given to such maps where tier 10 was 'too easy'. Yet, they were still somehow verified. May God be with you."
     },
     "labels": {
       "grapples": "GRAPPLES \n This map's difficulty is mostly built on complex chains of jumps involving grappling hooks.",
       "wallruns": "WALLRUNS \n This map's difficulty is mostly derived from complex and difficult chains of a wallrun mechanic.",
-      "trampolines": "TRAMPOLINES \n this map tests the player's skill to use the trampolines effectively at hardest spots.",
-      "ice": "ICE \n this map tests the player's skill to complete difficult segments involving complex mechanics with slippery ice surface.",
-      "nerveControl": "NERVE CONTROL \n this map tests the player's abilities to handle stress on risky and difficult segments.",
-      "xxl": "XXL \n this map has an extreme gameplay length, sometimes requiring up to hours of playtime even on speedrunning pace.",
-      "coyotes": "COYOTES \n this map involves jump segments requiring perfect (coyote-jump) timing to pass.",
-      "pfp": "P/F/P \n this map includes several extremely difficult frame- or pixelperfect jumps to complete.",
-      "gimicky": "GIMICKY \n this map utilizes some experimental, unintuitive gameplay mechanics and might be confusing to learn and beat.",
-      "puzzle": "PUZZLE \n this map is built around quest or puzzle gameplay elements, requiring some task to solve / escape.",
-      "moving": "MOVING \n this map utilizes new dynamic elements and mechanics from the 'moving blocks' update.",
-      "showcase": "SHOWCASE \n this map serves as an experimental visual demonstration of beautiful imagery, rather than a classic gameplay.",
-      "overall": "OVERALL \n this map does not have any specific skillset it tests, instead focusing on complex understanding of all the existing game mechanics.",
-      "nonLinear": "NON-LINEAR \n this map consists of numerous possible, sometimes hidden ways to complete instead of being completely linear.",
-      "chockepoints": "CHOKEPOINTS \n this map features several spots of heavily disbalanced difficulty spikes, with a high risk to fail and lose progress multiple times.",
-      "shitpost": "SHITPOST \n this map was not intended as a serious project, instead of being... complete SHIT to play and often to look at too."
+      "trampolines": "TRAMPOLINES \n This map tests the player's skill to use the trampolines effectively at hardest spots.",
+      "ice": "ICE \n This map tests the player's skill to complete difficult segments involving complex mechanics with slippery ice surface.",
+      "nerveControl": "NERVE CONTROL \n This map tests the player's abilities to handle stress on risky and difficult segments.",
+      "xxl": "XXL \n This map has an extreme gameplay length, sometimes requiring up to hours of playtime even on speedrunning pace.",
+      "coyotes": "COYOTES \n This map involves jump segments requiring perfect (coyote-jump) timing to pass.",
+      "pfp": "P/F/P \n This map includes several extremely difficult frame- or pixelperfect jumps to complete.",
+      "gimicky": "GIMICKY \n This map utilizes some experimental, unintuitive gameplay mechanics and might be confusing to learn and beat.",
+      "puzzle": "PUZZLE \n This map is built around quest or puzzle gameplay elements, requiring some task to solve / escape.",
+      "moving": "MOVING \n This map utilizes new dynamic elements and mechanics from the 'moving blocks' update.",
+      "showcase": "SHOWCASE \n This map serves as an experimental visual demonstration of beautiful imagery, rather than a classic gameplay.",
+      "overall": "OVERALL \n This map does not have any specific skillset it tests, instead focusing on complex understanding of all the existing game mechanics.",
+      "nonLinear": "NON-LINEAR \n This map consists of numerous possible, sometimes hidden ways to complete instead of being completely linear.",
+      "chockepoints": "CHOKEPOINTS \n This map features several spots of heavily disbalanced difficulty spikes, with a high risk to fail and lose progress multiple times.",
+      "shitpost": "SHITPOST \n This map was not intended as a serious project, instead of being... complete SHIT to play and often to look at too.",
+      "bath": "BATH \n This map is based on water-related gameplay elements or focuses on BETON BATH type gameplay in its majority.",
+      "random": "RANDOM \n This map has a considerable luck / random factor influence on its gameplay difficulty and completion stability.",
+      "precision": "PRECISION \n This map demands high movement accuracy and controls precision to play and complete effectively."
     }
   }
 }

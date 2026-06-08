@@ -106,6 +106,8 @@ export class SteamApiService {
       )
     )?.response;
 
+    // console.log(response);
+
     if (!response) return [];
 
     const returnedItems: WorkshopItem[] = [];

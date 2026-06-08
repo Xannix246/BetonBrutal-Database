@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { getUserPublicData, setUserPublicData, uploadImage } from "./requests";
+import { getUserPublicData, setUserPublicData, syncDiscordData, uploadImage } from "./requests";
 import clsx from "clsx";
 import Container from "../../shared/Containter/Container";
 import Input from "../../shared/Input/Input";
@@ -226,6 +226,10 @@ const UserProfile = ({ user, player, publicData, setPublicData }: Props) => {
                   className="uppercase p-3 bg-green/50 w-full"
                   onClick={onSave}
                 >{t(key.save)}</Button>
+                <Button
+                  className="uppercase p-3 bg-blue/50 w-full"
+                  onClick={syncDiscordData}
+                >{t(key.syncData)}</Button>
               </div>
             ) : (
               <Button

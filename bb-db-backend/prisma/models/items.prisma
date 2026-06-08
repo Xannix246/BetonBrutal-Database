@@ -20,7 +20,7 @@ model WorkshopItem {
   previews    String[]
   filename    String? // if map was uploaded
   tags        String[] // for prefabs or other future items
-  isHidden    Boolean?
+  isHidden    Boolean? @default(false)
 
   linkedCollection String?     @unique
   collection       Collection? @relation(fields: [linkedCollection], references: [id], onDelete: Cascade) // if tag - collection
@@ -73,6 +73,9 @@ enum Labels {
   nonLinear
   chockepoints
   shitpost
+  bath
+  random
+  precision
 }
 
 enum TierStatus {

@@ -15,6 +15,9 @@ export const Labels = {
   nonLinear: "nonLinear",
   chockepoints: "chockepoints",
   shitpost: "shitpost",
+  bath: "bath",
+  random: "random",
+  precision: "precision",
 } as const;
 
 export type Labels = typeof Labels[keyof typeof Labels];

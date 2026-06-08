@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 
-declare type SortBy = 'mostPopular' | 'newest' | 'oldest' | 'mostPlayed';
+declare type SortBy = 'mostPopular' | 'newest' | 'oldest' | 'mostPlayed' | 'topTier' | 'lowTier';
 
 declare type WorkshopItem = {
   id: string;
@@ -31,6 +31,7 @@ declare type WorkshopItemHeader = {
   linkedCollection?: string;
   tags?: string[];
   rating?: number;
+  isHidden?: boolean;
 };
 
 declare type Player = {

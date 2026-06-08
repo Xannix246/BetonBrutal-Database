@@ -178,7 +178,8 @@
       "tier7": "",
       "tier8": "",
       "tier9": "",
-      "tier10": ""
+      "tier10": "",
+      "tier11": ""
     },
     "labels": {
       "grapples": "",
@@ -196,7 +197,10 @@
       "overall": "",
       "nonLinear": "",
       "chockepoints": "",
-      "shitpost": ""
+      "shitpost": "",
+      "bath": "",
+      "random": "",
+      "precision": ""
     }
   }
 }

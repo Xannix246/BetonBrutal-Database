@@ -38,6 +38,10 @@ export const Keys = {
     mostPlayed: "workshop.mostPlayed",
     randomMap: "workshop.randomMap",
     create: "workshop.create",
+    selectTier: "workshop.selectTier",
+    tierUp: "workshop.tierUp",
+    tierDown: "workshop.tierDown",
+    setTier: "workshop.setTier",
   },
 
   workshopItem: {
@@ -80,6 +84,7 @@ export const Keys = {
     cancel: "player.cancel",
     save: "player.save",
     edit: "player.edit",
+    syncData: "player.syncData",
   },
 
   leaderboard: {
@@ -190,6 +195,7 @@ export const Keys = {
       tier8: "mapTiers.tooltips.tier8",
       tier9: "mapTiers.tooltips.tier9",
       tier10: "mapTiers.tooltips.tier10",
+      tier11: "mapTiers.tooltips.tier11",
     },
     labels: {
       grapples: "mapTiers.labels.grapples",
@@ -208,6 +214,9 @@ export const Keys = {
       nonLinear: "mapTiers.labels.nonLinear",
       chockepoints: "mapTiers.labels.chockepoints",
       shitpost: "mapTiers.labels.shitpost",
+      bath: "mapTiers.labels.bath",
+      random: "mapTiers.labels.random",
+      precision: "mapTiers.labels.precision",
     },
   }
 } as const;

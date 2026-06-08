@@ -42,7 +42,7 @@ export const getUserTierEntry = async (
   userId: string,
 ): Promise<TierEntry | undefined> => {
   return (await api.get(
-    `/workshop/get-tier-entries?userId=${userId}&mapId=${mapId}&type=accepted`
+    `/workshop/get-tier-entries?userId=${userId}&mapId=${mapId}`
   )).data[0] ?? undefined;
 }
 

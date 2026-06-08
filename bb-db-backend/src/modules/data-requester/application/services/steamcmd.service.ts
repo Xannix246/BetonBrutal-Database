@@ -97,6 +97,11 @@ export class SteamCmdService implements OnModuleInit {
     }
 
     if (data.includes('steamcmd has been disconnected')) {
+      if (this.current) {
+        this.current.reject(new Error(`SteamCMD disconnected`));
+        this.current = null;
+      }
+
       this.ptyProcess.kill();
 
       setTimeout(() => {
@@ -108,13 +113,37 @@ export class SteamCmdService implements OnModuleInit {
   }
 
   private send(command: string) {
-    // this.logger.log(`> ${command.trim()}`);
     this.ptyProcess.write(command.trim() + '\n');
   }
 
   enqueue(id: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.queue.push({ id, resolve, reject });
+      const timeout = setTimeout(
+        () => {
+          if (this.current?.id === id) {
+            this.logger.error(`Download timeout for ${id}`);
+
+            this.current = null;
+            this.processNext();
+
+            reject(new Error(`Timeout downloading ${id}`));
+          }
+        },
+        1000 * 60 * 5,
+      );
+
+      this.queue.push({
+        id,
+        resolve: () => {
+          clearTimeout(timeout);
+          resolve();
+        },
+        reject: (e) => {
+          clearTimeout(timeout);
+          reject(e);
+        },
+      });
+
       this.processNext();
     });
   }

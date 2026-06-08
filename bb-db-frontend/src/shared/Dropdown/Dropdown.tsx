@@ -49,7 +49,7 @@ const Dropdown = ({ button, className, menu }: Props) => {
         <div
           className={clsx(
             className,
-            "absolute right-0 mt-3 min-w-52 bg-black/70 text-white text-xl shadow-lg z-50"
+            "absolute right-0 mt-3 min-w-52 w-fit bg-black/70 text-white text-xl shadow-lg z-30"
           )}
         >
           {menu.map((item, i) => (

@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import Footer from "../../widgets/Footer/Footer";
 import Header from "../../widgets/Header/Header";
 import Container from "../../shared/Containter/Container";
-import { getPlayer, getPlayerMaps, getPlayerReplays, getUser, getUserFavorites } from "./requests";
+import { getPlayer, getPlayerMaps, getPlayerReplays, getUser as getUserData, getUserFavorites } from "./requests";
 import MapTile from "../../entities/MapTile";
 import Background from "../../widgets/Background/Background";
-import { getPrevLink } from "../../store/store";
+import { getPrevLink, getUser } from "../../store/store";
 import clsx from "clsx";
 import LeaderboardTable from "../../widgets/LeaderboardTable/LeaderboardTable";
 import UserProfile from "./UserProfile";
@@ -23,6 +23,7 @@ const PlayerPage = ({ id }: { id: string }) => {
   const source = getPrevLink();
   const [page, setPage] = useState<"mapCreator" | "run" | "favorites">(source);
   const [user, setUser] = useState<User>();
+  const globalUser = getUser();
   const [publicData, setPublicData] = useState<PublicData>();
 
   useEffect(() => {
@@ -33,7 +34,7 @@ const PlayerPage = ({ id }: { id: string }) => {
       setPlayer(player);
 
       if(player) {
-        const user = await getUser(player.id);
+        const user = await getUserData(player.id);
         setUser(user);
         setReplays(await getPlayerReplays(player.replays));
       }
@@ -41,6 +42,10 @@ const PlayerPage = ({ id }: { id: string }) => {
       setLoaded(true);
     })();
   }, []);
+
+  useEffect(() => {
+    setUser(globalUser);
+  }, [globalUser]);
 
   useEffect(() => {
     const onPageUpdate = async () => {

@@ -38,14 +38,19 @@ export class UsersController {
     return { user: session.user };
   }
 
+  @Get('me/update')
+  updateProfile(@Session() session: UserSession) {
+    return this.userSevice.syncUserData(session.user.id);
+  }
+
   @Delete('me/delete')
   async deleteData(@Session() session: UserRoleSession) {
-    return await this.userSevice.deleteData(session.user.id);
+    return this.userSevice.deleteData(session.user.id);
   }
 
   @Get('favorites/add')
   async addFavorites(@Query('id') id: string, @Session() session: UserSession) {
-    return await this.userSevice.addToFavorites(session.user.id, id);
+    return this.userSevice.addToFavorites(session.user.id, id);
   }
 
   @Delete('favorites/delete')
@@ -53,13 +58,13 @@ export class UsersController {
     @Query('id') id: string,
     @Session() session: UserSession,
   ) {
-    return await this.userSevice.removeFromFavorites(session.user.id, id);
+    return this.userSevice.removeFromFavorites(session.user.id, id);
   }
 
   @Get('public-data/:id')
   @OptionalAuth()
   async getPublicData(@Param('id') id: string) {
-    return await this.userSevice.getPublicData(id);
+    return this.userSevice.getPublicData(id);
   }
 
   @Put('public-data')
@@ -67,7 +72,7 @@ export class UsersController {
     @Body() body: UpdatePublicDataDto,
     @Session() session: UserSession,
   ) {
-    return await this.userSevice.setPublicData(
+    return this.userSevice.setPublicData(
       {
         ...body,
         userId: session.user.id,
@@ -88,24 +93,24 @@ export class UsersController {
     @Res() res: Response,
     @Session() session: UserRoleSession,
   ) {
-    return await this.steamService.linkSteamId(req, res, session.user.id);
+    return this.steamService.linkSteamId(req, res, session.user.id);
   }
 
   @Get('unlink-steam')
   async unlinkSteam(@Session() session: UserRoleSession) {
-    return await this.steamService.unlinkSteamId(session.user.id);
+    return this.steamService.unlinkSteamId(session.user.id);
   }
 
   @Get('s-id/:id')
   @OptionalAuth()
   async getBySteamId(@Param('id') id: string) {
-    return await this.userSevice.getUserBySteamId(id);
+    return this.userSevice.getUserBySteamId(id);
   }
 
   @Get(':id/favorites')
   @OptionalAuth()
   async getFavorites(@Param('id') id: string) {
-    return await this.userSevice.getFavorites(id);
+    return this.userSevice.getFavorites(id);
   }
 
   @Post(':id/set-role')
@@ -118,12 +123,12 @@ export class UsersController {
       throw new ForbiddenException('Invalid secret');
     }
 
-    return await this.modService.forceSetRole(id, body.role);
+    return this.modService.forceSetRole(id, body.role);
   }
 
   @Get(':id')
   @OptionalAuth()
   async getUser(@Param('id') id: string) {
-    return await this.userSevice.getUser(id);
+    return this.userSevice.getUser(id);
   }
 }

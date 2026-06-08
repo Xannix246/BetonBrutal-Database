@@ -5,9 +5,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { UserSession } from '@thallesp/nestjs-better-auth';
-import { auth } from 'src/modules/auth/auth.module';
+import axios from 'axios';
+import { DiscordOAuthData, DiscordTokenRefreshResponce } from 'd.types/auth';
+import { auth } from '../../auth/services/auth.shared';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { WorkshopService } from 'src/modules/workshop/domain/services/workshop.service';
+import { env } from 'process';
 
 @Injectable()
 export class UserService {
@@ -54,6 +57,77 @@ export class UserService {
       image: user.image,
       steamId: user.steamId,
     };
+  }
+
+  async syncUserData(id: string): Promise<User | null> {
+    let userData = await this.prisma.account.findUnique({
+      where: { userId: id },
+    });
+
+    if (!userData) {
+      throw new NotFoundException('Account not found');
+    }
+
+    if (
+      userData.lastUpdated &&
+      Date.now() - userData.lastUpdated.valueOf() < 1000 * 60 * 60
+    ) {
+      return null;
+    }
+
+    if (
+      !userData.accessTokenExpiresAt ||
+      userData.accessTokenExpiresAt < new Date()
+    ) {
+      const data = (
+        await axios.post(
+          'https://discord.com/api/oauth2/token',
+          new URLSearchParams({
+            client_id: env.DISCORD_CLIENT_ID!,
+            client_secret: env.DISCORD_CLIENT_SECRET!,
+            grant_type: 'refresh_token',
+            refresh_token: userData.refreshToken!,
+          }),
+          {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+          },
+        )
+      ).data as DiscordTokenRefreshResponce;
+
+      userData = await this.prisma.account.update({
+        where: { userId: id },
+        data: {
+          accessToken: data.access_token,
+          refreshToken: data.refresh_token,
+          accessTokenExpiresAt: new Date(
+            new Date().valueOf() + data.expires_in * 1000,
+          ),
+        },
+      });
+    }
+
+    const updatedUserData = (
+      await axios.get('https://discord.com/api/oauth2/@me', {
+        headers: {
+          Authorization: `Bearer ${userData.accessToken}`,
+        },
+      })
+    ).data as DiscordOAuthData;
+
+    await this.prisma.account.update({
+      where: { userId: id },
+      data: { lastUpdated: new Date() },
+    });
+
+    return this.prisma.user.update({
+      where: { id },
+      data: {
+        name: updatedUserData.user.global_name,
+        image: `https://cdn.discordapp.com/avatars/${updatedUserData.user.id}/${updatedUserData.user.avatar}.png`,
+      },
+    });
   }
 
   async getFavorites(id: string): Promise<WorkshopItemHeader[]> {

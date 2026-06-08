@@ -1,4 +1,4 @@
-declare type SortBy = "mostPopular" | "newest" | "oldest" | "mostPlayed";
+declare type SortBy = "mostPopular" | "newest" | "oldest" | "mostPlayed" | "topTier" | "lowTier";
 
 declare type WorkshopItem = {
   id: string;
@@ -141,6 +141,9 @@ declare enum Labels {
   nonLinear = "nonLinear",
   chockepoints = "chockepoints",
   shitpost = "shitpost",
+  bath = "bath",
+  random = "random",
+  precision = "precision",
 }
 
 declare type TierData = {
