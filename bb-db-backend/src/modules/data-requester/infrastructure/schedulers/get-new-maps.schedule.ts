@@ -35,16 +35,18 @@ export class GetNewMapsScheduler {
       (i) => Math.floor(i.createDate.getTime() / 1000) > lastTimestamp,
     );
 
-    console.log(lastMap, lastTimestamp, newItems);
-
     newItemsCount = newItems.length;
 
     for (const item of newItems) {
       let isDownloaded: string | null | void = null;
 
       if (!Number(env.DISABLE_DOWNLOADING)) {
-        await this.steamCmd.enqueue(item.steamId);
-        isDownloaded = await this.steamCmd.copyFileToStorage(item.steamId);
+        try {
+          await this.steamCmd.enqueue(item.steamId);
+          isDownloaded = await this.steamCmd.copyFileToStorage(item.steamId);
+        } catch (e) {
+          this.logger.warn(`Failed to download map ${item.steamId}`, e);
+        }
       }
 
       await this.prisma.workshopItem.upsert({
