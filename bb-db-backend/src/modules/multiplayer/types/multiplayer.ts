@@ -100,7 +100,7 @@ export type SessionRace = {
 // can be stored in prisma
 export type MapSession = {
   id: string;
-  type: MapType;
+  // type: MapType;
   players: string[]; // SessionPlayer id's
   // blocks: Block[]; // instead of storing all map data with thousands of blocks we could just take map archive
   // in the ./maps folder, unpack it, decompile Map.bbmap and send blocks data from it

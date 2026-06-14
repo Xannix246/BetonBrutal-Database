@@ -33,15 +33,17 @@ export class RaceCommand implements OnModuleInit {
 
     const map = context.mapSessions.get(player.mapId);
 
+    console.log(player.mapId, context.mapSessions);
+
     if (player.mapId?.startsWith('E')) return 'Cannot race in editor';
     if (!map) return 'Map not found';
     if (map.players.length === 0) return 'No player to race';
 
-    let race = context.raceSessions.get(map.type + map.id);
+    let race = context.raceSessions.get(map.id);
 
     if (!race) {
       race = {
-        id: map.type + map.id,
+        id: map.id,
         players: [],
         time: new Date(),
         started: false,

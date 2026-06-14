@@ -3,10 +3,13 @@ import { WebSocketServer, WebSocket } from 'ws';
 import { PacketManager } from '../services/packet-manager.service';
 import { MultiplayerService } from '../services/multiplayer.service';
 import { Event, PacketType, SessionPlayer } from '../types/multiplayer';
+import { v4 } from 'uuid';
 
 @Injectable()
 export class MultiplayerWebsocketGateway implements OnModuleInit {
   private server!: WebSocketServer;
+  private readonly users: Map<string, string> = new Map();
+
   constructor(
     private readonly packetManager: PacketManager,
     private readonly multiplayer: MultiplayerService,
@@ -14,15 +17,16 @@ export class MultiplayerWebsocketGateway implements OnModuleInit {
 
   onModuleInit() {
     this.server = new WebSocketServer({
-      port: 80,
+      port: 8080,
     });
 
     this.server.on('connection', (socket) => {
-      this.handleConnection(socket);
+      const uuid = v4();
+      this.handleConnection(socket, uuid);
     });
   }
 
-  private handleConnection(socket: WebSocket) {
+  private handleConnection(socket: WebSocket, uuid: string) {
     let player: SessionPlayer | undefined;
     const setPlayer = (p: SessionPlayer) => {
       player = p;
@@ -30,16 +34,24 @@ export class MultiplayerWebsocketGateway implements OnModuleInit {
     console.log('Client connected');
 
     socket.on('message', (data: Buffer) => {
-      this.handleMessage(socket, setPlayer, player, data);
+      this.handleMessage(socket, uuid, setPlayer, player, data);
     });
 
     socket.on('close', () => {
+      const user = this.users.get(uuid);
+
+      if (user) {
+        this.multiplayer.onDisconnect(user);
+      }
+
+      this.users.delete(uuid);
       console.log('Client disconnected');
     });
   }
 
   private handleMessage(
     socket: WebSocket,
+    uuid: string,
     setPlayer: (p: SessionPlayer) => void,
     player: SessionPlayer | undefined,
     data: Buffer,
@@ -64,6 +76,7 @@ export class MultiplayerWebsocketGateway implements OnModuleInit {
         this.multiplayer.getVersion(socket, packet);
         break;
       case PacketType.Join:
+        this.users.set(uuid, packet.id);
         this.multiplayer.join(socket, setPlayer, packet);
         break;
       case PacketType.Event:

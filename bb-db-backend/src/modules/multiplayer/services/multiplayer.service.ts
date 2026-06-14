@@ -6,7 +6,6 @@ import { CommandsService } from './commands.service';
 import {
   Event,
   MapSession,
-  MapType,
   PacketType,
   SessionCollab,
   SessionPlayer,
@@ -67,10 +66,15 @@ export class MultiplayerService implements OnModuleInit {
     for (const player of this.players) {
       if (
         ignorePlayers.includes(player[0]) ||
-        (receivers && !receivers.includes(player[0]))
+        (receivers && receivers.length > 0 && !receivers.includes(player[0]))
       ) {
         continue;
       }
+
+      console.log(
+        `broadcasted packet ${packet.packet} to players\nPlayers: `,
+        this.players,
+      );
 
       player[1].socket.send(this.packetManager.serialize(packet));
     }
@@ -110,6 +114,7 @@ export class MultiplayerService implements OnModuleInit {
     setPlayer: (p: SessionPlayer) => void,
     packet: PlayerJoinPacket,
   ) {
+    console.log(this.players);
     if (this.players.has(packet.id)) {
       return socket.close();
     }
@@ -128,6 +133,10 @@ export class MultiplayerService implements OnModuleInit {
 
     setPlayer(player);
     this.players.set(packet.id, player);
+    this.joinMap(player, {
+      packet: PacketType.Map,
+      map: packet.map,
+    });
 
     this.ping(player, socket);
 
@@ -178,6 +187,9 @@ export class MultiplayerService implements OnModuleInit {
   }
 
   playerMove(player: SessionPlayer, packet: MovePacket) {
+    if (!player.mapId) return;
+
+    const map = this.mapSessions.get(player.mapId)!;
     const data: SessionPlayerData = {
       mode: packet.mode,
       position: packet.position,
@@ -193,17 +205,19 @@ export class MultiplayerService implements OnModuleInit {
         ...data,
       },
       [player.id],
+      map.players,
     );
   }
 
   joinMap(player: SessionPlayer, packet: MapPacket) {
     let map = this.mapSessions.get(packet.map);
-    const mapType = packet.map.slice(0, 1) as MapType;
+    // const mapType = packet.map.slice(0, 1) as MapType;
 
     if (!map) {
       map = {
-        id: packet.map.slice(1),
-        type: mapType,
+        // id: packet.map.slice(1),
+        id: packet.map,
+        // type: mapType,
         players: [],
         settings: [],
       };
@@ -348,7 +362,7 @@ export class MultiplayerService implements OnModuleInit {
 
     if (map) {
       map.players = map.players.filter((id) => id !== playerId);
-      if (map.players.length === 0) this.mapSessions.delete(map.type + map.id);
+      if (map.players.length === 0) this.mapSessions.delete(map.id);
     }
   }
 

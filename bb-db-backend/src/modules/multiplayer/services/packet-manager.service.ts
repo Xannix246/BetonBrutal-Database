@@ -2,13 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { PacketSerializer } from '../infrastructure/packet/packet.serializer';
 import { PacketDeserializer } from '../infrastructure/packet/packet.deserializer';
 import { PacketData } from '../types/packet.types';
-import {
-  PacketType,
-  Event,
-  GameMode,
-  Vector3,
-  Color,
-} from '../types/multiplayer';
+import { PacketType, GameMode, Vector3, Color } from '../types/multiplayer';
 
 @Injectable()
 export class PacketManager {
