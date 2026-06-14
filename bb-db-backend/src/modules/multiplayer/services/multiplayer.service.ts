@@ -364,6 +364,11 @@ export class MultiplayerService implements OnModuleInit {
       map.players = map.players.filter((id) => id !== playerId);
       if (map.players.length === 0) this.mapSessions.delete(map.id);
     }
+
+    this.broadcastPacket({
+      packet: PacketType.Disconnect,
+      id: playerId,
+    });
   }
 
   // events
