@@ -56,7 +56,7 @@ export class PacketManager {
         return;
 
       case PacketType.GetPlayers:
-        serializer.writeUInt16(data.players.length);
+        serializer.writeUInt32(data.players.length);
         for (const player of data.players) {
           serializer.writeUInt64(player.id);
           serializer.writeString(player.nick);
@@ -195,7 +195,7 @@ export class PacketManager {
         return {
           packet,
           players: Array.from(
-            { length: deserializer.readUInt16(buffer) },
+            { length: deserializer.readUInt32(buffer) },
             () => ({
               id: deserializer.readUInt64(buffer),
               nick: deserializer.readString(buffer),

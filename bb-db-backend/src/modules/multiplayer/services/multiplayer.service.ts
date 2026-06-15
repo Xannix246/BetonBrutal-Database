@@ -33,11 +33,11 @@ export class MultiplayerService implements OnModuleInit {
   private readonly logger = new Logger(MultiplayerService.name);
   private readonly mapRecords: Record<string, string>[] = [];
 
-  public players: Map<string, SessionPlayer> = new Map();
-  public playerData: Map<string, SessionPlayerData> = new Map();
-  public mapSessions: Map<string, MapSession> = new Map();
-  public raceSessions: Map<string, SessionRace> = new Map();
-  public collabSessions: Map<string, SessionCollab> = new Map();
+  public readonly players: Map<string, SessionPlayer> = new Map();
+  public readonly playerData: Map<string, SessionPlayerData> = new Map();
+  public readonly mapSessions: Map<string, MapSession> = new Map();
+  public readonly raceSessions: Map<string, SessionRace> = new Map();
+  public readonly collabSessions: Map<string, SessionCollab> = new Map();
 
   constructor(
     private readonly prisma: PrismaService,
@@ -233,6 +233,7 @@ export class MultiplayerService implements OnModuleInit {
     });
 
     this.logger.log(`${player.name} joined map: ${map.id}`);
+    console.log(this.mapSessions);
   }
 
   sendMessage(player: SessionPlayer, packet: MessagePacket) {
@@ -345,8 +346,10 @@ export class MultiplayerService implements OnModuleInit {
     const collab = collabs.find((collab) => collab.players.includes(playerId));
 
     if (collab) {
-      collab.players = collab?.players.filter((id) => id !== playerId) ?? [];
-      if (collab.players.length === 0) this.collabSessions.delete(collab.id);
+      collab.players = collab.players.filter((id) => id !== playerId) ?? [];
+      if (collab.players.length === 0 || collab.ownerId === playerId) {
+        this.collabSessions.delete(collab.id);
+      }
     }
 
     const races = [...this.raceSessions.values()];

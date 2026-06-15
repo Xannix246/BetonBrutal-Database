@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { WebSocketServer, WebSocket } from 'ws';
 import { PacketManager } from '../services/packet-manager.service';
 import { MultiplayerService } from '../services/multiplayer.service';
@@ -7,8 +7,9 @@ import { v4 } from 'uuid';
 
 @Injectable()
 export class MultiplayerWebsocketGateway implements OnModuleInit {
-  private server!: WebSocketServer;
+  private readonly logger = new Logger(MultiplayerWebsocketGateway.name);
   private readonly users: Map<string, string> = new Map();
+  private server!: WebSocketServer;
 
   constructor(
     private readonly packetManager: PacketManager,
@@ -31,7 +32,7 @@ export class MultiplayerWebsocketGateway implements OnModuleInit {
     const setPlayer = (p: SessionPlayer) => {
       player = p;
     };
-    console.log('Client connected');
+    this.logger.log('Client connected');
 
     socket.on('message', (data: Buffer) => {
       this.handleMessage(socket, uuid, setPlayer, player, data);
@@ -46,6 +47,7 @@ export class MultiplayerWebsocketGateway implements OnModuleInit {
 
       this.users.delete(uuid);
       console.log('Client disconnected');
+      console.log(this.users);
     });
   }
 
@@ -59,7 +61,7 @@ export class MultiplayerWebsocketGateway implements OnModuleInit {
     const packet = this.packetManager.deserialize(data);
 
     if (!packet) {
-      console.log('failed to parse packet');
+      this.logger.log('failed to parse packet');
       socket.close();
       return;
     }
@@ -68,7 +70,7 @@ export class MultiplayerWebsocketGateway implements OnModuleInit {
       packet.packet !== PacketType.Event &&
       packet.packet !== PacketType.Move
     ) {
-      console.log(packet);
+      this.logger.log(packet);
     }
 
     switch (packet.packet) {
@@ -77,6 +79,7 @@ export class MultiplayerWebsocketGateway implements OnModuleInit {
         break;
       case PacketType.Join:
         this.users.set(uuid, packet.id);
+        console.log(this.users);
         this.multiplayer.join(socket, setPlayer, packet);
         break;
       case PacketType.Event:
