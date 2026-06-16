@@ -83,7 +83,7 @@ export class PacketManager {
         return;
 
       case PacketType.Move:
-        // serializer.writeUInt64(data.id);
+        serializer.writeUInt64(data.id!);
         this.writeGameMode(serializer, data.mode);
         this.writeVector3(serializer, data.position);
         this.writeVector3(serializer, data.rotation);
