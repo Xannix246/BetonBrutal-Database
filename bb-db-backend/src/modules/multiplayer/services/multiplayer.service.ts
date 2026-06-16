@@ -76,7 +76,7 @@ export class MultiplayerService implements OnModuleInit {
       //   this.players,
       // );
 
-      console.log(packet);
+      console.log(ignorePlayers, receivers);
 
       player[1].socket.send(this.packetManager.serialize(packet));
     }
