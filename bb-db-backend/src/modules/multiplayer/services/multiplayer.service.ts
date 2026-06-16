@@ -71,10 +71,12 @@ export class MultiplayerService implements OnModuleInit {
         continue;
       }
 
-      console.log(
-        `broadcasted packet ${packet.packet} to players\nPlayers: `,
-        this.players,
-      );
+      // console.log(
+      //   `broadcasted packet ${packet.packet} to players\nPlayers: `,
+      //   this.players,
+      // );
+
+      console.log(packet);
 
       player[1].socket.send(this.packetManager.serialize(packet));
     }
@@ -240,7 +242,7 @@ export class MultiplayerService implements OnModuleInit {
     this.broadcastPacket({
       packet: PacketType.Message,
       id: player.id,
-      message: packet.message,
+      message: `${player.nick ?? player.name}: ${packet.message}`,
     });
   }
 
