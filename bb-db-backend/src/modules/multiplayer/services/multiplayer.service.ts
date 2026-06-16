@@ -14,16 +14,16 @@ import {
 } from '../types/multiplayer';
 import {
   CommandPacket,
-  DeleteBlockPacket,
+  DeleteBlocksPacket,
   MapColorPacket,
   MapPacket,
   MapSettingsPacket,
   MessagePacket,
-  MoveBlockPacket,
+  MoveBlocksPacket,
   MovePacket,
   PacketData,
-  PaintBlockPacket,
-  PlaceBlockPacket,
+  PaintBlocksPacket,
+  PlaceBlocksPacket,
   PlayerJoinPacket,
   VersionPacket,
 } from '../types/packet.types';
@@ -265,62 +265,72 @@ export class MultiplayerService implements OnModuleInit {
     });
   }
 
-  placeBlock(player: SessionPlayer, packet: PlaceBlockPacket) {
+  placeBlock(player: SessionPlayer, packet: PlaceBlocksPacket) {
     if (!player.collabId) return;
 
     const collab = this.collabSessions.get(player.collabId);
 
     if (!collab) return;
 
-    collab.blocks.set(packet.instanceID, {
-      ...packet,
-    });
+    for (const block of packet.blocks) {
+      collab.blocks.set(block.instanceID, {
+        ...block,
+      });
+    }
+
     this.broadcastPacket({ ...packet }, [player.id], collab?.players);
     this.collabSessions.set(collab.id, collab);
   }
 
-  deleteBlock(player: SessionPlayer, packet: DeleteBlockPacket) {
+  deleteBlock(player: SessionPlayer, packet: DeleteBlocksPacket) {
     if (!player.collabId) return;
 
     const collab = this.collabSessions.get(player.collabId);
 
     if (!collab) return;
 
-    collab.blocks.delete(packet.instanceID);
+    for (const id of packet.instanceIDs) {
+      collab.blocks.delete(id);
+    }
+
     this.broadcastPacket({ ...packet }, [player.id], collab?.players);
     this.collabSessions.set(collab.id, collab);
   }
 
-  paintBlock(player: SessionPlayer, packet: PaintBlockPacket) {
+  paintBlock(player: SessionPlayer, packet: PaintBlocksPacket) {
     if (!player.collabId) return;
 
     const collab = this.collabSessions.get(player.collabId);
 
     if (!collab) return;
 
-    const block = collab.blocks.get(packet.instanceID)!;
+    for (const data of packet.blocks) {
+      const block = collab.blocks.get(data.instanceID)!;
+      collab.blocks.set(data.instanceID, {
+        ...block,
+        ...data,
+      });
+    }
 
-    collab.blocks.set(packet.instanceID, {
-      ...block,
-      ...packet,
-    });
     this.broadcastPacket({ ...packet }, [player.id], collab?.players);
     this.collabSessions.set(collab.id, collab);
   }
 
-  moveBlock(player: SessionPlayer, packet: MoveBlockPacket) {
+  moveBlock(player: SessionPlayer, packet: MoveBlocksPacket) {
     if (!player.collabId) return;
 
     const collab = this.collabSessions.get(player.collabId);
 
     if (!collab) return;
 
-    const block = collab.blocks.get(packet.instanceID)!;
+    for (const data of packet.blocks) {
+      const block = collab.blocks.get(data.instanceID)!;
+      collab.blocks.set(data.instanceID, {
+        ...block,
+        ...data,
+      });
+    }
 
-    collab.blocks.set(packet.instanceID, {
-      ...block,
-      ...packet,
-    });
     this.broadcastPacket({ ...packet }, [player.id], collab?.players);
     this.collabSessions.set(collab.id, collab);
   }

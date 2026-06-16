@@ -119,13 +119,10 @@ export class CollabCommand implements OnModuleInit {
       });
     }
 
-    for (const block of collab.blocks) {
-      this.commandsService.sendPacket(player, {
-        packet: PacketType.PlaceBlock,
-        ...block[1],
-        customColor: block[1].customColor!,
-      });
-    }
+    this.commandsService.sendPacket(player, {
+      packet: PacketType.PlaceBlocks,
+      blocks: [...collab.blocks.values()],
+    });
 
     return 'You have joined the collab';
   }

@@ -120,31 +120,43 @@ export class PacketManager {
         serializer.writeString(data.map);
         return;
 
-      case PacketType.PlaceBlock:
-        serializer.writeGuid(data.instanceID);
-        serializer.writeInt32(data.blockID);
-        this.writeVector3(serializer, data.position);
-        this.writeVector3(serializer, data.rotation);
-        serializer.writeFloat(data.scale);
-        serializer.writeUInt8(data.color);
-        this.writeColor(serializer, data.customColor);
+      case PacketType.PlaceBlocks:
+        serializer.writeUInt16(data.blocks.length);
+        for (const block of data.blocks) {
+          serializer.writeGuid(block.instanceID);
+          serializer.writeInt32(block.blockID);
+          this.writeVector3(serializer, block.position);
+          this.writeVector3(serializer, block.rotation);
+          serializer.writeFloat(block.scale);
+          serializer.writeUInt8(block.color);
+          this.writeColor(serializer, block.customColor);
+        }
         return;
 
-      case PacketType.DeleteBlock:
-        serializer.writeGuid(data.instanceID);
+      case PacketType.DeleteBlocks:
+        serializer.writeUInt16(data.instanceIDs.length);
+        for (const id of data.instanceIDs) {
+          serializer.writeGuid(id);
+        }
         return;
 
-      case PacketType.PaintBlock:
-        serializer.writeGuid(data.instanceID);
-        serializer.writeUInt8(data.color);
-        this.writeColor(serializer, data.customColor);
+      case PacketType.PaintBlocks:
+        serializer.writeUInt16(data.blocks.length);
+        for (const block of data.blocks) {
+          serializer.writeGuid(block.instanceID);
+          serializer.writeUInt8(block.color);
+          this.writeColor(serializer, block.customColor);
+        }
         return;
 
-      case PacketType.MoveBlock:
-        serializer.writeGuid(data.instanceID);
-        this.writeVector3(serializer, data.position);
-        this.writeVector3(serializer, data.rotation);
-        serializer.writeFloat(data.scale);
+      case PacketType.MoveBlocks:
+        serializer.writeUInt16(data.blocks.length);
+        for (const block of data.blocks) {
+          serializer.writeGuid(block.instanceID);
+          this.writeVector3(serializer, block.position);
+          this.writeVector3(serializer, block.rotation);
+          serializer.writeFloat(block.scale);
+        }
         return;
 
       case PacketType.MapSettings:
@@ -279,39 +291,57 @@ export class PacketManager {
           map: deserializer.readString(buffer),
         };
 
-      case PacketType.PlaceBlock:
+      case PacketType.PlaceBlocks:
         return {
           packet,
-          instanceID: deserializer.readGuid(buffer),
-          blockID: deserializer.readInt32(buffer),
-          position: deserializer.readVector3(buffer),
-          rotation: deserializer.readVector3(buffer),
-          scale: deserializer.readFloat(buffer),
-          color: deserializer.readUInt8(buffer),
-          customColor: this.readColor(deserializer, buffer),
+          blocks: Array.from(
+            { length: deserializer.readUInt32(buffer) },
+            () => ({
+              instanceID: deserializer.readGuid(buffer),
+              blockID: deserializer.readInt32(buffer),
+              position: deserializer.readVector3(buffer),
+              rotation: deserializer.readVector3(buffer),
+              scale: deserializer.readFloat(buffer),
+              color: deserializer.readUInt8(buffer),
+              customColor: this.readColor(deserializer, buffer),
+            }),
+          ),
         };
 
-      case PacketType.DeleteBlock:
+      case PacketType.DeleteBlocks:
         return {
           packet,
-          instanceID: deserializer.readGuid(buffer),
+          instanceIDs: Array.from(
+            { length: deserializer.readUInt32(buffer) },
+            () => deserializer.readGuid(buffer),
+          ),
         };
 
-      case PacketType.PaintBlock:
+      case PacketType.PaintBlocks:
         return {
           packet,
-          instanceID: deserializer.readGuid(buffer),
-          color: deserializer.readUInt8(buffer),
-          customColor: this.readColor(deserializer, buffer),
+          blocks: Array.from(
+            { length: deserializer.readUInt32(buffer) },
+            () => ({
+              instanceID: deserializer.readGuid(buffer),
+              color: deserializer.readUInt8(buffer),
+              customColor: this.readColor(deserializer, buffer),
+            }),
+          ),
         };
 
-      case PacketType.MoveBlock:
+      case PacketType.MoveBlocks:
         return {
           packet,
-          instanceID: deserializer.readGuid(buffer),
-          position: deserializer.readVector3(buffer),
-          rotation: deserializer.readVector3(buffer),
-          scale: deserializer.readFloat(buffer),
+          blocks: Array.from(
+            { length: deserializer.readUInt32(buffer) },
+            () => ({
+              instanceID: deserializer.readGuid(buffer),
+              position: deserializer.readVector3(buffer),
+              rotation: deserializer.readVector3(buffer),
+              scale: deserializer.readFloat(buffer),
+            }),
+          ),
         };
 
       case PacketType.MapSettings:

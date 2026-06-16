@@ -96,35 +96,41 @@ export type LoadMapPacket = {
   map: string;
 };
 
-export type PlaceBlockPacket = {
-  packet: PacketType.PlaceBlock;
-  instanceID: string;
-  blockID: number;
-  position: Vector3;
-  rotation: Vector3;
-  scale: number;
-  color: number;
-  customColor: Color;
+export type PlaceBlocksPacket = {
+  packet: PacketType.PlaceBlocks;
+  blocks: {
+    instanceID: string;
+    blockID: number;
+    position: Vector3;
+    rotation: Vector3;
+    scale: number;
+    color: number;
+    customColor: Color;
+  }[];
 };
 
-export type DeleteBlockPacket = {
-  packet: PacketType.DeleteBlock;
-  instanceID: string;
+export type DeleteBlocksPacket = {
+  packet: PacketType.DeleteBlocks;
+  instanceIDs: string[];
 };
 
-export type PaintBlockPacket = {
-  packet: PacketType.PaintBlock;
-  instanceID: string;
-  color: number;
-  customColor: Color;
+export type PaintBlocksPacket = {
+  packet: PacketType.PaintBlocks;
+  blocks: {
+    instanceID: string;
+    color: number;
+    customColor: Color;
+  }[];
 };
 
-export type MoveBlockPacket = {
-  packet: PacketType.MoveBlock;
-  instanceID: string;
-  position: Vector3;
-  rotation: Vector3;
-  scale: number;
+export type MoveBlocksPacket = {
+  packet: PacketType.MoveBlocks;
+  blocks: {
+    instanceID: string;
+    position: Vector3;
+    rotation: Vector3;
+    scale: number;
+  }[];
 };
 
 export type MapSettingsPacket = {
@@ -154,10 +160,10 @@ export type PacketData =
   | CommandPacket
   | PlayerPingPacket
   | LoadMapPacket
-  | PlaceBlockPacket
-  | DeleteBlockPacket
-  | PaintBlockPacket
-  | MoveBlockPacket
+  | PlaceBlocksPacket
+  | DeleteBlocksPacket
+  | PaintBlocksPacket
+  | MoveBlocksPacket
   | MapSettingsPacket
   | MapColorPacket;
 

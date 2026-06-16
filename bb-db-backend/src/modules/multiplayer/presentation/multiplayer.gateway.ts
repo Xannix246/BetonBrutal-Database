@@ -85,17 +85,20 @@ export class MultiplayerWebsocketGateway implements OnModuleInit {
       case PacketType.Event:
         switch (packet.signal) {
           case Event.Ping:
-            this.multiplayer.ping(player!, socket);
+            if (!player) return;
+            this.multiplayer.ping(player, socket);
             break;
           case Event.RunComplete:
             this.multiplayer.completeRun(player!);
         }
         break;
       case PacketType.Move:
-        this.multiplayer.playerMove(player!, packet);
+        if (!player) return;
+        this.multiplayer.playerMove(player, packet);
         break;
       case PacketType.Map:
-        this.multiplayer.joinMap(player!, packet);
+        if (!player) return;
+        this.multiplayer.joinMap(player, packet);
         break;
       case PacketType.Message:
         this.multiplayer.sendMessage(player!, packet);
@@ -103,16 +106,16 @@ export class MultiplayerWebsocketGateway implements OnModuleInit {
       case PacketType.Command:
         void this.multiplayer.sendCommand(player!, packet);
         break;
-      case PacketType.PlaceBlock:
+      case PacketType.PlaceBlocks:
         this.multiplayer.placeBlock(player!, packet);
         break;
-      case PacketType.DeleteBlock:
+      case PacketType.DeleteBlocks:
         this.multiplayer.deleteBlock(player!, packet);
         break;
-      case PacketType.PaintBlock:
+      case PacketType.PaintBlocks:
         this.multiplayer.paintBlock(player!, packet);
         break;
-      case PacketType.MoveBlock:
+      case PacketType.MoveBlocks:
         this.multiplayer.moveBlock(player!, packet);
         break;
       case PacketType.MapSettings:

@@ -19,10 +19,10 @@ export enum PacketType {
   LoadMap = 15,
   // ToggleLight = 16,
   // LightColor = 17,
-  PlaceBlock = 18,
-  DeleteBlock = 19,
-  PaintBlock = 20,
-  MoveBlock = 21,
+  PlaceBlocks = 18,
+  DeleteBlocks = 19,
+  PaintBlocks = 20,
+  MoveBlocks = 21,
   MapSettings = 22,
   MapColor = 23,
 }
@@ -72,7 +72,7 @@ export type Block = {
   position: Vector3;
   rotation: Vector3;
   scale: number;
-  customColor?: Color;
+  customColor: Color;
 };
 
 // blocks can be changed quickly, so maybe it's better to save in ram but idk
