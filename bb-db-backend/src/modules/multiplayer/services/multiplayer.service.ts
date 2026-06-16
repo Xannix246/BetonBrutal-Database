@@ -215,6 +215,14 @@ export class MultiplayerService implements OnModuleInit {
     let map = this.mapSessions.get(packet.map);
     // const mapType = packet.map.slice(0, 1) as MapType;
 
+    if (player.mapId) {
+      const map = this.mapSessions.get(packet.map);
+      if (map) {
+        map.players = map.players.filter((playerId) => playerId !== player.id);
+        this.mapSessions.set(map.id, map);
+      }
+    }
+
     if (!map) {
       map = {
         // id: packet.map.slice(1),
@@ -351,6 +359,8 @@ export class MultiplayerService implements OnModuleInit {
       collab.players = collab.players.filter((id) => id !== playerId) ?? [];
       if (collab.players.length === 0 || collab.ownerId === playerId) {
         this.collabSessions.delete(collab.id);
+      } else {
+        this.collabSessions.set(collab.id, collab);
       }
     }
 
@@ -359,7 +369,11 @@ export class MultiplayerService implements OnModuleInit {
 
     if (race) {
       race.players = race.players.filter((id) => id !== playerId);
-      if (race.players.length === 0) this.raceSessions.delete(race.id);
+      if (race.players.length === 0) {
+        this.raceSessions.delete(race.id);
+      } else {
+        this.raceSessions.set(race.id, race);
+      }
     }
 
     const maps = [...this.mapSessions.values()];
@@ -367,7 +381,11 @@ export class MultiplayerService implements OnModuleInit {
 
     if (map) {
       map.players = map.players.filter((id) => id !== playerId);
-      if (map.players.length === 0) this.mapSessions.delete(map.id);
+      if (map.players.length === 0) {
+        this.mapSessions.delete(map.id);
+      } else {
+        this.mapSessions.set(map.id, map);
+      }
     }
 
     this.broadcastPacket({
