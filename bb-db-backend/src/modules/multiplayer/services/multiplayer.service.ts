@@ -27,6 +27,7 @@ import {
   PlayerJoinPacket,
   VersionPacket,
 } from '../types/packet.types';
+import { CompatibilityService } from './compatibility.service';
 
 @Injectable()
 export class MultiplayerService implements OnModuleInit {
@@ -43,7 +44,17 @@ export class MultiplayerService implements OnModuleInit {
     private readonly prisma: PrismaService,
     private readonly packetManager: PacketManager,
     private readonly commands: CommandsService,
-  ) {}
+    private readonly csm: CompatibilityService,
+  ) {
+    csm.context = {
+      players: this.players,
+      playerData: this.playerData,
+      mapSessions: this.mapSessions,
+      mapRecords: this.mapRecords,
+      raceSessions: this.raceSessions,
+      collabSessions: this.collabSessions,
+    };
+  }
 
   async onModuleInit() {
     const maps = await this.prisma.workshopItem.findMany({
@@ -76,7 +87,7 @@ export class MultiplayerService implements OnModuleInit {
       //   this.players,
       // );
 
-      console.log(ignorePlayers, receivers);
+      // console.log(ignorePlayers, receivers);
 
       player[1].socket.send(this.packetManager.serialize(packet));
     }
@@ -111,14 +122,16 @@ export class MultiplayerService implements OnModuleInit {
     );
   }
 
-  join(
+  async join(
     socket: WebSocket,
     setPlayer: (p: SessionPlayer) => void,
     packet: PlayerJoinPacket,
   ) {
-    console.log(this.players);
     if (this.players.has(packet.id)) {
-      return socket.close();
+      console.log(packet);
+      console.log('This player already exists!');
+      // return socket.close();
+      return;
     }
 
     const player: SessionPlayer = {
@@ -133,15 +146,11 @@ export class MultiplayerService implements OnModuleInit {
       mapId: packet.map,
     };
 
+    await this.csm.connectPlayer(player.id);
+
     setPlayer(player);
     this.players.set(packet.id, player);
-    this.joinMap(player, {
-      packet: PacketType.Map,
-      map: packet.map,
-    });
-
     this.ping(player, socket);
-
     this.broadcastPacket(
       {
         packet: PacketType.Join,
@@ -171,6 +180,13 @@ export class MultiplayerService implements OnModuleInit {
         }),
       }),
     );
+
+    this.csm.sendPacket(packet, player.id);
+
+    this.joinMap(player, {
+      packet: PacketType.Map,
+      map: packet.map,
+    });
 
     this.logger.log(`${packet.name} joined the server`);
   }
@@ -209,6 +225,8 @@ export class MultiplayerService implements OnModuleInit {
       [player.id],
       map.players,
     );
+
+    this.csm.sendPacket(packet, player.id);
   }
 
   joinMap(player: SessionPlayer, packet: MapPacket) {
@@ -242,8 +260,9 @@ export class MultiplayerService implements OnModuleInit {
       map: packet.map,
     });
 
+    this.csm.sendPacket(packet, player.id);
+
     this.logger.log(`${player.name} joined map: ${map.id}`);
-    console.log(this.mapSessions);
   }
 
   sendMessage(player: SessionPlayer, packet: MessagePacket) {
@@ -252,6 +271,8 @@ export class MultiplayerService implements OnModuleInit {
       id: player.id,
       message: `${player.nick ?? player.name}: ${packet.message}`,
     });
+
+    this.csm.sendPacket(packet, player.id);
   }
 
   async sendCommand(player: SessionPlayer, packet: CommandPacket) {
@@ -402,6 +423,15 @@ export class MultiplayerService implements OnModuleInit {
       packet: PacketType.Disconnect,
       id: playerId,
     });
+
+    this.csm.disconnectPlayer(playerId);
+    this.csm.sendPacket(
+      {
+        packet: PacketType.Disconnect,
+        id: playerId,
+      },
+      playerId,
+    );
   }
 
   // events

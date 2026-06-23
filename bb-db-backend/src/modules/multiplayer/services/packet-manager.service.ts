@@ -15,7 +15,7 @@ export class PacketManager {
     return Buffer.from(serializer.buffer.subarray(0, serializer.offset));
   }
 
-  public deserialize(buffer: Buffer): PacketData | undefined {
+  public deserialize(buffer: Buffer, getId?: boolean): PacketData | undefined {
     if (buffer.length < 1) {
       this.logger.warn('Packet buffer is too short');
       return;
@@ -24,7 +24,12 @@ export class PacketManager {
     const packetTypeByte = buffer.readUInt8(0);
     const packet = packetTypeByte as PacketType;
     const deserializer = new PacketDeserializer(1);
-    const payload = this.deserializePayload(packet, deserializer, buffer);
+    const payload = this.deserializePayload(
+      packet,
+      deserializer,
+      buffer,
+      getId,
+    );
 
     if (!payload) {
       this.logger.warn(
@@ -83,7 +88,9 @@ export class PacketManager {
         return;
 
       case PacketType.Move:
-        serializer.writeUInt64(data.id!);
+        if (data.id) {
+          serializer.writeUInt64(data.id);
+        }
         this.writeGameMode(serializer, data.mode);
         this.writeVector3(serializer, data.position);
         this.writeVector3(serializer, data.rotation);
@@ -95,12 +102,16 @@ export class PacketManager {
         return;
 
       case PacketType.Map:
-        serializer.writeUInt64(data.id!);
+        if (data.id) {
+          serializer.writeUInt64(data.id);
+        }
         serializer.writeString(data.map);
         return;
 
       case PacketType.Message:
-        serializer.writeUInt64(data.id!);
+        if (data.id) {
+          serializer.writeUInt64(data.id);
+        }
         serializer.writeString(data.message);
         return;
 
@@ -109,10 +120,10 @@ export class PacketManager {
         return;
 
       case PacketType.PlayersPing:
-        serializer.writeUInt16(data.players.length);
+        serializer.writeUInt32(data.players.length);
         for (const player of data.players) {
           serializer.writeUInt64(player.id);
-          serializer.writeUInt16(player.ping);
+          serializer.writeUInt32(player.ping);
         }
         return;
 
@@ -181,6 +192,7 @@ export class PacketManager {
     packet: PacketType,
     deserializer: PacketDeserializer,
     buffer: Buffer,
+    getId?: boolean,
   ): PacketData | undefined {
     switch (packet) {
       case PacketType.Version:
@@ -241,6 +253,7 @@ export class PacketManager {
         return {
           packet,
           // client Move packet has no id (sent by client), server associates sender by socket
+          id: (getId && deserializer.readUInt64(buffer)) || undefined,
           mode: this.readGameMode(deserializer, buffer),
           position: deserializer.readVector3(buffer),
           rotation: deserializer.readVector3(buffer),
@@ -256,14 +269,14 @@ export class PacketManager {
       case PacketType.Map:
         return {
           packet,
-          // id: deserializer.readUInt64(buffer),
+          id: (getId && deserializer.readUInt64(buffer)) || undefined,
           map: deserializer.readString(buffer),
         };
 
       case PacketType.Message:
         return {
           packet,
-          // id: deserializer.readUInt64(buffer),
+          id: (getId && deserializer.readUInt64(buffer)) || undefined,
           message: deserializer.readString(buffer),
         };
 
@@ -277,10 +290,10 @@ export class PacketManager {
         return {
           packet,
           players: Array.from(
-            { length: deserializer.readUInt16(buffer) },
+            { length: deserializer.readUInt32(buffer) },
             () => ({
               id: deserializer.readUInt64(buffer),
-              ping: deserializer.readUInt16(buffer),
+              ping: deserializer.readUInt32(buffer),
             }),
           ),
         };

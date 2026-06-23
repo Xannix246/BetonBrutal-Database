@@ -11,6 +11,7 @@ import { PingCommand } from './services/commands/ping.command';
 import { RaceCommand } from './services/commands/race.command';
 import { CheckRacesScheduler } from './infrastructure/schedulers/check-races.schedule';
 import { CollabCommand } from './services/commands/collab.command';
+import { CompatibilityService } from './services/compatibility.service';
 
 @Module({
   imports: [PrismaModule, WorkshopModule],
@@ -25,6 +26,7 @@ import { CollabCommand } from './services/commands/collab.command';
     RaceCommand,
     CollabCommand,
     CheckRacesScheduler,
+    CompatibilityService,
   ],
   exports: [MultiplayerService],
 })

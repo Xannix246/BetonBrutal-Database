@@ -66,12 +66,12 @@ export class MultiplayerWebsocketGateway implements OnModuleInit {
       return;
     }
 
-    if (
-      packet.packet !== PacketType.Event &&
-      packet.packet !== PacketType.Move
-    ) {
-      this.logger.log(packet);
-    }
+    // if (
+    //   packet.packet !== PacketType.Event &&
+    //   packet.packet !== PacketType.Move
+    // ) {
+    //   this.logger.log(packet);
+    // }
 
     switch (packet.packet) {
       case PacketType.Version:
@@ -80,7 +80,7 @@ export class MultiplayerWebsocketGateway implements OnModuleInit {
       case PacketType.Join:
         this.users.set(uuid, packet.id);
         console.log(this.users);
-        this.multiplayer.join(socket, setPlayer, packet);
+        void this.multiplayer.join(socket, setPlayer, packet);
         break;
       case PacketType.Event:
         switch (packet.signal) {
