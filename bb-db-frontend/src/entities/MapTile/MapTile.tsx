@@ -1,6 +1,6 @@
 import clsx from "clsx";
-import { getUser, setTargetData } from "../store/store";
-import { getColor } from "../features/GetColor";
+import { getUser, setTargetData } from "@store";
+import { getColor } from "@utils";
 
 type Props = {
   item: WorkshopItemHeader;

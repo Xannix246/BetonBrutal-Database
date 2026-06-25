@@ -1,8 +1,8 @@
 import clsx from "clsx";
-import { getColor } from "../features/GetColor";
-import Container from "../shared/Containter/Container";
 import { t } from "i18next";
-import { Keys } from "../../i18n/keys";
+import { Container } from "@shared";
+import { getColor } from "@utils";
+import { Keys } from "@locales/keys";
 
 type TierCard = {
   entry: TierEntry;

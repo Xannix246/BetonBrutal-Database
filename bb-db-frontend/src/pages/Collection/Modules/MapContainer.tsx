@@ -1,13 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { handleSearch } from "../../../features/SearchManager";
-import Input from "../../../shared/Input/Input";
-import List from "../../../shared/List/List";
-import clsx from "clsx";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
-import Textarea from "../../../shared/Textarea/Textarea";
-import Button from "../../../shared/Button/Button";
-import { Keys } from "../../../../i18n/keys";
+import clsx from "clsx";
 import { t } from "i18next";
+import { Button, Input, List, Textarea } from "@shared";
+import { handleSearch } from "@features";
+import { Keys } from "@locales/keys";
 
 type MapContainer = {
   maps: WorkshopItemHeader[];

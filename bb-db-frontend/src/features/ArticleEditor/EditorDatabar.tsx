@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import Container from "../../shared/Containter/Container";
-import Input from "../../shared/Input/Input";
 import { MinusIcon } from "@heroicons/react/24/outline";
+import { Container, Input } from "@shared";
 
 type Props = {
   preview: File | null;

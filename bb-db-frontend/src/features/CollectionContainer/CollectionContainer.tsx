@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { getMaps } from "./requests";
-import MapCard from "../../entities/MapCard";
 import clsx from "clsx";
-import MapTile from "../../entities/MapTile";
+import { MapCard, MapTile } from "@entities";
+import { getMaps } from "./requests";
 
 const CollectionContainer = ({ collection }: { collection: Collection }) => {
   const [maps, setMaps] = useState<WorkshopItemHeader[]>([]);

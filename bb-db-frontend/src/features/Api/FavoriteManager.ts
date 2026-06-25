@@ -1,6 +1,6 @@
-import { $favorites, $user } from "../store/store";
+import { $favorites, $user } from "@store";
+import { config } from "@config";
 import { api } from "./Auth";
-import { config } from "../../config/config";
 
 export const getFavorites = async () => {
   const result = ((

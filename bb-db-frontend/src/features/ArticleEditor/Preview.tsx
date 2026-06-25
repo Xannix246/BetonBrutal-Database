@@ -1,9 +1,9 @@
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useMemo } from "react";
-import { getDoc, getFiles } from "../../store/store";
+import { getDoc, getFiles } from "@store";
 
-const PreviewPane = ({ document }: { document?: string }) => {
+const PreviewPanel = ({ document }: { document?: string }) => {
   const files = getFiles();
   const markdown = document || getDoc();
 
@@ -72,4 +72,4 @@ const PreviewPane = ({ document }: { document?: string }) => {
   );
 };
 
-export default PreviewPane;
+export default PreviewPanel;

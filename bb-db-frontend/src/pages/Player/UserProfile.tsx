@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import { getUserPublicData, setUserPublicData, syncDiscordData, uploadImage } from "./requests";
 import clsx from "clsx";
-import Container from "../../shared/Containter/Container";
-import Input from "../../shared/Input/Input";
-import Button from "../../shared/Button/Button";
-import { getUser } from "../../store/store";
-import Textarea from "../../shared/Textarea/Textarea";
 import { t } from "i18next";
-import { Keys } from "../../../i18n/keys";
+import { Container, Input, Button, Textarea } from "@shared";
+import { getUser } from "@store";
+import { Keys } from "@locales/keys";
+import {
+  getUserPublicData,
+  setUserPublicData,
+  uploadImage,
+} from "./requests";
 
 type Props = {
   user: User;
@@ -226,10 +227,10 @@ const UserProfile = ({ user, player, publicData, setPublicData }: Props) => {
                   className="uppercase p-3 bg-green/50 w-full"
                   onClick={onSave}
                 >{t(key.save)}</Button>
-                <Button
+                {/* <Button
                   className="uppercase p-3 bg-blue/50 w-full"
                   onClick={syncDiscordData}
-                >{t(key.syncData)}</Button>
+                >{t(key.syncData)}</Button> */}
               </div>
             ) : (
               <Button

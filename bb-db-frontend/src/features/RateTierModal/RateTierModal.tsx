@@ -1,12 +1,10 @@
-import clsx from "clsx";
-import Modal from "../shared/Modal/Modal";
-import TierLabel from "../entities/TierLabel";
-import { getColor } from "./GetColor";
-import { tiersLabels, tiersTooltips } from "../widgets/MapTier/data";
-import { Labels } from "../widgets/MapTier/labels";
 import { useEffect, useState } from "react";
-import { Keys } from "../../i18n/keys";
+import clsx from "clsx";
 import { t } from "i18next";
+import {Modal } from "@shared";
+import { TierLabel } from "@entities";
+import { getColor, tiersLabels, tiersTooltips, Labels } from "@utils";
+import { Keys } from "@locales/keys";
 
 const key = Keys.mapTiers;
 

@@ -1,7 +1,7 @@
-import formatTime from "../features/FormatTime";
-import Container from "../shared/Containter/Container";
-import { $prevLink, getUser, setTargetData } from "../store/store";
 import { useEffect, useState } from "react";
+import { Container } from "@shared";
+import { $prevLink, getUser, setTargetData } from "@store";
+import { formatTime } from "@utils";
 
 type Props = {
   replay: Replay;

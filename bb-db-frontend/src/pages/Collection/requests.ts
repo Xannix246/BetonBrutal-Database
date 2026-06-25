@@ -1,4 +1,4 @@
-import { api } from "../../features/Auth";
+import { api } from "@features";
 
 export const getCollection = async (id: string): Promise<Collection> => {
   return (await api.get(`collections/${id}`)).data;

@@ -1,7 +1,6 @@
 import { v4 } from "uuid";
-import { api } from "../../features/Auth";
-import { setUser } from "../../store/store";
-import { addToast } from "../../store/toast-manager";
+import { api } from "@features";
+import { setUser, addToast } from "@store";
 
 export const getUser = async (id: string): Promise<User> => {
   return (await api.get(`/user/s-id/${id}`)).data;

@@ -1,4 +1,4 @@
-import Container from "../../shared/Containter/Container";
+import { Container } from "@shared";
 
 type Props = {
   comment: UserComment;

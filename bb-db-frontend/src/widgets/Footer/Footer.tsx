@@ -1,5 +1,5 @@
-import i18n, { resources, supportedLanguages } from "../../../i18n/config";
-import Link from "../../shared/Link/Link";
+import { Link } from "@shared";
+import i18n, { supportedLanguages } from "@locales/config";
 
 const Footer = () => {
   return (

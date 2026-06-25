@@ -1,20 +1,14 @@
-import clsx from "clsx";
-import Button from "../../shared/Button/Button";
-import Input from "../../shared/Input/Input";
-import Link from "../../shared/Link/Link";
 import { JSX, useCallback, useEffect, useState } from "react";
-import { handleEnterSearch, handleSearch } from "../../features/SearchManager";
-import { logOut, signIn, unlinkSteam } from "../../features/Auth";
-import Dropdown from "../../shared/Dropdown/Dropdown";
 import { ArrowLeftEndOnRectangleIcon, StarIcon, Bars3Icon, TrashIcon, LinkIcon, LinkSlashIcon, UserIcon, ChartBarIcon } from "@heroicons/react/24/outline";
 import { navigate } from "vike/client/router";
-import MobileMenu from "./MobileMenu";
-import { getUser, setUser } from "../../store/store";
-import DeleteModal from "../../features/DeleteModal";
-import { config } from "../../../config/config";
+import clsx from "clsx";
 import { t } from "i18next";
-import { Keys } from "../../../i18n/keys";
-import List from "../../shared/List/List";
+import { Button, Input, Link, List, Dropdown } from "@shared";
+import { handleEnterSearch, handleSearch, logOut, signIn, unlinkSteam, DeleteModal } from "@features";
+import { getUser, setUser } from "@store";
+import { config } from "@config";
+import { Keys } from "@locales/keys";
+import MobileMenu from "./MobileMenu";
 
 const key = Keys.header;
 

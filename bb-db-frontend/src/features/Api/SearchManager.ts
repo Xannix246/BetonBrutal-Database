@@ -1,7 +1,7 @@
-import { $searchData } from "../store/store";
 import { navigate } from "vike/client/router";
+import { $searchData } from "@store";
+import { config } from "@config";
 import { api } from "./Auth";
-import { config } from "../../config/config";
 
 export const handleSearch = async (searchQuery: string, returnOnlyData?: boolean) => {
   const result: WorkshopItemHeader[] = (

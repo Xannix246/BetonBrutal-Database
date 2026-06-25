@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { getActiveMap } from "../../../store/store";
+import { Button } from "@shared";
+import { Comment } from "@entities";
+import { getActiveMap } from "@store";
 import { deleteComment, getComments } from "../requests";
-import Comment from "../../../entities/Comment/Comment";
-import Button from "../../../shared/Button/Button";
 
 const CommentsContainer = () => {
   const activeMap = getActiveMap();

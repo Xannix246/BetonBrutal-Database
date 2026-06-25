@@ -4,8 +4,8 @@ import { EditorState } from "@codemirror/state";
 import { EditorView } from "codemirror";
 import { markdown } from "@codemirror/lang-markdown";
 import { oneDark } from "@codemirror/theme-one-dark";
+import { $files, getDoc, setDoc, setFiles } from "@store";
 import { formatText } from "./utils";
-import { $files, getDoc, setDoc, setFiles } from "../../store/store";
 
 const EditorViewComponent = () => {
   const editorRef = useRef<HTMLDivElement>(null);

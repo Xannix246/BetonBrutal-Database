@@ -1,5 +1,5 @@
-import { config } from "../../../config/config";
-import { api } from "../../features/Auth";
+import { api } from "@features";
+import { config } from "@config";
 
 export const getBrutalReplays = async (): Promise<Replay[]>  => {
   return (await api.get(`${config.serverUri}/workshop/TimeMS/replays`)).data;

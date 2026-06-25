@@ -1,7 +1,5 @@
-import Container from "../../shared/Containter/Container";
-import Background from "../../widgets/Background/Background";
-import Footer from "../../widgets/Footer/Footer";
-import Header from "../../widgets/Header/Header";
+import { Container } from "@shared";
+import { Background, Footer, Header } from "@widgets";
 
 const PrivacyPolicy = () => {
   return (

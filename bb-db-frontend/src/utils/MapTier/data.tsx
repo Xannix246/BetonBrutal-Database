@@ -17,8 +17,8 @@ import { ImMoveUp } from "react-icons/im";
 import { FaRegFaceAngry, FaFaucetDrip } from "react-icons/fa6";
 import { TbArrowBounce } from "react-icons/tb";
 import { LiaPoopSolid, LiaDiceD6Solid } from "react-icons/lia";
-import { Keys } from "../../../i18n/keys";
 import { t } from "i18next";
+import { Keys } from "@locales/keys";
 
 const tips = Keys.mapTiers.tooltips
 const lbs = Keys.mapTiers.labels;

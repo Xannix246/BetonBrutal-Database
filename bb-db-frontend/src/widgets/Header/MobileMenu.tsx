@@ -1,10 +1,9 @@
-import clsx from "clsx";
-import Button from "../../shared/Button/Button";
-import { signIn } from "../../features/Auth";
-import Link from "../../shared/Link/Link";
 import { JSX, useEffect } from "react";
-import { Keys } from "../../../i18n/keys";
+import clsx from "clsx";
 import { t } from "i18next";
+import { Button, Link } from "@shared";
+import { signIn } from "@features";
+import { Keys } from "@locales/keys";
 
 type Props = {
   open: boolean;

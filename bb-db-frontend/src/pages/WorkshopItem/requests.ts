@@ -1,6 +1,5 @@
-import { config } from "../../../config/config";
-import { api } from "../../features/Auth";
-import { getUser } from "../../store/store";
+import { api } from "@features";
+import { config } from "@config";
 
 export const getMap = async (id: string): Promise<WorkshopItem | null> => {
   return (await api.get(`${config.serverUri}/workshop/${id}`)).data;

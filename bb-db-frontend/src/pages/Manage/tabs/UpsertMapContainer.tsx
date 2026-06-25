@@ -1,13 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import Input from "../../../shared/Input/Input";
-import { getActiveMap, setActiveMap } from "../../../store/store";
-import Button from "../../../shared/Button/Button";
-import Textarea from "../../../shared/Textarea/Textarea";
+import { Input, Button, Textarea } from "@shared";
+import { DeleteMap, RateTierModal } from "@features";
+import { Labels } from "@utils";
+import { getActiveMap, setActiveMap } from "@store";
 import { createMap, getTierData, setMapTierData, updateMap, uploadImage } from "../requests";
-import { DeleteMap } from "../../../features/DataManager";
-import RateTierModal from "../../../features/RateTierModal";
-import { v4 } from "uuid";
-import { Labels } from "../../../widgets/MapTier/labels";
 
 const UpsertMapContainer = ({createNewMap = false}: { createNewMap?: boolean }) => {
   const activeMap = getActiveMap();

@@ -1,5 +1,5 @@
 import { EyeIcon, PencilIcon, ItalicIcon, LinkIcon, CodeBracketIcon, ChevronRightIcon, ListBulletIcon } from "@heroicons/react/24/solid";
-import Button from "../../shared/Button/Button";
+import { Button } from "@shared";
 
 type format = "bold" | "italic" | "link" | "code" | "quote" | "ul";
 

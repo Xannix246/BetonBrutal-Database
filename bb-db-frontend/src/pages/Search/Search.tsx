@@ -1,12 +1,10 @@
-import Footer from "../../widgets/Footer/Footer";
-import Header from "../../widgets/Header/Header";
-import Container from "../../shared/Containter/Container";
-import MapTile from "../../entities/MapTile";
-import { getSearchData } from "../../store/store";
-import Background from "../../widgets/Background/Background";
-import { t } from "i18next";
 import { useEffect, useState } from "react";
-import { Keys } from "../../../i18n/keys";
+import { t } from "i18next";
+import { Container } from "@shared";
+import { MapTile } from "@entities";
+import { Footer, Header, Background } from "@widgets";
+import { getSearchData } from "@store";
+import { Keys } from "@locales/keys";
 
 const key = Keys.search;
 

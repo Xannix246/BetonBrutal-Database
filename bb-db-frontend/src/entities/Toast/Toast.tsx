@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, PanInfo, useMotionValue, useTransform } from "motion/react";
-import Container from "../shared/Containter/Container";
-import { Toast as ToastType, removeToast } from "../store/toast-manager";
 import clsx from "clsx";
+import { Container } from "@shared";
+import { Toast as ToastType, removeToast } from "@store";
 
 const colors = {
   error: {

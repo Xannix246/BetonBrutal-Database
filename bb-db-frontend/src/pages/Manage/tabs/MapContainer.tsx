@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { handleSearch } from "../../../features/SearchManager";
-import Input from "../../../shared/Input/Input";
-import List from "../../../shared/List/List";
-import { setActiveMap } from "../../../store/store";
+import { Input, List } from "@shared";
+import { handleSearch } from "@features";
+import { setActiveMap } from "@store";
 import { getMap } from "../requests";
 
 const MapContainer = () => {

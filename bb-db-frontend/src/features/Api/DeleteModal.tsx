@@ -1,8 +1,8 @@
 import { Button } from "@headlessui/react";
-import Modal from "../shared/Modal/Modal"
+import { Modal } from "@shared";
+import { config } from "@config";
+import { setUser } from "../../store/store";
 import { api, authClient } from "./Auth";
-import { config } from "../../config/config";
-import { setUser } from "../store/store";
 
 const DeleteModal = ({ open, setOpen }: { open: boolean, setOpen: (val: boolean) => void }) => {
   const handleDelete = async () => {

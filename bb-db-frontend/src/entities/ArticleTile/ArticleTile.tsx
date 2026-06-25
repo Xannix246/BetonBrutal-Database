@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import Link from "../shared/Link/Link";
+import { Link } from "@shared";
 
 const ArticleTile = ({ article }: { article: Article }) => {
 

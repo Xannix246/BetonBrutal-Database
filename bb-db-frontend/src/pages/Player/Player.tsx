@@ -1,16 +1,19 @@
 import { useEffect, useState } from "react";
-import Footer from "../../widgets/Footer/Footer";
-import Header from "../../widgets/Header/Header";
-import Container from "../../shared/Containter/Container";
-import { getPlayer, getPlayerMaps, getPlayerReplays, getUser as getUserData, getUserFavorites } from "./requests";
-import MapTile from "../../entities/MapTile";
-import Background from "../../widgets/Background/Background";
-import { getPrevLink, getUser } from "../../store/store";
 import clsx from "clsx";
-import LeaderboardTable from "../../widgets/LeaderboardTable/LeaderboardTable";
-import UserProfile from "./UserProfile";
 import { t } from "i18next";
-import { Keys } from "../../../i18n/keys";
+import { Container } from "@shared";
+import { MapTile } from "@entities";
+import { Footer, Header, Background, LeaderboardTable } from "@widgets";
+import { getPrevLink, getUser } from "@store";
+import { Keys } from "@locales/keys";
+import UserProfile from "./UserProfile";
+import {
+  getPlayer,
+  getPlayerMaps,
+  getPlayerReplays,
+  getUser as getUserData,
+  getUserFavorites,
+} from "./requests";
 
 const key = Keys.player;
 

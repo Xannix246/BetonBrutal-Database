@@ -1,8 +1,8 @@
 import { useStore } from "@nanostores/react";
 import { atom } from "nanostores";
-import { api } from "../features/Auth";
 import { v4 } from "uuid";
 import { AxiosError } from "axios";
+import { api } from "@features";
 
 export type Toast = {
   id: string;

@@ -1,20 +1,16 @@
 import { useEffect, useState } from "react";
-import Background from "../../widgets/Background/Background";
-import Footer from "../../widgets/Footer/Footer";
-import Header from "../../widgets/Header/Header";
-import MapContainer from "./Modules/MapContainer";
-import MapTile from "../../entities/MapTile";
-import { v4 } from "uuid";
-import ContextMenu from "../../shared/ContextMenu/ContextMenu";
-import { getTargetData, getUser, setTargetData } from "../../store/store";
-import SidePanel from "./Modules/SidePanel";
-import Container from "../../shared/Containter/Container";
-import Button from "../../shared/Button/Button";
-import { signIn } from "../../features/Auth";
-import { getCollection, getItem, getItemData, postCollection, uploadPreview } from "./requests";
 import { navigate } from "vike/client/router";
-import { Keys } from "../../../i18n/keys";
+import { v4 } from "uuid";
 import { t } from "i18next";
+import { Container, Button, ContextMenu } from "@shared";
+import { MapTile } from "@entities";
+import { signIn } from "@features";
+import { Background, Footer, Header } from "@widgets";
+import { getTargetData, getUser, setTargetData } from "@store";
+import { Keys } from "@locales/keys";
+import { getCollection, getItem, getItemData, postCollection, uploadPreview } from "./requests";
+import MapContainer from "./Modules/MapContainer";
+import SidePanel from "./Modules/SidePanel";
 
 const key = Keys.collection.editor;
 

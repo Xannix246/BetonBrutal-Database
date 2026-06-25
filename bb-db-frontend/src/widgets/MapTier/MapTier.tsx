@@ -1,15 +1,14 @@
-import Container from "../../shared/Containter/Container";
-import { PiArrowsCounterClockwise } from "react-icons/pi";
-import TierLabel from "../../entities/TierLabel";
-import RateTierModal from "../../features/RateTierModal";
 import { useState } from "react";
-import { getColor } from "../../features/GetColor";
 import clsx from "clsx";
-import { submitTierVote, updateTierVote } from "./requests";
-import { getUser } from "../../store/store";
-import { tiersLabels, tiersTooltips } from "./data";
-import { Keys } from "../../../i18n/keys";
 import { t } from "i18next";
+import { Container } from "@shared";
+import { TierLabel } from "@entities";
+import { RateTierModal } from "@features";
+import { getColor } from "@utils";
+import { tiersLabels, tiersTooltips } from "@utils";
+import { getUser } from "@store";
+import { Keys } from "@locales/keys";
+import { submitTierVote, updateTierVote } from "./requests";
 
 const key = Keys.mapTiers;
 

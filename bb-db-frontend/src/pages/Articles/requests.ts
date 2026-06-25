@@ -1,6 +1,6 @@
-import { config } from "../../../config/config";
-import { api } from "../../features/Auth";
-import { $doc, $files, setDoc } from "../../store/store";
+import { config } from "@config";
+import { api } from "@features";
+import { $doc, $files, setDoc } from "@store";
 
 export const uploadFiles = async () => {
   const files = $files.get();

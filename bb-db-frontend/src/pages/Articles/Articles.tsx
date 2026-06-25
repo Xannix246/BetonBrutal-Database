@@ -1,20 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import Container from "../../shared/Containter/Container";
-import Background from "../../widgets/Background/Background";
-import Footer from "../../widgets/Footer/Footer";
-import Header from "../../widgets/Header/Header";
-import { getArticles } from "./requests";
-import ArticleTile from "../../entities/ArticleTile";
-import clsx from "clsx";
-import RadioGroup from "../../shared/RadioGroup/RadioGroup";
-import Input from "../../shared/Input/Input";
 import { MinusIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
-import Checkbox from "../../shared/Checkbox/Checkbox";
-import Button from "../../shared/Button/Button";
-import { getUser } from "../../store/store";
-import Link from "../../shared/Link/Link";
 import { t } from "i18next";
-import { Keys } from "../../../i18n/keys";
+import clsx from "clsx";
+import { Container, Button, Link, RadioGroup, Input, Checkbox } from "@shared";
+import { ArticleTile } from "@entities";
+import { Background, Header, Footer } from "@widgets";
+import { getUser } from "@store";
+import { Keys } from "@locales/keys";
+import { getArticles } from "./requests";
 
 const key = Keys.articles;
 

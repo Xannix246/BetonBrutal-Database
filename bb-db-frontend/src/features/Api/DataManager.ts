@@ -1,4 +1,4 @@
-import { config } from "../../config/config"
+import { config } from "@config"
 import { api } from "./Auth"
 
 export const DeleteMap = async (id: string): Promise<void> => {

@@ -1,11 +1,9 @@
-import Checkbox from "../../../shared/Checkbox/Checkbox";
-import Container from "../../../shared/Containter/Container";
-import { getUser } from "../../../store/store";
-import Button from "../../../shared/Button/Button";
 import { navigate } from "vike/client/router";
-import { deleteCollection } from "../requests";
-import { Keys } from "../../../../i18n/keys";
 import { t } from "i18next";
+import { Button, Container, Checkbox } from "@shared";
+import { getUser } from "@store";
+import { Keys } from "@locales/keys";
+import { deleteCollection } from "../requests";
 
 type SidePanel = {
   isPrivate: boolean;

@@ -1,21 +1,13 @@
-import Background from "../../widgets/Background/Background";
-import Footer from "../../widgets/Footer/Footer";
-import Header from "../../widgets/Header/Header";
-import Container from "../../shared/Containter/Container";
 import { useEffect, useState } from "react";
-import EditorSidebar from "../../features/editor/EditorSidebar";
-import EditorToolbar from "../../features/editor/EditorToolbar";
-import PreviewPane from "../../features/editor/Preview";
-import EditorView from "../../features/editor/EditorView";
-import clsx from "clsx";
 import { Button, Input } from "@headlessui/react";
-import { uploadArticle, uploadFiles } from "./requests";
-import EditorDatabar from "../../features/editor/EditorDatabar";
-import { ChevronRightIcon } from "@heroicons/react/24/outline";
-import Textarea from "../../shared/Textarea/Textarea";
 import { navigate } from "vike/client/router";
-import Link from "../../shared/Link/Link";
-import { getUser } from "../../store/store";
+import clsx from "clsx";
+import { ChevronRightIcon } from "@heroicons/react/24/outline";
+import { Container, Textarea, Link } from "@shared";
+import { EditorSidebar, EditorToolbar, PreviewPanel, EditorView, EditorDatabar } from "@features";
+import { Background, Header, Footer } from "@widgets";
+import { getUser } from "@store";
+import { uploadArticle, uploadFiles } from "./requests";
 
 const Editor = () => {
   const [title, setTitle] = useState("");
@@ -138,7 +130,7 @@ const Editor = () => {
 
                 <div className="relative">
                   <div className="h-64 bg-gradient-to-t from-transparent to-black absolute inset-0 -z-10" />
-                  <PreviewPane />
+                  <PreviewPanel />
                 </div>
               </div>
             ) : (

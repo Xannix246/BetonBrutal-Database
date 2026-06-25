@@ -1,8 +1,8 @@
-import { AnimatePresence } from "motion/react";
-import Toast from "../../entities/Toast";
-import Button from "../../shared/Button/Button";
-import { clearToasts, getToasts } from "../../store/toast-manager";
 import { useEffect, useState } from "react";
+import { AnimatePresence } from "motion/react";
+import { Button } from "@shared";
+import { Toast } from "@entities";
+import { clearToasts, getToasts } from "@store";
 
 const Toasts = () => {
   const toasts = getToasts();

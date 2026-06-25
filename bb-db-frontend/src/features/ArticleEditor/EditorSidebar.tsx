@@ -1,6 +1,5 @@
-import Button from "../../shared/Button/Button";
-import Container from "../../shared/Containter/Container";
-import { getDoc, getFiles, setDoc, setFiles } from "../../store/store";
+import { Container, Button } from "@shared";
+import { getDoc, getFiles, setDoc, setFiles } from "@store";
 
 const EditorSidebar = () => {
   const files = getFiles();

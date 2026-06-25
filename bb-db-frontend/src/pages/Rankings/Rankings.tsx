@@ -1,18 +1,13 @@
-import Header from "../../widgets/Header/Header";
-import Container from "../../shared/Containter/Container";
-import Background from "../../widgets/Background/Background";
 import { useEffect, useState } from "react";
 import clsx from "clsx";
-import Footer from "../../widgets/Footer/Footer";
-import { getBathReplays, getBdayReplays, getBrutalReplays } from "./requests";
-import LeaderboardTable from "../../widgets/LeaderboardTable/LeaderboardTable";
 import FuzzySearch from "fuzzy-search";
-import Input from "../../shared/Input/Input";
-import { getTargetData, getUser, setTargetData } from "../../store/store";
-import { banReplay, deleteReplay } from "../../features/DataManager";
-import ContextMenu from "../../shared/ContextMenu/ContextMenu";
 import { t } from "i18next";
-import { Keys } from "../../../i18n/keys";
+import { Container, Input, ContextMenu } from "@shared";
+import { Header, Footer, Background, LeaderboardTable } from "@widgets";
+import { banReplay, deleteReplay } from "@features";
+import { getTargetData, getUser, setTargetData } from "@store";
+import { Keys } from "@locales/keys";
+import { getBathReplays, getBdayReplays, getBrutalReplays } from "./requests";
 
 const key = Keys.rankings;
 
