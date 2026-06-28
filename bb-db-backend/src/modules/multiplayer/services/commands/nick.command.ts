@@ -1,10 +1,7 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { CommandsService } from '../commands.service';
-import {
-  CommandsContext,
-  PacketType,
-  SessionPlayer,
-} from '../../types/multiplayer';
+import { CommandsContext, SessionPlayer } from '../../types/multiplayer';
+import { PacketType } from 'src/generated/protos/multiplayer';
 
 @Injectable()
 export class NickCommand implements OnModuleInit {
@@ -24,18 +21,17 @@ export class NickCommand implements OnModuleInit {
     args: string[],
     context: CommandsContext,
   ): string {
-    const nick = args[0];
-    if (!nick) return 'Write your nickname';
+    const nickname = args[0];
+    if (!nickname) return 'Write your nickname';
 
-    player.nick = nick;
+    player.nick = nickname;
 
     context.players.set(player.id, player);
     this.commandsService.broadcastPacket({
-      packet: PacketType.Nickname,
-      id: player.id,
-      nick: player.nick,
+      packet: PacketType.NicknamePacket,
+      payload: { id: player.id, nickname: player.nick },
     });
 
-    return `Nickname set to: ${nick}`;
+    return `Nickname set to: ${nickname}`;
   }
 }

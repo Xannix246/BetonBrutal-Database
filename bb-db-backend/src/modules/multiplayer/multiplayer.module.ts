@@ -12,6 +12,8 @@ import { RaceCommand } from './services/commands/race.command';
 import { CheckRacesScheduler } from './infrastructure/schedulers/check-races.schedule';
 import { CollabCommand } from './services/commands/collab.command';
 import { CompatibilityService } from './services/compatibility.service';
+import { ProxyCommand } from './services/commands/proxy.command';
+import { ProtobufManager } from './services/protobuf-manager.service';
 
 @Module({
   imports: [PrismaModule, WorkshopModule],
@@ -19,12 +21,14 @@ import { CompatibilityService } from './services/compatibility.service';
     MultiplayerService,
     CommandsService,
     PacketManager,
+    ProtobufManager,
     MultiplayerWebsocketGateway,
     HelpCommand,
     NickCommand,
     PingCommand,
     RaceCommand,
     CollabCommand,
+    ProxyCommand,
     CheckRacesScheduler,
     CompatibilityService,
   ],

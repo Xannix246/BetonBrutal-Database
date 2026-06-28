@@ -1,0 +1,245 @@
+syntax = "proto3";
+
+package multiplayer;
+
+enum PacketType {
+  VersionPacket = 0;
+  EventPacket = 1;
+  JoinPacket = 2;
+  GetPlayersPacket = 3;
+  DisconnectPacket = 4;
+  NicknamePacket = 5;
+  BodyColorPacket = 6;
+  // LightColorPacket = 7;
+  MovePacket = 8;
+  GameModePacket = 9;
+  MapPacket = 10;
+  MessagePacket = 11;
+  CommandPacket = 12;
+  PlayersPingPacket = 13;
+  // PlayerJoinPacket = 14;
+  LoadMapPacket = 15;
+  // ToggleLightPacket = 16;
+  // LightColorPacket = 17;
+  PlaceBlocksPacket = 18;
+  PlaceBlockPacket = 19;
+  DeleteBlockPacket = 20;
+  ChangeBlockPacket = 21;
+  MapSettingsPacket = 22;
+  MapColorPacket = 23;
+  UnknownPacket = 404;
+}
+
+enum Events {
+  Ping = 0;
+  RunComplete = 1;
+  RaceStart = 2;
+  StartCollab = 3;
+  JoinCollab = 4;
+  CloseCollab = 5;
+}
+
+enum GameMode {
+  MENU = 0;
+  PLAY = 1;
+  SCOUT = 2;
+  PRACTICE = 3;
+  REPLAY = 4;
+  T_EDITOR = 5;
+  UNKNOWN = 6;
+}
+
+enum MapType {
+  MAIN = 0;
+  CUSTOM = 1;
+  M_EDITOR = 2;
+  HUB = 3;
+}
+
+enum MapSetting {
+  LightScaling = 0;
+  SuppressBackgroundMusic = 1;
+  SuppressAmbience = 2;
+  HideVoidPlatform = 3;
+  DefaultBackgroundColor = 4;
+  DefaultAmbientLight = 5;
+}
+
+enum Operations {
+  MoveBlock = 0;
+  PaintBlock = 1;
+}
+
+message Vector3 {
+  float x = 1;
+  float y = 2;
+  float z = 3;
+};
+
+message Color {
+  float r = 1;
+  float g = 2;
+  float b = 3;
+  float a = 4;
+};
+
+message PlayerEntry {
+  int64 id = 1;
+  string nickname = 2;
+  MapType map_mode = 3;
+  int64 map_id = 4;
+  optional string map_name = 5;
+}
+
+message PingEntry {
+  int64 id = 1;
+  int32 ping = 2;
+}
+
+message Block {
+  string instanceID = 1;
+  int32 blockID = 2;
+  Vector3 position = 3;
+  Vector3 rotation = 4;
+  float scale = 5;
+  int32 color = 6;
+  optional Color customColor = 7;
+}
+
+// Packets
+
+message Version {
+  string version = 1;
+}
+
+message Event {
+  Events type = 1;
+}
+
+message Join {
+  int64 id = 1;
+  string username = 2;
+  GameMode mode = 3;
+  MapType map_mode = 4;
+  int64 map_id = 5;
+  optional string map_name = 6;
+}
+
+message PlayerList {
+  repeated PlayerEntry players = 1;
+}
+
+message Disconnect {
+  int64 id = 1;
+}
+
+message Nickname {
+  int64 id = 1;
+  string nickname = 2;
+}
+
+message BodyColor {
+  int64 id = 1;
+  int32 color = 2;
+  Color customColor = 3;
+}
+
+message Move {
+  int64 id = 1;
+  GameMode mode = 2;
+  Vector3 position = 3;
+  Vector3 rotation = 4;
+}
+
+message ChangeGameMode {
+  int64 id = 1;
+  GameMode mode = 2;
+}
+
+message Map {
+  int64 id = 1;
+  MapType mode = 2;
+  int64 map_id = 3;
+}
+
+message Message {
+  int64 id = 1;
+  string message = 2;
+}
+
+message Command {
+  optional int64 id = 1;
+  optional string command = 2;
+  optional string message = 3;
+}
+
+message PlayersPing {
+  repeated PingEntry players = 1;
+}
+
+message LoadMap {
+  int64 id = 1;
+  MapType mode = 2;
+  int64 map_id = 3;
+}
+
+message PlaceBlocks {
+  int64 id = 1;
+  repeated Block block = 2;
+}
+
+message PlaceBlock {
+  int64 id = 1;
+  Block block = 2;
+}
+
+message DeleteBlock {
+  int64 id = 1;
+  string instanceID = 2;
+}
+
+message ChangeBlock {
+  int64 id = 1;
+  Block block = 2;
+  Operations operation = 3;
+}
+
+message MapSettings {
+  int64 id = 1;
+  MapSetting setting = 2;
+  bool state = 3;
+}
+
+message MapColor {
+  int64 id = 1;
+  int32 settings = 2;
+  Color color = 3;
+}
+
+message Packet {
+  oneof payload {
+    Version version = 2;
+    Event Event = 3;
+    Join join = 4;
+    PlayerList player_list = 5;
+    Disconnect disconnect = 6;
+    Nickname nickname = 7;
+    BodyColor body_color = 8;
+    Move move = 9;
+    ChangeGameMode game_mode = 10;
+    Map map = 11;
+    Message message = 12;
+    Command command = 13;
+    PlayersPing players_ping = 14;
+    // PlayerJoin = 15;
+    LoadMap load_map = 16;
+    // ToggleLight = 17;
+    // LightColor = 18;
+    PlaceBlocks place_blocks = 19;
+    PlaceBlock place_block = 20;
+    DeleteBlock delete_block = 21;
+    ChangeBlock change_block = 22;
+    MapSettings map_settings = 23;
+    MapColor map_color = 24;
+  }
+}

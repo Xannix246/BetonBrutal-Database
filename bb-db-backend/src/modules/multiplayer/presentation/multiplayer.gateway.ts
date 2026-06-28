@@ -1,9 +1,11 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { WebSocketServer, WebSocket } from 'ws';
-import { PacketManager } from '../services/packet-manager.service';
+// import { PacketManager } from '../services/packet-manager.service';
 import { MultiplayerService } from '../services/multiplayer.service';
-import { Event, PacketType, SessionPlayer } from '../types/multiplayer';
+import { SessionPlayer } from '../types/multiplayer';
 import { v4 } from 'uuid';
+import { ProtobufManager } from '../services/protobuf-manager.service';
+import { Events, PacketType } from 'src/generated/protos/multiplayer';
 
 @Injectable()
 export class MultiplayerWebsocketGateway implements OnModuleInit {
@@ -12,7 +14,7 @@ export class MultiplayerWebsocketGateway implements OnModuleInit {
   private server!: WebSocketServer;
 
   constructor(
-    private readonly packetManager: PacketManager,
+    private readonly packetManager: ProtobufManager,
     private readonly multiplayer: MultiplayerService,
   ) {}
 
@@ -74,58 +76,56 @@ export class MultiplayerWebsocketGateway implements OnModuleInit {
     // }
 
     switch (packet.packet) {
-      case PacketType.Version:
-        this.multiplayer.getVersion(socket, packet);
+      case PacketType.VersionPacket:
+        this.multiplayer.getVersion(socket, packet.payload);
         break;
-      case PacketType.Join:
-        this.users.set(uuid, packet.id);
+      case PacketType.JoinPacket:
+        this.users.set(uuid, packet.payload.id.toString());
         console.log(this.users);
-        void this.multiplayer.join(socket, setPlayer, packet);
+        void this.multiplayer.join(socket, setPlayer, packet.payload);
         break;
-      case PacketType.Event:
-        switch (packet.signal) {
-          case Event.Ping:
+      case PacketType.EventPacket:
+        switch (packet.payload.type) {
+          case Events.Ping:
             if (!player) return;
             this.multiplayer.ping(player, socket);
             break;
-          case Event.RunComplete:
+          case Events.RunComplete:
             this.multiplayer.completeRun(player!);
         }
         break;
-      case PacketType.Move:
+      case PacketType.MovePacket:
         if (!player) return;
-        this.multiplayer.playerMove(player, packet);
+        this.multiplayer.playerMove(player, packet.payload);
         break;
-      case PacketType.Map:
+      case PacketType.MapPacket:
         if (!player) return;
-        this.multiplayer.joinMap(player, packet);
+        this.multiplayer.joinMap(player, packet.payload);
         break;
-      case PacketType.Message:
-        this.multiplayer.sendMessage(player!, packet);
+      case PacketType.MessagePacket:
+        this.multiplayer.sendMessage(player!, packet.payload);
         break;
-      case PacketType.Command:
-        void this.multiplayer.sendCommand(player!, packet);
+      case PacketType.CommandPacket:
+        void this.multiplayer.sendCommand(player!, packet.payload);
         break;
-      case PacketType.PlaceBlocks:
-        this.multiplayer.placeBlock(player!, packet);
+      case PacketType.PlaceBlocksPacket:
+      case PacketType.PlaceBlockPacket:
+        this.multiplayer.placeBlock(player!, packet.payload);
         break;
-      case PacketType.DeleteBlocks:
-        this.multiplayer.deleteBlock(player!, packet);
+      case PacketType.DeleteBlockPacket:
+        this.multiplayer.deleteBlock(player!, packet.payload);
         break;
-      case PacketType.PaintBlocks:
-        this.multiplayer.paintBlock(player!, packet);
+      case PacketType.ChangeBlockPacket:
+        this.multiplayer.changeBlock(player!, packet.payload);
         break;
-      case PacketType.MoveBlocks:
-        this.multiplayer.moveBlock(player!, packet);
+      case PacketType.MapSettingsPacket:
+        this.multiplayer.setMapSettings(player!, packet.payload);
         break;
-      case PacketType.MapSettings:
-        this.multiplayer.setMapSettings(player!, packet);
+      case PacketType.MapColorPacket:
+        this.multiplayer.setMapColor(player!, packet.payload);
         break;
-      case PacketType.MapColor:
-        this.multiplayer.setMapColor(player!, packet);
-        break;
-      case PacketType.Disconnect:
-        this.multiplayer.onDisconnect(packet.id);
+      case PacketType.DisconnectPacket:
+        this.multiplayer.onDisconnect(packet.payload.id);
         break;
     }
   }

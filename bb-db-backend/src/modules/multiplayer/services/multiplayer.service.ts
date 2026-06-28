@@ -1,33 +1,19 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { WebSocket } from 'ws';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
-import { PacketManager } from './packet-manager.service';
 import { CommandsService } from './commands.service';
 import {
-  Event,
   MapSession,
-  PacketType,
   SessionCollab,
   SessionPlayer,
   SessionPlayerData,
   SessionRace,
 } from '../types/multiplayer';
-import {
-  CommandPacket,
-  DeleteBlocksPacket,
-  MapColorPacket,
-  MapPacket,
-  MapSettingsPacket,
-  MessagePacket,
-  MoveBlocksPacket,
-  MovePacket,
-  PacketData,
-  PaintBlocksPacket,
-  PlaceBlocksPacket,
-  PlayerJoinPacket,
-  VersionPacket,
-} from '../types/packet.types';
 import { CompatibilityService } from './compatibility.service';
+import { ProtoPacket } from '../types/proto.types';
+import { ProtobufManager } from './protobuf-manager.service';
+import { PacketType, Events } from 'src/generated/protos/multiplayer';
+import * as Proto from 'src/generated/protos/multiplayer';
 
 @Injectable()
 export class MultiplayerService implements OnModuleInit {
@@ -42,7 +28,7 @@ export class MultiplayerService implements OnModuleInit {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly packetManager: PacketManager,
+    private readonly packetManager: ProtobufManager,
     private readonly commands: CommandsService,
     private readonly csm: CompatibilityService,
   ) {
@@ -70,7 +56,7 @@ export class MultiplayerService implements OnModuleInit {
   }
 
   broadcastPacket(
-    packet: PacketData,
+    packet: ProtoPacket,
     ignorePlayers: string[] = [],
     receivers?: string[],
   ) {
@@ -82,13 +68,6 @@ export class MultiplayerService implements OnModuleInit {
         continue;
       }
 
-      // console.log(
-      //   `broadcasted packet ${packet.packet} to players\nPlayers: `,
-      //   this.players,
-      // );
-
-      // console.log(ignorePlayers, receivers);
-
       player[1].socket.send(this.packetManager.serialize(packet));
     }
   }
@@ -96,8 +75,8 @@ export class MultiplayerService implements OnModuleInit {
   broadcastServer(message: string, players: string[]) {
     this.broadcastPacket(
       {
-        packet: PacketType.Command,
-        message: message,
+        packet: PacketType.CommandPacket,
+        payload: { message },
       },
       [],
       players,
@@ -107,17 +86,17 @@ export class MultiplayerService implements OnModuleInit {
   sendPrivateMessage(player: SessionPlayer, message: string) {
     player.socket.send(
       this.packetManager.serialize({
-        packet: PacketType.Command,
-        message,
+        packet: PacketType.CommandPacket,
+        payload: { message },
       }),
     );
   }
 
-  getVersion(socket: WebSocket, packet: VersionPacket) {
+  getVersion(socket: WebSocket, packet: Proto.Version) {
     socket.send(
       this.packetManager.serialize({
-        packet: PacketType.Version,
-        version: packet.version,
+        packet: PacketType.VersionPacket,
+        payload: { version: packet.version },
       }),
     );
   }
@@ -125,7 +104,7 @@ export class MultiplayerService implements OnModuleInit {
   async join(
     socket: WebSocket,
     setPlayer: (p: SessionPlayer) => void,
-    packet: PlayerJoinPacket,
+    packet: Proto.Join,
   ) {
     if (this.players.has(packet.id)) {
       console.log(packet);
@@ -136,14 +115,14 @@ export class MultiplayerService implements OnModuleInit {
 
     const player: SessionPlayer = {
       id: packet.id,
-      nick: packet.name,
-      name: packet.name,
+      nick: packet.username,
+      name: packet.username,
       socket,
       ping: {
         lastSync: new Date(),
         latencyMs: 0,
       },
-      mapId: packet.map,
+      mapId: packet.mapId,
     };
 
     await this.csm.connectPlayer(player.id);
@@ -153,49 +132,59 @@ export class MultiplayerService implements OnModuleInit {
     this.ping(player, socket);
     this.broadcastPacket(
       {
-        packet: PacketType.Join,
-        id: player.id,
-        name: player.name,
-        map:
-          this.mapRecords.find((record) => record.id === player.mapId)?.name ??
-          packet.map ??
-          'unknown',
+        packet: PacketType.JoinPacket,
+        payload: {
+          id: player.id,
+          username: player.name,
+          mode: packet.mode,
+          mapId: player.mapId!,
+          mapMode: packet.mapMode,
+          mapName: this.mapRecords.find((record) => record.id === player.mapId)!
+            .name,
+        },
       },
       [player.id],
     );
 
     socket.send(
       this.packetManager.serialize({
-        packet: PacketType.GetPlayers,
-        players: [...this.players.values()].map((player) => {
-          return {
-            id: player.id,
-            nick: player.name,
-            map:
-              this.mapRecords.find((record) => record.id === player.mapId)
-                ?.name ??
-              packet.map ??
-              'unknown',
-          };
-        }),
+        packet: PacketType.GetPlayersPacket,
+        payload: {
+          players: [...this.players.values()].map((player) => {
+            return {
+              id: player.id,
+              nickname: player.name,
+              mode: this.playerData.get(player.id)!.mode,
+              mapId: player.mapId!,
+              mapMode: packet.mapMode,
+              mapName: this.mapRecords.find(
+                (record) => record.id === player.mapId,
+              )!.name,
+            };
+          }),
+        },
       }),
     );
 
-    this.csm.sendPacket(packet, player.id);
+    this.csm.sendPacket(
+      { packet: PacketType.JoinPacket, payload: packet },
+      player.id,
+    );
 
     this.joinMap(player, {
-      packet: PacketType.Map,
-      map: packet.map,
-    });
+      id: player.id,
+      mode: packet.mapMode,
+      mapId: packet.mapId,
+    } satisfies Proto.Map);
 
-    this.logger.log(`${packet.name} joined the server`);
+    this.logger.log(`${packet.username} joined the server`);
   }
 
   ping(player: SessionPlayer, socket: WebSocket) {
     socket.send(
       this.packetManager.serialize({
-        packet: PacketType.Event,
-        signal: Event.Ping,
+        packet: PacketType.EventPacket,
+        payload: { type: Events.Ping },
       }),
     );
 
@@ -204,37 +193,38 @@ export class MultiplayerService implements OnModuleInit {
     player.ping.latencyMs = player.ping.lastSync.valueOf() - lastSync;
   }
 
-  playerMove(player: SessionPlayer, packet: MovePacket) {
+  playerMove(player: SessionPlayer, packet: Proto.Move) {
     if (!player.mapId) return;
 
     const map = this.mapSessions.get(player.mapId)!;
     const data: SessionPlayerData = {
       mode: packet.mode,
-      position: packet.position,
-      rotation: packet.rotation,
+      position: packet.position!,
+      rotation: packet.rotation!,
     };
 
     this.playerData.set(player.id, data);
 
     this.broadcastPacket(
       {
-        packet: PacketType.Move,
-        id: player.id,
-        ...data,
+        packet: PacketType.MovePacket,
+        payload: { id: player.id, ...data },
       },
       [player.id],
       map.players,
     );
 
-    this.csm.sendPacket(packet, player.id);
+    this.csm.sendPacket(
+      { packet: PacketType.MovePacket, payload: packet },
+      player.id,
+    );
   }
 
-  joinMap(player: SessionPlayer, packet: MapPacket) {
-    let map = this.mapSessions.get(packet.map);
-    // const mapType = packet.map.slice(0, 1) as MapType;
+  joinMap(player: SessionPlayer, packet: Proto.Map) {
+    let map = this.mapSessions.get(packet.mapId);
 
     if (player.mapId) {
-      const map = this.mapSessions.get(packet.map);
+      const map = this.mapSessions.get(packet.mapId);
       if (map) {
         map.players = map.players.filter((playerId) => playerId !== player.id);
         this.mapSessions.set(map.id, map);
@@ -243,39 +233,45 @@ export class MultiplayerService implements OnModuleInit {
 
     if (!map) {
       map = {
-        // id: packet.map.slice(1),
-        id: packet.map,
-        // type: mapType,
+        id: packet.mapId,
+        type: packet.mode,
         players: [],
         settings: [],
       };
     }
 
     map.players.push(player.id);
-    this.mapSessions.set(packet.map, map);
+    this.mapSessions.set(packet.mapId, map);
 
     this.broadcastPacket({
-      packet: PacketType.Map,
-      id: player.id,
-      map: packet.map,
+      packet: PacketType.MapPacket,
+      payload: { id: player.id, mode: packet.mode, mapId: packet.mapId },
     });
 
-    this.csm.sendPacket(packet, player.id);
+    this.csm.sendPacket(
+      { packet: PacketType.MapPacket, payload: packet },
+      player.id,
+    );
 
     this.logger.log(`${player.name} joined map: ${map.id}`);
   }
 
-  sendMessage(player: SessionPlayer, packet: MessagePacket) {
+  sendMessage(player: SessionPlayer, packet: Proto.Message) {
     this.broadcastPacket({
-      packet: PacketType.Message,
-      id: player.id,
-      message: `${player.nick ?? player.name}: ${packet.message}`,
+      packet: PacketType.MessagePacket,
+      payload: {
+        id: player.id,
+        message: `${player.nick ?? player.name}: ${packet.message}`,
+      },
     });
 
-    this.csm.sendPacket(packet, player.id);
+    this.csm.sendPacket(
+      { packet: PacketType.MessagePacket, payload: packet },
+      player.id,
+    );
   }
 
-  async sendCommand(player: SessionPlayer, packet: CommandPacket) {
+  async sendCommand(player: SessionPlayer, packet: Proto.Command) {
     await this.commands.executeCommand(player, packet.command!, {
       players: this.players,
       playerData: this.playerData,
@@ -286,98 +282,110 @@ export class MultiplayerService implements OnModuleInit {
     });
   }
 
-  placeBlock(player: SessionPlayer, packet: PlaceBlocksPacket) {
+  placeBlock(
+    player: SessionPlayer,
+    packet: Proto.PlaceBlocks | Proto.PlaceBlock,
+  ) {
     if (!player.collabId) return;
 
     const collab = this.collabSessions.get(player.collabId);
 
-    if (!collab) return;
+    if (!collab || !packet.block) return;
 
-    for (const block of packet.blocks) {
-      collab.blocks.set(block.instanceID, {
-        ...block,
-      });
+    if (Array.isArray(packet.block)) {
+      for (const block of packet.block) {
+        collab.blocks.set(block.instanceID, { ...block });
+      }
+
+      this.broadcastPacket(
+        {
+          packet: PacketType.PlaceBlocksPacket,
+          payload: { block: packet.block, id: player.id },
+        },
+        [player.id],
+        collab?.players,
+      );
+    } else {
+      collab.blocks.set(packet.block.instanceID, { ...packet.block });
+      this.broadcastPacket(
+        {
+          packet: PacketType.PlaceBlockPacket,
+          payload: { block: packet.block, id: player.id },
+        },
+        [player.id],
+        collab?.players,
+      );
     }
 
-    this.broadcastPacket({ ...packet }, [player.id], collab?.players);
     this.collabSessions.set(collab.id, collab);
   }
 
-  deleteBlock(player: SessionPlayer, packet: DeleteBlocksPacket) {
+  deleteBlock(player: SessionPlayer, packet: Proto.DeleteBlock) {
     if (!player.collabId) return;
 
     const collab = this.collabSessions.get(player.collabId);
 
     if (!collab) return;
 
-    for (const id of packet.instanceIDs) {
-      collab.blocks.delete(id);
-    }
+    collab.blocks.delete(packet.instanceID);
 
-    this.broadcastPacket({ ...packet }, [player.id], collab?.players);
+    this.broadcastPacket(
+      { packet: PacketType.DeleteBlockPacket, payload: { ...packet } },
+      [player.id],
+      collab?.players,
+    );
     this.collabSessions.set(collab.id, collab);
   }
 
-  paintBlock(player: SessionPlayer, packet: PaintBlocksPacket) {
+  changeBlock(player: SessionPlayer, packet: Proto.ChangeBlock) {
     if (!player.collabId) return;
 
     const collab = this.collabSessions.get(player.collabId);
 
     if (!collab) return;
 
-    for (const data of packet.blocks) {
-      const block = collab.blocks.get(data.instanceID)!;
-      collab.blocks.set(data.instanceID, {
-        ...block,
-        ...data,
-      });
-    }
+    collab.blocks.set(packet.block!.instanceID, {
+      ...packet.block!,
+    });
 
-    this.broadcastPacket({ ...packet }, [player.id], collab?.players);
+    this.broadcastPacket(
+      { packet: PacketType.ChangeBlockPacket, payload: { ...packet } },
+      [player.id],
+      collab?.players,
+    );
     this.collabSessions.set(collab.id, collab);
   }
 
-  moveBlock(player: SessionPlayer, packet: MoveBlocksPacket) {
+  setMapSettings(player: SessionPlayer, packet: Proto.MapSettings) {
     if (!player.collabId) return;
 
     const collab = this.collabSessions.get(player.collabId);
 
     if (!collab) return;
 
-    for (const data of packet.blocks) {
-      const block = collab.blocks.get(data.instanceID)!;
-      collab.blocks.set(data.instanceID, {
-        ...block,
-        ...data,
-      });
-    }
-
-    this.broadcastPacket({ ...packet }, [player.id], collab?.players);
+    collab.settings.set(packet.setting, packet.state);
+    this.broadcastPacket(
+      { packet: PacketType.MapSettingsPacket, payload: { ...packet } },
+      [player.id],
+      collab?.players,
+    );
     this.collabSessions.set(collab.id, collab);
   }
 
-  setMapSettings(player: SessionPlayer, packet: MapSettingsPacket) {
+  setMapColor(player: SessionPlayer, packet: Proto.MapColor) {
     if (!player.collabId) return;
 
     const collab = this.collabSessions.get(player.collabId);
 
     if (!collab) return;
 
-    collab.settings.set(packet.settings, packet.state);
-    this.broadcastPacket({ ...packet }, [player.id], collab?.players);
-    this.collabSessions.set(collab.id, collab);
-  }
+    collab.color.set(packet.settings, packet.color!);
 
-  setMapColor(player: SessionPlayer, packet: MapColorPacket) {
-    if (!player.collabId) return;
-
-    const collab = this.collabSessions.get(player.collabId);
-
-    if (!collab) return;
-
-    collab.color.set(packet.settings, packet.color);
-
-    this.broadcastPacket({ ...packet }, [player.id], collab?.players);
+    this.broadcastPacket(
+      { packet: PacketType.MapColorPacket, payload: { ...packet } },
+      [player.id],
+      collab?.players,
+    );
     this.collabSessions.set(collab.id, collab);
   }
 
@@ -420,15 +428,15 @@ export class MultiplayerService implements OnModuleInit {
     }
 
     this.broadcastPacket({
-      packet: PacketType.Disconnect,
-      id: playerId,
+      packet: PacketType.DisconnectPacket,
+      payload: { id: playerId },
     });
 
     this.csm.disconnectPlayer(playerId);
     this.csm.sendPacket(
       {
-        packet: PacketType.Disconnect,
-        id: playerId,
+        packet: PacketType.DisconnectPacket,
+        payload: { id: playerId },
       },
       playerId,
     );

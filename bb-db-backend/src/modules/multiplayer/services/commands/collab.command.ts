@@ -2,12 +2,10 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { CommandsService } from '../commands.service';
 import {
   CommandsContext,
-  Event,
-  GameMode,
-  PacketType,
   SessionCollab,
   SessionPlayer,
 } from '../../types/multiplayer';
+import { Events, GameMode, PacketType } from 'src/generated/protos/multiplayer';
 
 @Injectable()
 export class CollabCommand implements OnModuleInit {
@@ -15,7 +13,7 @@ export class CollabCommand implements OnModuleInit {
 
   onModuleInit() {
     this.commandsService.register({
-      aliases: ['/collab'],
+      aliases: ['/collab', '/c'],
       args: ['[create/leave/join/close]', '<name>'],
       description: 'show this list',
       execute: (...args) => this.collabCommand(...args),
@@ -50,7 +48,7 @@ export class CollabCommand implements OnModuleInit {
   ): string {
     if (player.collabId) return "You're already in a collab.";
 
-    if (context.playerData.get(player.id)!.mode !== GameMode.EDITOR)
+    if (context.playerData.get(player.id)!.mode !== GameMode.T_EDITOR)
       return 'You must in the editor to collab.';
 
     this.commandsService.sendMessage(
@@ -71,7 +69,7 @@ export class CollabCommand implements OnModuleInit {
     context.players.set(player.id, player);
     context.collabSessions.set(name, collab);
 
-    this.commandsService.sendEvent(player, Event.StartCollab);
+    this.commandsService.sendEvent(player, Events.StartCollab);
 
     return 'Collab opened!';
   }
@@ -83,7 +81,7 @@ export class CollabCommand implements OnModuleInit {
   ): string {
     if (player.collabId) return "You're already in a collab.";
 
-    if (context.playerData.get(player.id)!.mode !== GameMode.EDITOR)
+    if (context.playerData.get(player.id)!.mode !== GameMode.T_EDITOR)
       return 'You must in the editor to collab.';
 
     const collab = context.collabSessions.get(name);
@@ -94,7 +92,7 @@ export class CollabCommand implements OnModuleInit {
     collab.players.push(player.id);
     context.collabSessions.set(name, collab);
 
-    this.commandsService.sendEvent(player, Event.JoinCollab);
+    this.commandsService.sendEvent(player, Events.JoinCollab);
 
     if (collab.blocks.size > 2000) {
       this.commandsService.sendMessage(
@@ -105,23 +103,21 @@ export class CollabCommand implements OnModuleInit {
 
     for (const setting of collab.settings) {
       this.commandsService.sendPacket(player, {
-        packet: PacketType.MapSettings,
-        settings: setting[0],
-        state: setting[1],
+        packet: PacketType.MapSettingsPacket,
+        payload: { id: player.id, setting: setting[0], state: setting[1] },
       });
     }
 
     for (const color of collab.color) {
       this.commandsService.sendPacket(player, {
-        packet: PacketType.MapColor,
-        settings: color[0],
-        color: color[1],
+        packet: PacketType.MapColorPacket,
+        payload: { id: player.id, settings: color[0], color: color[1] },
       });
     }
 
     this.commandsService.sendPacket(player, {
-      packet: PacketType.PlaceBlocks,
-      blocks: [...collab.blocks.values()],
+      packet: PacketType.PlaceBlocksPacket,
+      payload: { id: player.id, block: [...collab.blocks.values()] },
     });
 
     return 'You have joined the collab';
@@ -163,7 +159,7 @@ export class CollabCommand implements OnModuleInit {
 
     context.collabSessions.delete(collab.id);
 
-    this.commandsService.broadcastEvent(Event.CloseCollab, collab.players, [
+    this.commandsService.broadcastEvent(Events.CloseCollab, collab.players, [
       player.id,
     ]);
 

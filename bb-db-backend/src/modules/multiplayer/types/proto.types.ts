@@ -1,0 +1,152 @@
+import * as Proto from 'src/generated/protos/multiplayer';
+
+type Version = {
+  packet: Proto.PacketType.VersionPacket;
+  payload: Proto.Version;
+};
+
+type Event = {
+  packet: Proto.PacketType.EventPacket;
+  payload: Proto.Event;
+};
+
+type Join = {
+  packet: Proto.PacketType.JoinPacket;
+  payload: Proto.Join;
+};
+
+type PlayerList = {
+  packet: Proto.PacketType.GetPlayersPacket;
+  payload: Proto.PlayerList;
+};
+
+type Disconnect = {
+  packet: Proto.PacketType.DisconnectPacket;
+  payload: Proto.Disconnect;
+};
+
+type Nickname = {
+  packet: Proto.PacketType.NicknamePacket;
+  payload: Proto.Nickname;
+};
+
+type BodyColor = {
+  packet: Proto.PacketType.BodyColorPacket;
+  payload: Proto.BodyColor;
+};
+
+type Move = {
+  packet: Proto.PacketType.MovePacket;
+  payload: Proto.Move;
+};
+
+type GameMode = {
+  packet: Proto.PacketType.GameModePacket;
+  payload: Proto.ChangeGameMode;
+};
+
+type Map = {
+  packet: Proto.PacketType.MapPacket;
+  payload: Proto.Map;
+};
+
+type Message = {
+  packet: Proto.PacketType.MessagePacket;
+  payload: Proto.Message;
+};
+
+type Command = {
+  packet: Proto.PacketType.CommandPacket;
+  payload: Proto.Command;
+};
+
+type PlayersPing = {
+  packet: Proto.PacketType.PlayersPingPacket;
+  payload: Proto.PlayersPing;
+};
+
+type LoadMap = {
+  packet: Proto.PacketType.LoadMapPacket;
+  payload: Proto.LoadMap;
+};
+
+type PlaceBlocks = {
+  packet: Proto.PacketType.PlaceBlocksPacket;
+  payload: Proto.PlaceBlocks;
+};
+
+type PlaceBlock = {
+  packet: Proto.PacketType.PlaceBlockPacket;
+  payload: Proto.PlaceBlock;
+};
+
+type DeleteBlock = {
+  packet: Proto.PacketType.DeleteBlockPacket;
+  payload: Proto.DeleteBlock;
+};
+
+type ChangeBlock = {
+  packet: Proto.PacketType.ChangeBlockPacket;
+  payload: Proto.ChangeBlock;
+};
+
+type MapSettings = {
+  packet: Proto.PacketType.MapSettingsPacket;
+  payload: Proto.MapSettings;
+};
+
+type MapColor = {
+  packet: Proto.PacketType.MapColorPacket;
+  payload: Proto.MapColor;
+};
+
+type UnknownPacket = {
+  packet: Proto.PacketType.UnknownPacket;
+  payload: unknown;
+};
+
+export type ProtoPacket =
+  | Version
+  | Event
+  | Join
+  | PlayerList
+  | Disconnect
+  | Nickname
+  | BodyColor
+  | Move
+  | GameMode
+  | Map
+  | Message
+  | Command
+  | PlayersPing
+  | LoadMap
+  | PlaceBlocks
+  | PlaceBlock
+  | DeleteBlock
+  | ChangeBlock
+  | MapSettings
+  | MapColor
+  | UnknownPacket;
+
+export enum ProtoType {
+  Version = 'version',
+  Event = 'event',
+  Join = 'join',
+  PlayerList = 'playerList',
+  Disconnect = 'disconnect',
+  Nickname = 'nickname',
+  BodyColor = 'bodyColor',
+  Move = 'move',
+  GameMode = 'gameMode',
+  Map = 'map',
+  Message = 'message',
+  Command = 'command',
+  PlayersPing = 'playersPing',
+  LoadMap = 'loadMap',
+  PlaceBlocks = 'placeBlocks',
+  PlaceBlock = 'placeBlock',
+  DeleteBlock = 'deleteBlock',
+  ChangeBlock = 'changeBlock',
+  MapSettings = 'mapSettings',
+  MapColor = 'mapColor',
+}

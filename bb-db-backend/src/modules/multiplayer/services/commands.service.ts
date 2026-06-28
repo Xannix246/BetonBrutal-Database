@@ -2,26 +2,25 @@ import { Injectable } from '@nestjs/common';
 import {
   CommandDefinition,
   CommandsContext,
-  Event,
-  PacketType,
   SessionPlayer,
 } from '../types/multiplayer';
-import { PacketManager } from './packet-manager.service';
 import { WebSocket } from 'ws';
-import { PacketData } from '../types/packet.types';
+import { ProtobufManager } from './protobuf-manager.service';
+import { Events, PacketType } from 'src/generated/protos/multiplayer';
+import { ProtoPacket } from '../types/proto.types';
 
 @Injectable()
 export class CommandsService {
   public readonly commands = new Map<string, CommandDefinition>();
   public context: CommandsContext | undefined;
 
-  constructor(private readonly packetManager: PacketManager) {}
+  constructor(private readonly packetManager: ProtobufManager) {}
 
   private sendServerMessage(socket: WebSocket, message: string) {
     socket.send(
       this.packetManager.serialize({
-        packet: PacketType.Command,
-        message,
+        packet: PacketType.CommandPacket,
+        payload: { message },
       }),
     );
   }
@@ -33,7 +32,7 @@ export class CommandsService {
   }
 
   broadcastPacket(
-    packet: PacketData,
+    packet: ProtoPacket,
     ignorePlayers: string[] = [],
     receivers?: string[],
   ) {
@@ -49,7 +48,7 @@ export class CommandsService {
     }
   }
 
-  sendPacket(player: SessionPlayer, packet: PacketData) {
+  sendPacket(player: SessionPlayer, packet: ProtoPacket) {
     player.socket.send(this.packetManager.serialize(packet));
   }
 
@@ -60,8 +59,8 @@ export class CommandsService {
   ) {
     this.broadcastPacket(
       {
-        packet: PacketType.Command,
-        message,
+        packet: PacketType.CommandPacket,
+        payload: { message },
       },
       ignorePlayers,
       receivers,
@@ -71,28 +70,32 @@ export class CommandsService {
   sendMessage(player: SessionPlayer, message: string) {
     player.socket.send(
       this.packetManager.serialize({
-        packet: PacketType.Command,
-        message,
+        packet: PacketType.CommandPacket,
+        payload: { message },
       }),
     );
   }
 
-  broadcastEvent(event: Event, receivers?: string[], ignorePlayers?: string[]) {
+  broadcastEvent(
+    event: Events,
+    receivers?: string[],
+    ignorePlayers?: string[],
+  ) {
     this.broadcastPacket(
       {
-        packet: PacketType.Event,
-        signal: event,
+        packet: PacketType.EventPacket,
+        payload: { type: event },
       },
       ignorePlayers,
       receivers,
     );
   }
 
-  sendEvent(player: SessionPlayer, event: Event) {
+  sendEvent(player: SessionPlayer, event: Events) {
     player.socket.send(
       this.packetManager.serialize({
-        packet: PacketType.Event,
-        signal: event,
+        packet: PacketType.EventPacket,
+        payload: { type: event },
       }),
     );
   }
@@ -104,13 +107,17 @@ export class CommandsService {
   ) {
     const [rawCommand, ...args] = commandLine.trim().split(/\s+/);
 
-    const command = this.commands.get(rawCommand.toLowerCase());
+    const command = [...this.commands.values()].find((command) =>
+      command.aliases.includes(rawCommand.toLowerCase()),
+    );
 
     if (!command) {
       return this.sendServerMessage(player.socket, 'Invalid command.');
     }
 
     this.context = context;
+
+    if (!command.execute) return;
 
     const result = await command.execute(player, args, context);
 

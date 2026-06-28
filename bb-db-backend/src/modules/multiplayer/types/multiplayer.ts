@@ -1,4 +1,11 @@
 import { WebSocket } from 'ws';
+import {
+  GameMode as ProtoGameMode,
+  MapType as ProtoMapType,
+  Block as ProtoBlock,
+  MapSetting as ProtoMapSetting,
+  // MapSettings as ProtoMapSettings,
+} from 'src/generated/protos/multiplayer';
 
 export enum PacketType {
   Version = 0,
@@ -80,9 +87,9 @@ export type SessionCollab = {
   id: string;
   ownerId: string;
   players: string[];
-  blocks: Map<string, Block>;
-  settings: Map<MapSetting, boolean>;
-  color: Map<MapSetting, Color>;
+  blocks: Map<string, ProtoBlock>;
+  settings: Map<ProtoMapSetting, boolean>;
+  color: Map<ProtoMapSetting, Color>;
 };
 
 // can be stored in prisma
@@ -101,11 +108,11 @@ export type SessionRace = {
 // can be stored in prisma
 export type MapSession = {
   id: string;
-  // type: MapType;
+  type: ProtoMapType;
   players: string[]; // SessionPlayer id's
   // blocks: Block[]; // instead of storing all map data with thousands of blocks we could just take map archive
   // in the ./maps folder, unpack it, decompile Map.bbmap and send blocks data from it
-  settings: MapSetting[];
+  settings: ProtoMapSetting[];
   // createdAt: Date; don't see the point in that
 };
 
@@ -122,10 +129,11 @@ export type SessionPlayer = {
   mapId?: string; // MapSession id
   raceId?: string; // SessionRace id
   collabId?: string; // SessionCollab id
+  proxyMode?: boolean;
 };
 
 export type SessionPlayerData = {
-  mode: GameMode;
+  mode: ProtoGameMode;
   position: Vector3;
   rotation: Vector3;
 };
@@ -143,7 +151,7 @@ export interface CommandDefinition {
   aliases: string[];
   args?: string[];
   description: string;
-  execute(
+  execute?(
     player: SessionPlayer,
     args: string[],
     context: CommandsContext,

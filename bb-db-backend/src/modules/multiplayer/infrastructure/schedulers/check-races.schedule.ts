@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { MultiplayerService } from '../../services/multiplayer.service';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { Event, PacketType, SessionRace } from '../../types/multiplayer';
+import { SessionRace } from '../../types/multiplayer';
+import { Events, PacketType } from 'src/generated/protos/multiplayer';
 
 @Injectable()
 export class CheckRacesScheduler {
@@ -52,8 +53,8 @@ export class CheckRacesScheduler {
     this.multiplayer.broadcastServer('Race has started, GO!', race.players);
 
     this.multiplayer.broadcastPacket({
-      packet: PacketType.Event,
-      signal: Event.RaceStart,
+      packet: PacketType.EventPacket,
+      payload: { type: Events.RaceStart },
     });
   }
 
