@@ -17,7 +17,7 @@ export class HelpCommand implements OnModuleInit {
     const commands = [...this.commandsService.commands.values()];
     const commandsDescription = commands.map(
       (command) =>
-        `${command.aliases[0]}${command.aliases.length > 1 && ` (or ${command.aliases.slice(1).join('|')})`} ${command.args?.join(' ') ?? ''} - ${command.description}`,
+        `${command.aliases[0]}${command.aliases.length > 1 ? ` (or ${command.aliases.slice(1).join('|')})` : ''} ${command.args?.join(' ') ?? ''} - ${command.description}`,
     );
 
     return commandsDescription.join('\n');

@@ -14,12 +14,17 @@ import { CollabCommand } from './services/commands/collab.command';
 import { CompatibilityService } from './services/compatibility.service';
 import { ProxyCommand } from './services/commands/proxy.command';
 import { ProtobufManager } from './services/protobuf-manager.service';
+import { CheckPingScheduler } from './infrastructure/schedulers/check-ping.schedule';
+import { CollabService } from './services/collab.service';
+import { EventsService } from './services/events.service';
 
 @Module({
   imports: [PrismaModule, WorkshopModule],
   providers: [
     MultiplayerService,
     CommandsService,
+    CollabService,
+    EventsService,
     PacketManager,
     ProtobufManager,
     MultiplayerWebsocketGateway,
@@ -30,6 +35,7 @@ import { ProtobufManager } from './services/protobuf-manager.service';
     CollabCommand,
     ProxyCommand,
     CheckRacesScheduler,
+    CheckPingScheduler,
     CompatibilityService,
   ],
   exports: [MultiplayerService],

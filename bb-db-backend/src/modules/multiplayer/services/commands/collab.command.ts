@@ -48,7 +48,7 @@ export class CollabCommand implements OnModuleInit {
   ): string {
     if (player.collabId) return "You're already in a collab.";
 
-    if (context.playerData.get(player.id)!.mode !== GameMode.T_EDITOR)
+    if (context.playerData.get(player.id)?.mode !== GameMode.T_EDITOR)
       return 'You must in the editor to collab.';
 
     this.commandsService.sendMessage(
@@ -61,6 +61,7 @@ export class CollabCommand implements OnModuleInit {
       ownerId: player.id,
       players: [player.id],
       blocks: new Map(),
+      groups: new Map(),
       settings: new Map(),
       color: new Map(),
     };
@@ -81,7 +82,7 @@ export class CollabCommand implements OnModuleInit {
   ): string {
     if (player.collabId) return "You're already in a collab.";
 
-    if (context.playerData.get(player.id)!.mode !== GameMode.T_EDITOR)
+    if (context.playerData.get(player.id)?.mode !== GameMode.T_EDITOR)
       return 'You must in the editor to collab.';
 
     const collab = context.collabSessions.get(name);

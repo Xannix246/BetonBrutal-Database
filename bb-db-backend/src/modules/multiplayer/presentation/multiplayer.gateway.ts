@@ -6,6 +6,8 @@ import { SessionPlayer } from '../types/multiplayer';
 import { v4 } from 'uuid';
 import { ProtobufManager } from '../services/protobuf-manager.service';
 import { Events, PacketType } from 'src/generated/protos/multiplayer';
+import { CollabService } from '../services/collab.service';
+import { EventsService } from '../services/events.service';
 
 @Injectable()
 export class MultiplayerWebsocketGateway implements OnModuleInit {
@@ -16,6 +18,8 @@ export class MultiplayerWebsocketGateway implements OnModuleInit {
   constructor(
     private readonly packetManager: ProtobufManager,
     private readonly multiplayer: MultiplayerService,
+    private readonly collab: CollabService,
+    private readonly events: EventsService,
   ) {}
 
   onModuleInit() {
@@ -48,8 +52,6 @@ export class MultiplayerWebsocketGateway implements OnModuleInit {
       }
 
       this.users.delete(uuid);
-      console.log('Client disconnected');
-      console.log(this.users);
     });
   }
 
@@ -68,12 +70,12 @@ export class MultiplayerWebsocketGateway implements OnModuleInit {
       return;
     }
 
-    // if (
-    //   packet.packet !== PacketType.Event &&
-    //   packet.packet !== PacketType.Move
-    // ) {
-    //   this.logger.log(packet);
-    // }
+    if (
+      packet.packet !== PacketType.EventPacket &&
+      packet.packet !== PacketType.MovePacket
+    ) {
+      this.logger.log(packet);
+    }
 
     switch (packet.packet) {
       case PacketType.VersionPacket:
@@ -88,10 +90,10 @@ export class MultiplayerWebsocketGateway implements OnModuleInit {
         switch (packet.payload.type) {
           case Events.Ping:
             if (!player) return;
-            this.multiplayer.ping(player, socket);
+            this.events.ping(player);
             break;
           case Events.RunComplete:
-            this.multiplayer.completeRun(player!);
+            this.events.completeRun(player!);
         }
         break;
       case PacketType.MovePacket:
@@ -110,19 +112,34 @@ export class MultiplayerWebsocketGateway implements OnModuleInit {
         break;
       case PacketType.PlaceBlocksPacket:
       case PacketType.PlaceBlockPacket:
-        this.multiplayer.placeBlock(player!, packet.payload);
+        this.collab.placeBlock(player!, packet.payload);
         break;
       case PacketType.DeleteBlockPacket:
-        this.multiplayer.deleteBlock(player!, packet.payload);
+        this.collab.deleteBlock(player!, packet.payload);
         break;
       case PacketType.ChangeBlockPacket:
-        this.multiplayer.changeBlock(player!, packet.payload);
+        this.collab.changeBlock(player!, packet.payload);
         break;
       case PacketType.MapSettingsPacket:
-        this.multiplayer.setMapSettings(player!, packet.payload);
+        this.collab.setMapSettings(player!, packet.payload);
         break;
       case PacketType.MapColorPacket:
-        this.multiplayer.setMapColor(player!, packet.payload);
+        this.collab.setMapColor(player!, packet.payload);
+        break;
+      case PacketType.CreateGroupPacket:
+        this.collab.createGroup(player!, packet.payload);
+        break;
+      case PacketType.ChangeGroupPacket:
+        this.collab.changeGroup(player!, packet.payload);
+        break;
+      case PacketType.DeleteGroupPacket:
+        this.collab.deleteGroup(player!, packet.payload);
+        break;
+      case PacketType.AddBlockToGroupPacket:
+        this.collab.addBlockToGroup(player!, packet.payload);
+        break;
+      case PacketType.RemoveBlockFromGroupPacket:
+        this.collab.removeBlockFromGroup(player!, packet.payload);
         break;
       case PacketType.DisconnectPacket:
         this.multiplayer.onDisconnect(packet.payload.id);

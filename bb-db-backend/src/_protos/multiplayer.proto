@@ -27,6 +27,11 @@ enum PacketType {
   ChangeBlockPacket = 21;
   MapSettingsPacket = 22;
   MapColorPacket = 23;
+  CreateGroupPacket = 24;
+  ChangeGroupPacket = 25;
+  DeleteGroupPacket = 26;
+  AddBlockToGroupPacket = 27;
+  RemoveBlockFromGroupPacket = 28;
   UnknownPacket = 404;
 }
 
@@ -87,7 +92,7 @@ message PlayerEntry {
   int64 id = 1;
   string nickname = 2;
   MapType map_mode = 3;
-  int64 map_id = 4;
+  string map_id = 4;
   optional string map_name = 5;
 }
 
@@ -106,6 +111,13 @@ message Block {
   optional Color customColor = 7;
 }
 
+message Group {
+  string instanceID = 1;
+  string name = 2;
+  repeated string blocks = 3;
+  optional Block pivot = 4;
+}
+
 // Packets
 
 message Version {
@@ -121,7 +133,7 @@ message Join {
   string username = 2;
   GameMode mode = 3;
   MapType map_mode = 4;
-  int64 map_id = 5;
+  string map_id = 5;
   optional string map_name = 6;
 }
 
@@ -149,6 +161,7 @@ message Move {
   GameMode mode = 2;
   Vector3 position = 3;
   Vector3 rotation = 4;
+  optional uint64 packet_id = 5;
 }
 
 message ChangeGameMode {
@@ -159,7 +172,7 @@ message ChangeGameMode {
 message Map {
   int64 id = 1;
   MapType mode = 2;
-  int64 map_id = 3;
+  string map_id = 3;
 }
 
 message Message {
@@ -180,7 +193,7 @@ message PlayersPing {
 message LoadMap {
   int64 id = 1;
   MapType mode = 2;
-  int64 map_id = 3;
+  string map_id = 3;
 }
 
 message PlaceBlocks {
@@ -216,6 +229,33 @@ message MapColor {
   Color color = 3;
 }
 
+message CreateGroup {
+  int64 id = 1;
+  Group group = 2;
+}
+
+message ChangeGroup {
+  int64 id = 1;
+  Group group = 2;
+}
+
+message DeleteGroup {
+  int64 id = 1;
+  string instanceID = 2;
+}
+
+message AddBlockToGroup {
+  int64 id = 1;
+  string groupInstanceID = 2;
+  string blockInstanceID = 3;
+}
+
+message RemoveBlockFromGroup {
+  int64 id = 1;
+  string groupInstanceID = 2;
+  string blockInstanceID = 3;
+}
+
 message Packet {
   oneof payload {
     Version version = 2;
@@ -241,5 +281,10 @@ message Packet {
     ChangeBlock change_block = 22;
     MapSettings map_settings = 23;
     MapColor map_color = 24;
+    CreateGroup create_group = 25;
+    ChangeGroup change_group = 26;
+    DeleteGroup delete_group = 27;
+    AddBlockToGroup add_block_to_group = 28;
+    RemoveBlockFromGroup remove_block_from_group = 29;
   }
 }

@@ -13,17 +13,20 @@ export class CheckRacesScheduler {
     const races = this.multiplayer.raceSessions.values();
 
     for (const race of races) {
-      if (!race.started && this.getSeconds(race.time.valueOf()) === 15 - 3) {
-        if (race.players.length < 2) continue;
+      if (!race.started && this.getSeconds(race.time.valueOf()) < 15) {
+        // if (race.players.length < 2) continue;
+        if (this.getSeconds(race.time.valueOf()) < 10) continue;
         this.multiplayer.broadcastServer(
-          'Race starting in 3 seconds...',
+          `Race starting in ${15 - this.getSeconds(race.time.valueOf())} seconds...`,
           race.players,
         );
       } else if (!race.started && this.getSeconds(race.time.valueOf()) >= 15) {
         this.raceStart(race);
       } else if (
         race.players.length === race.results.length ||
-        (race.finished && this.getSeconds(race.time.valueOf()) > 60)
+        (race.finished &&
+          this.getSeconds(race.time.valueOf()) >
+            (race.results[0].time / 1000) * 4)
       ) {
         this.raceEnd(race);
       }
@@ -31,21 +34,21 @@ export class CheckRacesScheduler {
   }
 
   private raceStart(race: SessionRace) {
-    if (race.players.length < 2) {
-      for (const playerId of race.players) {
-        const player = this.multiplayer.players.get(playerId)!;
-        player.raceId = undefined;
-        this.multiplayer.players.set(playerId, player);
-      }
+    // if (race.players.length < 2) {
+    //   for (const playerId of race.players) {
+    //     const player = this.multiplayer.players.get(playerId)!;
+    //     player.raceId = undefined;
+    //     this.multiplayer.players.set(playerId, player);
+    //   }
 
-      this.multiplayer.broadcastServer(
-        'Race canceled: Not enough players.',
-        race.players,
-      );
+    //   this.multiplayer.broadcastServer(
+    //     'Race canceled: Not enough players.',
+    //     race.players,
+    //   );
 
-      this.multiplayer.raceSessions.delete(race.id);
-      return;
-    }
+    //   this.multiplayer.raceSessions.delete(race.id);
+    //   return;
+    // }
 
     race.started = true;
     race.time = new Date();
@@ -79,7 +82,7 @@ export class CheckRacesScheduler {
   }
 
   private formatTime(score: number): string {
-    const seconds = score / 100;
+    const seconds = score / 1000;
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);
     const remainingSeconds = seconds % 60;

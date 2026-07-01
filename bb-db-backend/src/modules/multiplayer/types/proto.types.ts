@@ -100,6 +100,31 @@ type MapColor = {
   payload: Proto.MapColor;
 };
 
+type CreateGroup = {
+  packet: Proto.PacketType.CreateGroupPacket;
+  payload: Proto.CreateGroup;
+};
+
+type ChangeGroup = {
+  packet: Proto.PacketType.ChangeGroupPacket;
+  payload: Proto.ChangeGroup;
+};
+
+type DeleteGroup = {
+  packet: Proto.PacketType.DeleteGroupPacket;
+  payload: Proto.DeleteGroup;
+};
+
+type AddBlockToGroup = {
+  packet: Proto.PacketType.AddBlockToGroupPacket;
+  payload: Proto.AddBlockToGroup;
+};
+
+type RemoveBlockFromGroup = {
+  packet: Proto.PacketType.RemoveBlockFromGroupPacket;
+  payload: Proto.RemoveBlockFromGroup;
+};
+
 type UnknownPacket = {
   packet: Proto.PacketType.UnknownPacket;
   payload: unknown;
@@ -126,6 +151,11 @@ export type ProtoPacket =
   | ChangeBlock
   | MapSettings
   | MapColor
+  | CreateGroup
+  | ChangeGroup
+  | DeleteGroup
+  | AddBlockToGroup
+  | RemoveBlockFromGroup
   | UnknownPacket;
 
 export enum ProtoType {
@@ -149,4 +179,9 @@ export enum ProtoType {
   ChangeBlock = 'changeBlock',
   MapSettings = 'mapSettings',
   MapColor = 'mapColor',
+  CreateGroup = 'createGroup',
+  ChangeGroup = 'changeGroup',
+  DeleteGroup = 'deleteGroup',
+  AddBlockToGroup = 'addBlockToGroup',
+  RemoveBlockFromGroup = 'removeBlockFromGroup',
 }

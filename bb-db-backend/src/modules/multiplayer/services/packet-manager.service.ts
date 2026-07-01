@@ -12,7 +12,10 @@ export class PacketManager {
     const serializer = new PacketSerializer(0, new Uint8Array());
     serializer.writeUInt8(data.packet);
     this.serializePayload(serializer, data);
-    return Buffer.from(serializer.buffer.subarray(0, serializer.offset));
+    const buffer = Buffer.from(
+      serializer.buffer.subarray(0, serializer.offset),
+    );
+    return buffer;
   }
 
   public deserialize(buffer: Buffer, getId?: boolean): PacketData | undefined {
@@ -116,7 +119,7 @@ export class PacketManager {
         return;
 
       case PacketType.Command:
-        serializer.writeString(data.message ?? '');
+        serializer.writeString(data.command ?? '');
         return;
 
       case PacketType.PlayersPing:

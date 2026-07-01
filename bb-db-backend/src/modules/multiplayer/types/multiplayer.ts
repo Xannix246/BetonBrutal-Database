@@ -82,12 +82,20 @@ export type Block = {
   customColor: Color;
 };
 
+export type Group = {
+  instanceID: string;
+  name: string;
+  blocks: string[];
+  pivot?: ProtoBlock;
+};
+
 // blocks can be changed quickly, so maybe it's better to save in ram but idk
 export type SessionCollab = {
   id: string;
   ownerId: string;
   players: string[];
   blocks: Map<string, ProtoBlock>;
+  groups: Map<string, Group>;
   settings: Map<ProtoMapSetting, boolean>;
   color: Map<ProtoMapSetting, Color>;
 };
@@ -109,7 +117,7 @@ export type SessionRace = {
 export type MapSession = {
   id: string;
   type: ProtoMapType;
-  players: string[]; // SessionPlayer id's
+  players: Set<string>; // SessionPlayer id's
   // blocks: Block[]; // instead of storing all map data with thousands of blocks we could just take map archive
   // in the ./maps folder, unpack it, decompile Map.bbmap and send blocks data from it
   settings: ProtoMapSetting[];
@@ -136,6 +144,7 @@ export type SessionPlayerData = {
   mode: ProtoGameMode;
   position: Vector3;
   rotation: Vector3;
+  packetId?: string;
 };
 
 export type CommandsContext = {

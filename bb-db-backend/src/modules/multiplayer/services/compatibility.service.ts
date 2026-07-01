@@ -20,6 +20,7 @@ import { ProtobufManager } from './protobuf-manager.service';
 @Injectable()
 export class CompatibilityService {
   private readonly sockets: Map<string, WebSocket> = new Map();
+  private readonly proxyPlayers: Map<string, string> = new Map();
   public context: CommandsContext | undefined;
   // playerId, socket
 
@@ -29,7 +30,9 @@ export class CompatibilityService {
   ) {}
 
   async connectPlayer(playerId: string) {
-    const socket = new WebSocket('wss://betonbrutal.com:55082');
+    // wss://betonbrutal.com:55071 - exp
+    // wss://betonbrutal.com:55082 - dev
+    const socket = new WebSocket('wss://betonbrutal.com:55071');
 
     await new Promise<void>((resolve, reject) => {
       socket.addEventListener('open', () => {
@@ -40,11 +43,16 @@ export class CompatibilityService {
           }),
         );
         resolve();
+        console.log('Client connected to compability server');
       });
 
       socket.addEventListener('error', (error) => {
         reject(Error(error.type));
       });
+
+      // socket.addEventListener('close', (message) =>
+      //   console.log('Client disconnected, reason:', message),
+      // );
     });
 
     this.sockets.set(playerId, socket);
@@ -157,10 +165,12 @@ export class CompatibilityService {
         if (player.proxyMode) {
           if (packet.payload.command?.includes('collab')) return;
 
+          // console.log('here is packet', packet);
+
           socket.send(
             this.legacyPacketManager.serialize({
               packet: LegacyPacketType.Command,
-              command: packet.payload.command,
+              command: `${packet.payload.command}`,
             }),
           );
         }
@@ -171,20 +181,41 @@ export class CompatibilityService {
   private handleConnection(socket: WebSocket, id: string) {
     socket.on('message', (message) => {
       this.handleMessage(message as Buffer, id);
+      // try {
+      //   this.handleMessage(message as Buffer, id);
+      // } catch {
+      //   console.log('well, nevermind');
+      // }
     });
   }
 
   private handleMessage(message: Buffer, playerId: string) {
     const packet = this.legacyPacketManager.deserialize(message, true);
     const player = this.context!.players.get(playerId);
+    const socket = this.sockets.get(playerId);
     const ids = [...this.context!.players.keys()];
+    let data: {
+      id: string;
+      nick?: string;
+      map?: string;
+      ping?: number;
+    }[] = [];
+
+    if (
+      packet?.packet === LegacyPacketType.PlayersPing ||
+      packet?.packet === LegacyPacketType.GetPlayers
+    ) {
+      data = [...packet.players.filter((player) => !ids.includes(player.id))];
+    }
+
     // console.log('packet received:', packet);
 
     if (!packet || !player) return;
 
     if (
       packet.packet !== LegacyPacketType.Event &&
-      packet.packet !== LegacyPacketType.Move
+      packet.packet !== LegacyPacketType.Move &&
+      packet.packet === LegacyPacketType.Command
     ) {
       console.log('packet received:', packet);
       // console.log(this.packetManager.serialize(packet));
@@ -203,6 +234,7 @@ export class CompatibilityService {
         LegacyPacketType.GetPlayers,
         LegacyPacketType.PlayersPing,
         LegacyPacketType.Command,
+        LegacyPacketType.Disconnect,
       ].includes(packet.packet)
     ) {
       if (
@@ -213,23 +245,20 @@ export class CompatibilityService {
       }
 
       if (packet.packet === LegacyPacketType.GetPlayers) {
-        const data = [
-          ...packet.players.filter((player) => !ids.includes(player.id)),
-        ];
-
-        console.log(data);
-
+        for (const player of packet.players) {
+          this.proxyPlayers.set(player.id, player.nick);
+        }
         player.socket.send(
           this.packetManager.serialize({
             packet: PacketType.GetPlayersPacket,
             payload: {
               players: data.map((player) => ({
                 id: player.id,
-                nickname: player.nick,
+                nickname: player.nick!,
                 mapMode: this.convertMapType(
-                  player.map.slice(0, 1) as LegacyMapType,
+                  player.map!.slice(0, 1) as LegacyMapType,
                 ),
-                mapId: player.map.slice(1),
+                mapId: player.map!.slice(1),
               })),
             },
           }),
@@ -256,12 +285,27 @@ export class CompatibilityService {
                 mapMode: this.convertMapType(
                   packet.map.slice(0, 1) as LegacyMapType,
                 ),
-                mapId: packet.map.slice(1),
+                mapId: Number(packet.map.slice(1)) ? packet.map.slice(1) : '0',
+                mapName: !Number(packet.map.slice(1))
+                  ? packet.map.slice(1)
+                  : undefined,
               },
             }),
           );
+          this.sendPrivateMessage(
+            player.id,
+            `Player ${packet.name} joined the server`,
+          );
           break;
         case LegacyPacketType.Event:
+          if (packet.signal === Event.Ping) {
+            return socket?.send(
+              this.legacyPacketManager.serialize({
+                packet: LegacyPacketType.Event,
+                signal: Event.Ping,
+              }),
+            );
+          }
           player.socket.send(
             this.packetManager.serialize({
               packet: PacketType.EventPacket,
@@ -286,6 +330,7 @@ export class CompatibilityService {
           break;
         case LegacyPacketType.Map:
           if (!packet.id) return;
+          if (packet.id === player.id) return;
           player.socket.send(
             this.packetManager.serialize({
               packet: PacketType.MapPacket,
@@ -334,15 +379,22 @@ export class CompatibilityService {
           player.socket.send(
             this.packetManager.serialize({
               packet: PacketType.PlayersPingPacket,
-              payload: { players: packet.players },
+              payload: {
+                players: data.map((player) => ({
+                  id: player.id,
+                  ping: player.ping!,
+                })),
+              },
             }),
           );
           break;
         case LegacyPacketType.Command:
           if (player.proxyMode) {
-            let data = packet.message?.split('\n');
-            data = data?.filter((str) => !str.includes('collab'));
-            data?.push('/cb - disable proxy mode');
+            let data = packet.command?.split('\n');
+            if (packet.command?.includes('help')) {
+              data = data?.filter((str) => !str.includes('collab'));
+              data?.push('/compatibility (or /cb|/proxy) - disable proxy mode');
+            }
 
             player.socket.send(
               this.packetManager.serialize({
@@ -351,6 +403,20 @@ export class CompatibilityService {
               }),
             );
           }
+          break;
+        case LegacyPacketType.Disconnect:
+          if (ids.includes(packet.id)) return;
+          player.socket.send(
+            this.packetManager.serialize({
+              packet: PacketType.DisconnectPacket,
+              payload: { id: packet.id },
+            }),
+          );
+          this.sendPrivateMessage(
+            player.id,
+            `Player ${this.proxyPlayers.get(packet.id)} left the server`,
+          );
+          this.proxyPlayers.delete(packet.id);
           break;
       }
     }
@@ -426,5 +492,18 @@ export class CompatibilityService {
       default:
         throw new Error('Failed to convert GameMode');
     }
+  }
+
+  private sendPrivateMessage(playerId: string, message: string) {
+    const player = this.context?.players.get(playerId);
+
+    if (!player) return;
+
+    player.socket.send(
+      this.packetManager.serialize({
+        packet: PacketType.CommandPacket,
+        payload: { message },
+      }),
+    );
   }
 }

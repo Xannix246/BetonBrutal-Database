@@ -26,9 +26,10 @@ export class CommandsService {
   }
 
   register(command: CommandDefinition) {
-    for (const alias of command.aliases) {
-      this.commands.set(alias.toLowerCase(), command);
-    }
+    // for (const alias of command.aliases) {
+    //   this.commands.set(alias.toLowerCase(), command);
+    // }
+    this.commands.set(command.aliases[0].toLowerCase(), command);
   }
 
   broadcastPacket(

@@ -29,6 +29,7 @@ export class RaceCommand implements OnModuleInit {
   }
 
   private raceJoin(player: SessionPlayer, context: CommandsContext): string {
+    console.log(player, context.mapSessions);
     if (!player.mapId) return "You're not in map";
 
     const map = context.mapSessions.get(player.mapId);
@@ -37,9 +38,13 @@ export class RaceCommand implements OnModuleInit {
 
     if (player.mapId?.startsWith('E')) return 'Cannot race in editor';
     if (!map) return 'Map not found';
-    if (map.players.length === 0) return 'No player to race';
+    if (map.players.size === 0) return 'No player to race';
 
     let race = context.raceSessions.get(map.id);
+
+    if (race?.players.includes(player.id)) {
+      return 'You already in race';
+    }
 
     if (!race) {
       race = {
@@ -58,7 +63,7 @@ export class RaceCommand implements OnModuleInit {
 
     this.commandsService.broadcastMessage(
       'Race is starting. Type /race to join!',
-      map.players,
+      [...map.players],
       [player.id],
     );
 
@@ -71,7 +76,7 @@ export class RaceCommand implements OnModuleInit {
       return `Race starting in ${15 - this.getSeconds(race.time.valueOf())} seconds.`;
     if (!race.finished)
       return `Race started ${this.getSeconds(race.time.valueOf())} seconds ago.`;
-    return `Race is ending in ${60 - this.getSeconds(race.time.valueOf())} seconds.`;
+    return `Race is ending in ${((race.results[0].time / 1000) * 4 - this.getSeconds(race.time.valueOf())).toFixed(0)} seconds.`;
   }
 
   private raceQuit(player: SessionPlayer, context: CommandsContext): string {
