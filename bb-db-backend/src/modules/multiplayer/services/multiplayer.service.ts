@@ -279,7 +279,7 @@ export class MultiplayerService implements OnModuleInit {
     console.log('got command', packet.command);
     if (
       player.proxyMode &&
-      !['compatibility', 'cb', 'proxy'].includes(packet.command!)
+      !['/compatibility', '/cb', '/proxy'].includes(packet.command!)
     ) {
       return this.csm.sendPacket(
         { packet: PacketType.CommandPacket, payload: packet },
