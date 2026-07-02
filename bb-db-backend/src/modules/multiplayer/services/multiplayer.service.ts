@@ -160,6 +160,7 @@ export class MultiplayerService implements OnModuleInit {
               mapName:
                 this.mapRecords.find((record) => record.id === player.mapId)
                   ?.name ?? player.mapId,
+              playerColor: player.color,
             };
           }),
         },
@@ -169,6 +170,13 @@ export class MultiplayerService implements OnModuleInit {
     this.csm.sendPacket(
       { packet: PacketType.JoinPacket, payload: packet },
       player.id,
+    );
+
+    this.broadcastServer(
+      `Player ${player.nick} joined the server`,
+      [...this.players.values()]
+        .filter((p) => p.id !== player.id)
+        .map((p) => p.id),
     );
 
     this.joinMap(player, {
@@ -209,6 +217,20 @@ export class MultiplayerService implements OnModuleInit {
     );
   }
 
+  setColor(player: SessionPlayer, packet: Proto.BodyColor) {
+    player.color = packet.customColor;
+
+    this.players.set(player.id, player);
+
+    const readyPacket: ProtoPacket = {
+      packet: PacketType.BodyColorPacket,
+      payload: packet,
+    };
+
+    this.broadcastPacket(readyPacket);
+    this.csm.sendPacket(readyPacket, player.id);
+  }
+
   joinMap(player: SessionPlayer, packet: Proto.Map) {
     // if (!packet.mapId) return;
     let map = this.mapSessions.get(packet.mapId);
@@ -240,12 +262,6 @@ export class MultiplayerService implements OnModuleInit {
 
     map.players.add(player.id);
     this.mapSessions.set(packet.mapId, map);
-
-    console.log('JoinMapData', {
-      id: player.id,
-      mode: packet.mode,
-      mapId: packet.mapId,
-    });
 
     this.broadcastPacket({
       packet: PacketType.MapPacket,
@@ -302,7 +318,6 @@ export class MultiplayerService implements OnModuleInit {
 
     if (!player) return;
 
-    this.players.delete(playerId);
     const collabs = [...this.collabSessions.values()];
     const collab = collabs.find((collab) => collab.players.includes(playerId));
 
@@ -345,14 +360,7 @@ export class MultiplayerService implements OnModuleInit {
     });
 
     this.csm.disconnectPlayer(playerId);
-    this.csm.sendPacket(
-      {
-        packet: PacketType.DisconnectPacket,
-        payload: { id: playerId },
-      },
-      playerId,
-    );
-
+    this.players.delete(playerId);
     this.broadcastServer(`Player ${player?.nick} left the server`);
   }
 }

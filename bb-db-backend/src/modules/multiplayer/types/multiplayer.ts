@@ -4,6 +4,7 @@ import {
   MapType as ProtoMapType,
   Block as ProtoBlock,
   MapSetting as ProtoMapSetting,
+  Color as ProtoColor,
   // MapSettings as ProtoMapSettings,
 } from 'src/generated/protos/multiplayer';
 
@@ -138,6 +139,7 @@ export type SessionPlayer = {
   raceId?: string; // SessionRace id
   collabId?: string; // SessionCollab id
   proxyMode?: boolean;
+  color?: ProtoColor;
 };
 
 export type SessionPlayerData = {

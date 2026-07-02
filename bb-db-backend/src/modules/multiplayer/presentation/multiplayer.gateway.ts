@@ -48,7 +48,8 @@ export class MultiplayerWebsocketGateway implements OnModuleInit {
       const user = this.users.get(uuid);
 
       if (user) {
-        this.multiplayer.onDisconnect(user);
+        void this.multiplayer.onDisconnect(user);
+        console.log(`${user} disconnected`);
       }
 
       this.users.delete(uuid);
@@ -100,6 +101,9 @@ export class MultiplayerWebsocketGateway implements OnModuleInit {
         if (!player) return;
         this.multiplayer.playerMove(player, packet.payload);
         break;
+      case PacketType.BodyColorPacket:
+        this.multiplayer.setColor(player!, packet.payload);
+        break;
       case PacketType.MapPacket:
         if (!player) return;
         this.multiplayer.joinMap(player, packet.payload);
@@ -140,9 +144,6 @@ export class MultiplayerWebsocketGateway implements OnModuleInit {
         break;
       case PacketType.RemoveBlockFromGroupPacket:
         this.collab.removeBlockFromGroup(player!, packet.payload);
-        break;
-      case PacketType.DisconnectPacket:
-        this.multiplayer.onDisconnect(packet.payload.id);
         break;
     }
   }

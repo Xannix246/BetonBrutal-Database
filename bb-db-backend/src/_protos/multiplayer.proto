@@ -94,6 +94,7 @@ message PlayerEntry {
   MapType map_mode = 3;
   string map_id = 4;
   optional string map_name = 5;
+  optional Color playerColor = 6;
 }
 
 message PingEntry {
@@ -152,8 +153,7 @@ message Nickname {
 
 message BodyColor {
   int64 id = 1;
-  int32 color = 2;
-  Color customColor = 3;
+  Color customColor = 2;
 }
 
 message Move {

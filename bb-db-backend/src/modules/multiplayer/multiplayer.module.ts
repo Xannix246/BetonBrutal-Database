@@ -17,6 +17,7 @@ import { ProtobufManager } from './services/protobuf-manager.service';
 import { CheckPingScheduler } from './infrastructure/schedulers/check-ping.schedule';
 import { CollabService } from './services/collab.service';
 import { EventsService } from './services/events.service';
+import { DummyCommands } from './services/commands/dummy-commands';
 
 @Module({
   imports: [PrismaModule, WorkshopModule],
@@ -34,6 +35,7 @@ import { EventsService } from './services/events.service';
     RaceCommand,
     CollabCommand,
     ProxyCommand,
+    DummyCommands,
     CheckRacesScheduler,
     CheckPingScheduler,
     CompatibilityService,

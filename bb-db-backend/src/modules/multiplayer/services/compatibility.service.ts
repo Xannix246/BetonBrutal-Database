@@ -246,6 +246,7 @@ export class CompatibilityService {
 
       if (packet.packet === LegacyPacketType.GetPlayers) {
         for (const player of packet.players) {
+          if (ids.includes(player.id)) continue;
           this.proxyPlayers.set(player.id, player.nick);
         }
         player.socket.send(
@@ -275,6 +276,8 @@ export class CompatibilityService {
 
       switch (packet.packet) {
         case LegacyPacketType.Join:
+          if (ids.includes(packet.id)) return;
+          this.proxyPlayers.set(packet.id, packet.name);
           player.socket.send(
             this.packetManager.serialize({
               packet: PacketType.JoinPacket,
@@ -405,7 +408,7 @@ export class CompatibilityService {
           }
           break;
         case LegacyPacketType.Disconnect:
-          if (ids.includes(packet.id)) return;
+          if (!this.proxyPlayers.has(packet.id)) return;
           player.socket.send(
             this.packetManager.serialize({
               packet: PacketType.DisconnectPacket,
