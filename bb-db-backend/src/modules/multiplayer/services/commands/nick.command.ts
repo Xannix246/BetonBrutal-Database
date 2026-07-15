@@ -1,6 +1,6 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { CommandsService } from '../commands.service';
-import { CommandsContext, SessionPlayer } from '../../types/multiplayer';
+import { C, CommandsContext, SessionPlayer } from '../../types/multiplayer';
 import { PacketType } from 'src/generated/protos/multiplayer';
 
 @Injectable()
@@ -22,7 +22,7 @@ export class NickCommand implements OnModuleInit {
     context: CommandsContext,
   ): string {
     const nickname = args[0];
-    if (!nickname) return 'Write your nickname';
+    if (!nickname) return `<color=${C.yellow}>Write your nickname</color>`;
 
     player.nick = nickname;
 
@@ -32,6 +32,6 @@ export class NickCommand implements OnModuleInit {
       payload: { id: player.id, nickname: player.nick },
     });
 
-    return `Nickname set to: ${nickname}`;
+    return `<color=${C.green}>Nickname set to: ${nickname}</color>`;
   }
 }

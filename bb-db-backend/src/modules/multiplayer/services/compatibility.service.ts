@@ -5,6 +5,7 @@ import {
   Event,
   MapType as LegacyMapType,
   GameMode as LegacyGameMode,
+  Ref,
 } from '../types/multiplayer';
 import { PacketManager } from './packet-manager.service';
 import { WebSocket } from 'ws';
@@ -20,7 +21,14 @@ import { ProtobufManager } from './protobuf-manager.service';
 @Injectable()
 export class CompatibilityService {
   private readonly sockets: Map<string, WebSocket> = new Map();
-  private readonly proxyPlayers: Map<string, string> = new Map();
+  private readonly proxyPlayers: Map<
+    string,
+    {
+      nickname: Ref<string>;
+      mapType?: Ref<MapType | undefined>;
+      mode?: Ref<MapType | undefined>;
+    }
+  > = new Map();
   public context: CommandsContext | undefined;
   // playerId, socket
 
@@ -30,11 +38,13 @@ export class CompatibilityService {
   ) {}
 
   async connectPlayer(playerId: string) {
+    // return;
     // wss://betonbrutal.com:55071 - exp
     // wss://betonbrutal.com:55082 - dev
     const socket = new WebSocket('wss://betonbrutal.com:55071');
 
     await new Promise<void>((resolve, reject) => {
+      const player = this.context!.players.get(playerId)!;
       socket.addEventListener('open', () => {
         socket.send(
           this.legacyPacketManager.serialize({
@@ -42,20 +52,35 @@ export class CompatibilityService {
             version: 1,
           }),
         );
+
+        socket.send(
+          this.legacyPacketManager.serialize({
+            packet: LegacyPacketType.Join,
+            id: playerId,
+            name: player?.nick ?? player.name,
+            map:
+              this.convertMapTypeL(
+                this.context!.playerData.get(playerId)?.mapMode.value ??
+                  MapType.MAIN,
+              ) + player.mapId,
+          }),
+        );
         resolve();
+        this.sockets.set(playerId, socket);
         console.log('Client connected to compability server');
       });
 
       socket.addEventListener('error', (error) => {
-        reject(Error(error.type));
+        reject(new Error(error.message));
       });
 
-      // socket.addEventListener('close', (message) =>
-      //   console.log('Client disconnected, reason:', message),
-      // );
+      socket.addEventListener('close', (msg) => {
+        console.log(
+          `Client ${player.name} (${playerId}) disconnected from compability server:`,
+          msg.reason,
+        );
+      });
     });
-
-    this.sockets.set(playerId, socket);
     this.handleConnection(socket, playerId);
   }
 
@@ -71,32 +96,9 @@ export class CompatibilityService {
   sendPacket(packet: ProtoPacket, playerId: string) {
     const player = this.context!.players.get(playerId);
     const socket = this.sockets.get(playerId);
-
     if (!socket || !player) return;
 
-    if (
-      packet.packet !== PacketType.EventPacket &&
-      packet.packet !== PacketType.MovePacket
-    ) {
-      console.log('packet sent:', packet);
-    }
-
     switch (packet.packet) {
-      // case PacketType.VersionPacket:
-      //   socket.send(this.legacyPacketManager.serialize(packet));
-      //   break;
-      case PacketType.JoinPacket:
-        socket.send(
-          this.legacyPacketManager.serialize({
-            packet: LegacyPacketType.Join,
-            id: packet.payload.id,
-            name: packet.payload.username,
-            map:
-              this.convertMapTypeL(packet.payload.mapMode) +
-              packet.payload.mapId,
-          }),
-        );
-        break;
       case PacketType.EventPacket:
         switch (packet.payload.type) {
           case Events.Ping:
@@ -108,6 +110,7 @@ export class CompatibilityService {
             );
             break;
           case Events.RunComplete:
+            console.log('Sent Run Complete event', packet);
             socket.send(
               this.legacyPacketManager.serialize({
                 packet: LegacyPacketType.Event,
@@ -120,7 +123,9 @@ export class CompatibilityService {
         socket.send(
           this.legacyPacketManager.serialize({
             packet: LegacyPacketType.Move,
-            mode: this.convertGML(packet.payload.mode),
+            mode: this.convertGML(
+              this.context!.playerData.get(playerId)!.mode.value,
+            ),
             position: packet.payload.position!,
             rotation: packet.payload.rotation!,
           }),
@@ -131,7 +136,9 @@ export class CompatibilityService {
           this.legacyPacketManager.serialize({
             packet: LegacyPacketType.Map,
             map:
-              this.convertMapTypeL(packet.payload.mode) + packet.payload.mapId,
+              this.convertMapTypeL(
+                this.context!.playerData.get(playerId)!.mapMode.value,
+              ) + packet.payload.mapId,
           }),
         );
         break;
@@ -140,7 +147,9 @@ export class CompatibilityService {
           this.legacyPacketManager.serialize({
             packet: LegacyPacketType.LoadMap,
             map:
-              this.convertMapTypeL(packet.payload.mode) + packet.payload.mapId,
+              this.convertMapTypeL(
+                this.context!.playerData.get(playerId)!.mapMode.value,
+              ) + packet.payload.mapId,
           }),
         );
         break;
@@ -164,9 +173,7 @@ export class CompatibilityService {
       case PacketType.CommandPacket:
         if (player.proxyMode) {
           if (packet.payload.command?.includes('collab')) return;
-
           // console.log('here is packet', packet);
-
           socket.send(
             this.legacyPacketManager.serialize({
               packet: LegacyPacketType.Command,
@@ -181,11 +188,6 @@ export class CompatibilityService {
   private handleConnection(socket: WebSocket, id: string) {
     socket.on('message', (message) => {
       this.handleMessage(message as Buffer, id);
-      // try {
-      //   this.handleMessage(message as Buffer, id);
-      // } catch {
-      //   console.log('well, nevermind');
-      // }
     });
   }
 
@@ -208,17 +210,14 @@ export class CompatibilityService {
       data = [...packet.players.filter((player) => !ids.includes(player.id))];
     }
 
-    // console.log('packet received:', packet);
-
     if (!packet || !player) return;
 
     if (
       packet.packet !== LegacyPacketType.Event &&
       packet.packet !== LegacyPacketType.Move &&
-      packet.packet === LegacyPacketType.Command
+      packet.packet !== LegacyPacketType.PlayersPing
     ) {
       console.log('packet received:', packet);
-      // console.log(this.packetManager.serialize(packet));
     }
 
     if (
@@ -239,7 +238,7 @@ export class CompatibilityService {
     ) {
       if (
         packet.packet === LegacyPacketType.Event &&
-        ![Event.Ping, Event.RunComplete].includes(packet.signal)
+        ![Event.Ping, Event.RaceStart].includes(packet.signal)
       ) {
         return;
       }
@@ -247,9 +246,15 @@ export class CompatibilityService {
       if (packet.packet === LegacyPacketType.GetPlayers) {
         for (const player of packet.players) {
           if (ids.includes(player.id)) continue;
-          this.proxyPlayers.set(player.id, player.nick);
+          this.proxyPlayers.set(player.id, {
+            nickname: new Ref(player.nick),
+            mapType: new Ref<MapType | undefined>(
+              this.convertMapType(player.map.slice(0, 1) as LegacyMapType),
+            ),
+          });
         }
-        player.socket.send(
+
+        return player.socket.send(
           this.packetManager.serialize({
             packet: PacketType.GetPlayersPacket,
             payload: {
@@ -260,11 +265,11 @@ export class CompatibilityService {
                   player.map!.slice(0, 1) as LegacyMapType,
                 ),
                 mapId: player.map!.slice(1),
+                playerColor: { r: 0.5, g: 0.5, b: 0.5, a: 1 },
               })),
             },
           }),
         );
-        return;
       }
 
       if (
@@ -277,7 +282,13 @@ export class CompatibilityService {
       switch (packet.packet) {
         case LegacyPacketType.Join:
           if (ids.includes(packet.id)) return;
-          this.proxyPlayers.set(packet.id, packet.name);
+          this.proxyPlayers.set(player.id, {
+            nickname: new Ref(packet.name),
+            mapType: new Ref<MapType | undefined>(
+              this.convertMapType(packet.map.slice(0, 1) as LegacyMapType),
+            ),
+          });
+
           player.socket.send(
             this.packetManager.serialize({
               packet: PacketType.JoinPacket,
@@ -288,7 +299,7 @@ export class CompatibilityService {
                 mapMode: this.convertMapType(
                   packet.map.slice(0, 1) as LegacyMapType,
                 ),
-                mapId: Number(packet.map.slice(1)) ? packet.map.slice(1) : '0',
+                mapId: packet.map.slice(1),
                 mapName: !Number(packet.map.slice(1))
                   ? packet.map.slice(1)
                   : undefined,
@@ -301,32 +312,44 @@ export class CompatibilityService {
           );
           break;
         case LegacyPacketType.Event:
-          if (packet.signal === Event.Ping) {
-            return socket?.send(
-              this.legacyPacketManager.serialize({
-                packet: LegacyPacketType.Event,
-                signal: Event.Ping,
-              }),
-            );
+          switch (packet.signal) {
+            case Event.Ping:
+              socket?.send(
+                this.legacyPacketManager.serialize({
+                  packet: LegacyPacketType.Event,
+                  signal: Event.Ping,
+                }),
+              );
+              break;
+            case Event.RaceStart:
+              player.socket.send(
+                this.packetManager.serialize({
+                  packet: PacketType.EventPacket,
+                  payload: {
+                    type: Events.RaceStart,
+                  },
+                }),
+              );
+              player.socket.send(
+                this.packetManager.serialize({
+                  packet: PacketType.CommandPacket,
+                  payload: {
+                    message: 'Race has started, GO!',
+                  },
+                }),
+              );
+              break;
           }
-          player.socket.send(
-            this.packetManager.serialize({
-              packet: PacketType.EventPacket,
-              payload: {
-                type: packet.signal as unknown as Events,
-              },
-            }),
-          );
           break;
         case LegacyPacketType.Move:
           if (!packet.id) return;
+          if (!this.proxyPlayers.has(packet.id)) return;
           player.socket.send(
             this.packetManager.serialize({
               packet: PacketType.MovePacket,
               payload: {
                 ...packet,
                 id: packet.id,
-                mode: this.convertGM(packet.mode),
               },
             }),
           );
@@ -334,15 +357,34 @@ export class CompatibilityService {
         case LegacyPacketType.Map:
           if (!packet.id) return;
           if (packet.id === player.id) return;
+          if (!ids.includes(packet.id)) {
+            const proxyPlayer = this.proxyPlayers.get(packet.id)!;
+            proxyPlayer?.mapType?.set(
+              this.convertMapType(packet.map.slice(0, 1) as LegacyMapType),
+            );
+          }
           player.socket.send(
             this.packetManager.serialize({
               packet: PacketType.MapPacket,
               payload: {
                 id: packet.id,
-                mode: this.convertMapType(
-                  packet.map.slice(0, 1) as LegacyMapType,
-                ),
                 mapId: packet.map.slice(1),
+              },
+            }),
+          );
+          console.log(
+            'Maptype:',
+            this.proxyPlayers.get(packet.id)?.mapType?.value,
+          );
+          player.socket.send(
+            this.packetManager.serialize({
+              packet: PacketType.PlayerDataPacket,
+              payload: {
+                id: packet.id,
+                mapMode:
+                  this.proxyPlayers.get(packet.id)?.mapType?.value ??
+                  MapType.CUSTOM,
+                mode: GameMode.PLAY,
               },
             }),
           );
@@ -353,9 +395,6 @@ export class CompatibilityService {
               packet: PacketType.LoadMapPacket,
               payload: {
                 id: player.id,
-                mode: this.convertMapType(
-                  packet.map.slice(0, 1) as LegacyMapType,
-                ),
                 mapId: packet.map.slice(1),
               },
             }),
@@ -417,7 +456,7 @@ export class CompatibilityService {
           );
           this.sendPrivateMessage(
             player.id,
-            `Player ${this.proxyPlayers.get(packet.id)} left the server`,
+            `Player ${this.proxyPlayers.get(packet.id)?.nickname.value} left the server`,
           );
           this.proxyPlayers.delete(packet.id);
           break;

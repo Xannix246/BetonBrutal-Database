@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { MultiplayerService } from '../../services/multiplayer.service';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { SessionRace } from '../../types/multiplayer';
+import { C, SessionRace } from '../../types/multiplayer';
 import { Events, PacketType } from 'src/generated/protos/multiplayer';
 
 @Injectable()
@@ -16,14 +16,15 @@ export class CheckRacesScheduler {
       if (!race.started && this.getSeconds(race.time.valueOf()) < 15) {
         // if (race.players.length < 2) continue;
         if (this.getSeconds(race.time.valueOf()) < 10) continue;
+        const time = 15 - this.getSeconds(race.time.valueOf());
         this.multiplayer.broadcastServer(
-          `Race starting in ${15 - this.getSeconds(race.time.valueOf())} seconds...`,
-          race.players,
+          `${this.getColor(time)}Race starting in ${time} seconds...</color>`,
+          [...race.players],
         );
       } else if (!race.started && this.getSeconds(race.time.valueOf()) >= 15) {
         this.raceStart(race);
       } else if (
-        race.players.length === race.results.length ||
+        race.players.size === race.results.length ||
         (race.finished &&
           this.getSeconds(race.time.valueOf()) >
             (race.results[0].time / 1000) * 4)
@@ -53,7 +54,10 @@ export class CheckRacesScheduler {
     race.started = true;
     race.time = new Date();
 
-    this.multiplayer.broadcastServer('Race has started, GO!', race.players);
+    this.multiplayer.broadcastServer(
+      `<color=green># Race has started, GO!</color>`,
+      [...race.players],
+    );
 
     this.multiplayer.broadcastPacket({
       packet: PacketType.EventPacket,
@@ -66,11 +70,11 @@ export class CheckRacesScheduler {
 
     for (const result of race.results) {
       summary.push(
-        `${this.formatTime(result.time)} - ${this.multiplayer.players.get(result.playerId)?.nick}`,
+        `<color=${C.blue}>${this.formatTime(result.time)}</color> - ${this.multiplayer.players.get(result.playerId)?.nick}`,
       );
     }
 
-    this.multiplayer.broadcastServer(summary.join('\n'), race.players);
+    this.multiplayer.broadcastServer(summary.join('\n'), [...race.players]);
 
     for (const playerId of race.players) {
       const player = this.multiplayer.players.get(playerId)!;
@@ -93,6 +97,17 @@ export class CheckRacesScheduler {
         .padStart(5, '0')}`;
     } else {
       return `${minutes}:${remainingSeconds.toFixed(2).padStart(5, '0')}`;
+    }
+  }
+
+  private getColor(seconds: number) {
+    switch (seconds) {
+      case 3:
+        return `<color=${C.red}>`;
+      case 2:
+        return `<color=${C.yellow}>`;
+      default:
+        return `<color=${C.blue}>`;
     }
   }
 

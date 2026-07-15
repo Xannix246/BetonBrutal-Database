@@ -1,6 +1,6 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { CommandsService } from '../commands.service';
-import { SessionPlayer } from '../../types/multiplayer';
+import { C, SessionPlayer } from '../../types/multiplayer';
 
 @Injectable()
 export class PingCommand implements OnModuleInit {
@@ -15,6 +15,6 @@ export class PingCommand implements OnModuleInit {
   }
 
   pingCommand(player: SessionPlayer): string {
-    return `Ping: ${player.ping.latencyMs}ms`;
+    return `<color=${C.blue}>Ping: ${player.ping.latencyMs}ms</color>`;
   }
 }

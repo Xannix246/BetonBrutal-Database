@@ -73,7 +73,8 @@ export class MultiplayerWebsocketGateway implements OnModuleInit {
 
     if (
       packet.packet !== PacketType.EventPacket &&
-      packet.packet !== PacketType.MovePacket
+      packet.packet !== PacketType.MovePacket &&
+      packet.packet !== PacketType.PlayerDataPacket
     ) {
       this.logger.log(packet);
     }
@@ -96,6 +97,9 @@ export class MultiplayerWebsocketGateway implements OnModuleInit {
           case Events.RunComplete:
             this.events.completeRun(player!);
         }
+        break;
+      case PacketType.AckResPacket:
+        this.multiplayer.handleAckPacket(packet.payload);
         break;
       case PacketType.MovePacket:
         if (!player) return;
@@ -145,6 +149,29 @@ export class MultiplayerWebsocketGateway implements OnModuleInit {
       case PacketType.RemoveBlockFromGroupPacket:
         this.collab.removeBlockFromGroup(player!, packet.payload);
         break;
+      case PacketType.CreateTriggerPacket:
+        this.collab.createTrigger(player!, packet.payload);
+        break;
+      case PacketType.ChangeTriggerPacket:
+        this.collab.changeTrigger(player!, packet.payload);
+        break;
+      case PacketType.DeleteTriggerPacket:
+        this.collab.deleteTrigger(player!, packet.payload);
+        break;
+      case PacketType.AddOperationPacket:
+        this.collab.addOperation(player!, packet.payload);
+        break;
+      case PacketType.EditOperationPacket:
+        this.collab.editOperation(player!, packet.payload);
+        break;
+      case PacketType.MoveOperationOrderPacket:
+        this.collab.moveOperation(player!, packet.payload);
+        break;
+      case PacketType.RemoveOperationPacket:
+        this.collab.removeOperation(player!, packet.payload);
+        break;
+      case PacketType.PlayerDataPacket:
+        this.multiplayer.updatePlayerData(player!, packet.payload);
     }
   }
 }

@@ -23,6 +23,7 @@ export class CollabService {
 
     if (Array.isArray(packet.block)) {
       for (const block of packet.block) {
+        console.log(JSON.stringify(block));
         collab.blocks.set(block.instanceID, block);
       }
 
@@ -32,7 +33,7 @@ export class CollabService {
           payload: { block: packet.block, id: player.id },
         },
         [player.id],
-        collab?.players,
+        [...collab.players],
       );
     } else {
       collab.blocks.set(packet.block.instanceID, packet.block);
@@ -42,7 +43,7 @@ export class CollabService {
           payload: { block: packet.block, id: player.id },
         },
         [player.id],
-        collab.players,
+        [...collab.players],
       );
     }
   }
@@ -58,7 +59,7 @@ export class CollabService {
     this.multiplayer.broadcastPacket(
       { packet: PacketType.DeleteBlockPacket, payload: packet },
       [player.id],
-      collab.players,
+      [...collab.players],
     );
   }
 
@@ -76,7 +77,7 @@ export class CollabService {
     this.multiplayer.broadcastPacket(
       { packet: PacketType.ChangeBlockPacket, payload: packet },
       [player.id],
-      collab.players,
+      [...collab.players],
     );
   }
 
@@ -91,7 +92,7 @@ export class CollabService {
     this.multiplayer.broadcastPacket(
       { packet: PacketType.MapSettingsPacket, payload: packet },
       [player.id],
-      collab.players,
+      [...collab.players],
     );
   }
 
@@ -106,7 +107,7 @@ export class CollabService {
     this.multiplayer.broadcastPacket(
       { packet: PacketType.MapColorPacket, payload: packet },
       [player.id],
-      collab.players,
+      [...collab.players],
     );
   }
 
@@ -117,19 +118,20 @@ export class CollabService {
 
     if (!collab || !packet.group) return;
 
-    collab.groups.set(packet.group.instanceID, {
+    const group = {
       instanceID: packet.group.instanceID,
       name: packet.group.name,
-      blocks: packet.group.blocks,
+      blocks: new Set(packet.group.blocks),
       pivot: packet.group.pivot
         ? collab.blocks.get(packet.group.pivot.instanceID)
         : undefined,
-    });
+    };
 
+    collab.groups.set(packet.group.instanceID, group);
     this.multiplayer.broadcastPacket(
       { packet: PacketType.CreateGroupPacket, payload: packet },
       [player.id],
-      collab.players,
+      [...collab.players],
     );
   }
 
@@ -140,11 +142,15 @@ export class CollabService {
 
     if (!collab || !packet.group) return;
 
-    collab.groups.set(packet.group.instanceID, packet.group);
+    collab.groups.set(packet.group.instanceID, {
+      ...packet.group,
+      blocks: new Set(packet.group.blocks),
+    });
+
     this.multiplayer.broadcastPacket(
       { packet: PacketType.ChangeGroupPacket, payload: packet },
       [player.id],
-      collab.players,
+      [...collab.players],
     );
   }
 
@@ -159,7 +165,7 @@ export class CollabService {
     this.multiplayer.broadcastPacket(
       { packet: PacketType.DeleteGroupPacket, payload: packet },
       [player.id],
-      collab.players,
+      [...collab.players],
     );
   }
 
@@ -167,15 +173,15 @@ export class CollabService {
     if (!player.collabId) return;
 
     const collab = this.collabSessions.get(player.collabId);
-    const group = collab?.groups.get(packet.groupInstanceID);
+    const group = collab?.groups.get(packet.groupInstanceId);
 
     if (!collab || !group) return;
 
-    group.blocks.push(packet.blockInstanceID);
+    group.blocks.add(packet.blockInstanceId);
     this.multiplayer.broadcastPacket(
       { packet: PacketType.AddBlockToGroupPacket, payload: packet },
       [player.id],
-      collab.players,
+      [...collab.players],
     );
   }
 
@@ -186,20 +192,162 @@ export class CollabService {
     if (!player.collabId) return;
 
     const collab = this.collabSessions.get(player.collabId);
-    const group = collab?.groups.get(packet.groupInstanceID);
+    const group = collab?.groups.get(packet.groupInstanceId);
 
     if (!collab || !group) return;
 
-    group.blocks = group.blocks.filter(
-      (block) => block !== packet.blockInstanceID,
-    );
-
-    collab.groups.set(group.instanceID, group);
-
+    group.blocks.delete(packet.blockInstanceId);
     this.multiplayer.broadcastPacket(
       { packet: PacketType.RemoveBlockFromGroupPacket, payload: packet },
       [player.id],
-      collab.players,
+      [...collab.players],
     );
+  }
+
+  createTrigger(player: SessionPlayer, packet: Proto.CreateTrigger) {
+    if (!player.collabId || !packet.trigger) return;
+
+    const collab = this.collabSessions.get(player.collabId);
+
+    if (!collab) return;
+
+    const trigger = {
+      instanceId: packet.trigger.instanceId,
+      triggerId: packet.trigger.triggerId,
+      retriggerable: packet.trigger.retriggerable,
+      triggerWhenRunning: packet.trigger.triggerWhenRunning,
+      resetOnRetrigger: packet.trigger.resetOnRetrigger,
+      operations: packet.trigger.operations,
+    };
+
+    collab.triggers.set(trigger.instanceId, trigger);
+    // this.multiplayer.broadcastPacket(
+    //   { packet: PacketType.CreateTriggerPacket, payload: packet },
+    //   [player.id],
+    //   [...collab.players],
+    // );
+  }
+
+  changeTrigger(player: SessionPlayer, packet: Proto.ChangeTrigger) {
+    if (!player.collabId || !packet.trigger) return;
+
+    const collab = this.collabSessions.get(player.collabId);
+    const trigger = collab?.triggers.get(packet.trigger.instanceId);
+
+    if (!collab || !trigger) return;
+
+    collab.triggers.set(packet.trigger.instanceId, {
+      ...packet.trigger,
+      operations: trigger.operations,
+    });
+
+    this.multiplayer.broadcastPacket(
+      { packet: PacketType.ChangeTriggerPacket, payload: packet },
+      [player.id],
+      [...collab.players],
+    );
+  }
+
+  deleteTrigger(player: SessionPlayer, packet: Proto.DeleteTrigger) {
+    if (!player.collabId) return;
+
+    const collab = this.collabSessions.get(player.collabId);
+
+    if (!collab) return;
+
+    collab.triggers.delete(packet.instanceID);
+    // this.multiplayer.broadcastPacket(
+    //   { packet: PacketType.DeleteTriggerPacket, payload: packet },
+    //   [player.id],
+    //   [...collab.players],
+    // );
+  }
+
+  addOperation(player: SessionPlayer, packet: Proto.AddOperation) {
+    if (!player.collabId || !packet.operation) return;
+
+    const collab = this.collabSessions.get(player.collabId);
+    const trigger = collab?.triggers.get(packet.triggerInstanceId);
+
+    // if (!collab || !trigger) return;
+
+    if (!collab) {
+      return console.log('Collab not found');
+    }
+
+    if (!trigger) {
+      return console.log('Trigger not found', collab.triggers);
+    }
+
+    trigger.operations.push(packet.operation);
+    this.multiplayer.broadcastPacket(
+      { packet: PacketType.AddOperationPacket, payload: packet },
+      [player.id],
+      [...collab.players],
+    );
+
+    // console.log('Added operation', trigger.operations);
+  }
+
+  editOperation(player: SessionPlayer, packet: Proto.EditOperation) {
+    if (!player.collabId || !packet.operation) return;
+
+    const collab = this.collabSessions.get(player.collabId);
+    const trigger = collab?.triggers.get(packet.triggerInstanceId);
+
+    if (!collab || !trigger) return;
+
+    trigger.operations.splice(packet.opIndex, 1, packet.operation);
+    this.multiplayer.broadcastPacket(
+      { packet: PacketType.EditOperationPacket, payload: packet },
+      [player.id],
+      [...collab.players],
+    );
+
+    // console.log('Edited operation', trigger.operations);
+  }
+
+  moveOperation(player: SessionPlayer, packet: Proto.ReorderOperation) {
+    if (!player.collabId) return;
+
+    const collab = this.collabSessions.get(player.collabId);
+    const trigger = collab?.triggers.get(packet.triggerInstanceId);
+    const opIndex = packet.opIndex;
+    const moveTo = packet.moveTo;
+
+    if (!collab || !trigger) return;
+    if (opIndex + moveTo < 0 || opIndex + moveTo >= trigger.operations.length) {
+      return;
+    }
+
+    const operation = structuredClone(trigger.operations[opIndex]);
+    trigger.operations.splice(opIndex, 1);
+    trigger.operations.splice(opIndex + moveTo, 0, operation);
+
+    this.multiplayer.broadcastPacket(
+      { packet: PacketType.MoveOperationOrderPacket, payload: packet },
+      [player.id],
+      [...collab.players],
+    );
+
+    // console.log('Moved operation', trigger.operations);
+  }
+
+  removeOperation(player: SessionPlayer, packet: Proto.RemoveOperation) {
+    if (!player.collabId) return;
+
+    const collab = this.collabSessions.get(player.collabId);
+    const trigger = collab?.triggers.get(packet.triggerInstanceId);
+
+    if (!collab || !trigger) return;
+
+    trigger.operations.splice(packet.opIndex, 1);
+    this.multiplayer.broadcastPacket(
+      { packet: PacketType.RemoveOperationPacket, payload: packet },
+      [player.id],
+      [...collab.players],
+    );
+
+    // console.log('Removed operation', trigger.operations);
   }
 }

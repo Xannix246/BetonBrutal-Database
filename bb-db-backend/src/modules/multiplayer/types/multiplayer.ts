@@ -5,6 +5,8 @@ import {
   Block as ProtoBlock,
   MapSetting as ProtoMapSetting,
   Color as ProtoColor,
+  Vector3 as ProtoVector3,
+  Trigger,
   // MapSettings as ProtoMapSettings,
 } from 'src/generated/protos/multiplayer';
 
@@ -77,16 +79,16 @@ export type Block = {
   blockID: number;
   instanceID: string;
   color: number;
-  position: Vector3;
-  rotation: Vector3;
+  position: ProtoVector3;
+  rotation: ProtoVector3;
   scale: number;
-  customColor: Color;
+  customColor: ProtoColor;
 };
 
 export type Group = {
   instanceID: string;
   name: string;
-  blocks: string[];
+  blocks: Set<string>;
   pivot?: ProtoBlock;
 };
 
@@ -94,17 +96,18 @@ export type Group = {
 export type SessionCollab = {
   id: string;
   ownerId: string;
-  players: string[];
+  players: Set<string>;
   blocks: Map<string, ProtoBlock>;
   groups: Map<string, Group>;
   settings: Map<ProtoMapSetting, boolean>;
-  color: Map<ProtoMapSetting, Color>;
+  color: Map<ProtoMapSetting, ProtoColor>;
+  triggers: Map<string, Trigger>;
 };
 
 // can be stored in prisma
 export type SessionRace = {
   id: string;
-  players: string[];
+  players: Set<string>;
   time: Date;
   started: boolean;
   finished: boolean;
@@ -117,11 +120,11 @@ export type SessionRace = {
 // can be stored in prisma
 export type MapSession = {
   id: string;
-  type: ProtoMapType;
+  // type: ProtoMapType;
   players: Set<string>; // SessionPlayer id's
   // blocks: Block[]; // instead of storing all map data with thousands of blocks we could just take map archive
   // in the ./maps folder, unpack it, decompile Map.bbmap and send blocks data from it
-  settings: ProtoMapSetting[];
+  // settings: ProtoMapSetting[];
   // createdAt: Date; don't see the point in that
 };
 
@@ -143,10 +146,11 @@ export type SessionPlayer = {
 };
 
 export type SessionPlayerData = {
-  mode: ProtoGameMode;
-  position: Vector3;
-  rotation: Vector3;
-  packetId?: string;
+  mode: Ref<ProtoGameMode>;
+  mapMode: Ref<ProtoMapType>;
+  position: Ref<ProtoVector3>;
+  rotation: Ref<ProtoVector3>;
+  // packetId?: Ref<string>;
 };
 
 export type CommandsContext = {
@@ -156,9 +160,10 @@ export type CommandsContext = {
   raceSessions: Map<string, SessionRace>;
   collabSessions: Map<string, SessionCollab>;
   mapRecords: Record<string, string>[];
+  asyncPackets: Map<string, (value: void) => void>;
 };
 
-export interface CommandDefinition {
+export type CommandDefinition = {
   aliases: string[];
   args?: string[];
   description: string;
@@ -167,4 +172,30 @@ export interface CommandDefinition {
     args: string[],
     context: CommandsContext,
   ): string | Promise<string> | void;
+};
+
+export class Ref<T> {
+  constructor(
+    private _value: T,
+    private onChange?: (newValue: T) => void,
+  ) {}
+
+  get value(): T {
+    return this._value;
+  }
+
+  set(newValue: T): void {
+    this._value = newValue;
+    this.onChange?.(newValue);
+  }
+}
+
+//hex colors
+export enum C {
+  red = '#ad4433',
+  blue = '#6ea2bf',
+  yellow = '#ffbd2f',
+  green = '#6a902b',
+  pink = '#d78d7c',
+  dark_green = '#405819',
 }

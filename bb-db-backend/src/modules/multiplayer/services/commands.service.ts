@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import {
+  C,
   CommandDefinition,
   CommandsContext,
   SessionPlayer,
@@ -8,6 +9,7 @@ import { WebSocket } from 'ws';
 import { ProtobufManager } from './protobuf-manager.service';
 import { Events, PacketType } from 'src/generated/protos/multiplayer';
 import { ProtoPacket } from '../types/proto.types';
+import { v4 } from 'uuid';
 
 @Injectable()
 export class CommandsService {
@@ -51,6 +53,41 @@ export class CommandsService {
 
   sendPacket(player: SessionPlayer, packet: ProtoPacket) {
     player.socket.send(this.packetManager.serialize(packet));
+  }
+
+  async sendPacketAsync(
+    player: SessionPlayer,
+    packet: ProtoPacket,
+    timeoutMs = 8000,
+  ) {
+    const uuid = v4();
+
+    player.socket.send(
+      this.packetManager.serialize({
+        packet: PacketType.AckResPacket,
+        payload: {
+          id: uuid,
+          packetType: packet.packet,
+        },
+      }),
+    );
+
+    return new Promise<boolean>((resolve) => {
+      const timeout = setTimeout(() => {
+        if (this.context!.asyncPackets.has(uuid)) {
+          this.context!.asyncPackets.delete(uuid);
+          resolve(false);
+        }
+      }, timeoutMs);
+
+      const handleResolve = () => {
+        clearTimeout(timeout);
+        resolve(true);
+      };
+
+      player.socket.send(this.packetManager.serialize(packet));
+      this.context!.asyncPackets.set(uuid, handleResolve);
+    });
   }
 
   broadcastMessage(
@@ -113,7 +150,10 @@ export class CommandsService {
     );
 
     if (!command) {
-      return this.sendServerMessage(player.socket, 'Invalid command.');
+      return this.sendServerMessage(
+        player.socket,
+        `<color=${C.red}>Invalid command.</color>`,
+      );
     }
 
     this.context = context;

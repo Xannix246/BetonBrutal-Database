@@ -1,6 +1,6 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { CommandsService } from '../commands.service';
-import { CommandsContext, SessionPlayer } from '../../types/multiplayer';
+import { C, CommandsContext, SessionPlayer } from '../../types/multiplayer';
 
 @Injectable()
 export class ProxyCommand implements OnModuleInit {
@@ -20,12 +20,12 @@ export class ProxyCommand implements OnModuleInit {
     if (!player.proxyMode) {
       player.proxyMode = true;
       context.players.set(player.id, player);
-      return 'Proxy mode enabled';
+      return `<color=${C.yellow}>Proxy mode enabled</color>`;
     }
     {
       player.proxyMode = false;
       context.players.set(player.id, player);
-      return 'Proxy mode disabled';
+      return `<color=${C.green}>Proxy mode disabled</color>`;
     }
   }
 }

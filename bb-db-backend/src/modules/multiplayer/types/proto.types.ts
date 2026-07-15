@@ -125,6 +125,51 @@ type RemoveBlockFromGroup = {
   payload: Proto.RemoveBlockFromGroup;
 };
 
+type CreateTrigger = {
+  packet: Proto.PacketType.CreateTriggerPacket;
+  payload: Proto.CreateTrigger;
+};
+
+type ChangeTrigger = {
+  packet: Proto.PacketType.ChangeTriggerPacket;
+  payload: Proto.ChangeTrigger;
+};
+
+type DeleteTrigger = {
+  packet: Proto.PacketType.DeleteTriggerPacket;
+  payload: Proto.DeleteTrigger;
+};
+
+type AddOperation = {
+  packet: Proto.PacketType.AddOperationPacket;
+  payload: Proto.AddOperation;
+};
+
+type EditOperation = {
+  packet: Proto.PacketType.EditOperationPacket;
+  payload: Proto.EditOperation;
+};
+
+type ReorderOperation = {
+  packet: Proto.PacketType.MoveOperationOrderPacket;
+  payload: Proto.ReorderOperation;
+};
+
+type RemoveOperation = {
+  packet: Proto.PacketType.RemoveOperationPacket;
+  payload: Proto.RemoveOperation;
+};
+
+type PlayerData = {
+  packet: Proto.PacketType.PlayerDataPacket;
+  payload: Proto.PlayerData;
+};
+
+type AckPacket = {
+  packet: Proto.PacketType.AckResPacket;
+  payload: Proto.AckPacket;
+};
+
 type UnknownPacket = {
   packet: Proto.PacketType.UnknownPacket;
   payload: unknown;
@@ -156,6 +201,15 @@ export type ProtoPacket =
   | DeleteGroup
   | AddBlockToGroup
   | RemoveBlockFromGroup
+  | CreateTrigger
+  | ChangeTrigger
+  | DeleteTrigger
+  | AddOperation
+  | EditOperation
+  | ReorderOperation
+  | RemoveOperation
+  | PlayerData
+  | AckPacket
   | UnknownPacket;
 
 export enum ProtoType {
@@ -184,4 +238,13 @@ export enum ProtoType {
   DeleteGroup = 'deleteGroup',
   AddBlockToGroup = 'addBlockToGroup',
   RemoveBlockFromGroup = 'removeBlockFromGroup',
+  CreateTrigger = 'createTrigger',
+  ChangeTrigger = 'changeTrigger',
+  DeleteTrigger = 'deleteTrigger',
+  AddOperation = 'addOperation',
+  EditOperation = 'editOperation',
+  ReorderOperation = 'reorderOperation',
+  RemoveOperation = 'removeOperation',
+  PlayerData = 'playerData',
+  AckPacket = 'ackPacket',
 }

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { MapType, Packet, PacketType } from 'src/generated/protos/multiplayer';
+import { Packet, PacketType } from 'src/generated/protos/multiplayer';
 import { ProtoType, ProtoPacket } from '../types/proto.types';
 
 @Injectable()
@@ -18,13 +18,6 @@ export class ProtobufManager {
     if (data.packet === PacketType.UnknownPacket) {
       throw new Error('Cannot create unknown packet');
     }
-
-    // if (
-    //   data.packet !== PacketType.EventPacket &&
-    //   data.packet !== PacketType.MovePacket
-    // ) {
-    //   console.log(data);
-    // }
 
     try {
       switch (data.packet) {
@@ -104,11 +97,7 @@ export class ProtobufManager {
           packet = Packet.toBinary({
             payload: {
               oneofKind: ProtoType.Map,
-              map: {
-                id: data.payload.id,
-                mapId: data.payload.mapId ?? 0,
-                mode: data.payload.mode ?? MapType.HUB,
-              },
+              map: data.payload,
             },
           });
           break;
@@ -153,14 +142,12 @@ export class ProtobufManager {
           });
           break;
         case PacketType.PlaceBlockPacket:
-          console.log(data.payload);
           packet = Packet.toBinary({
             payload: {
               oneofKind: ProtoType.PlaceBlock,
               placeBlock: data.payload,
             },
           });
-          console.log(packet);
           break;
         case PacketType.DeleteBlockPacket:
           packet = Packet.toBinary({
@@ -231,6 +218,78 @@ export class ProtobufManager {
             payload: {
               oneofKind: ProtoType.RemoveBlockFromGroup,
               removeBlockFromGroup: data.payload,
+            },
+          });
+          break;
+        case PacketType.CreateTriggerPacket:
+          packet = Packet.toBinary({
+            payload: {
+              oneofKind: ProtoType.CreateTrigger,
+              createTrigger: data.payload,
+            },
+          });
+          break;
+        case PacketType.ChangeTriggerPacket:
+          packet = Packet.toBinary({
+            payload: {
+              oneofKind: ProtoType.ChangeTrigger,
+              changeTrigger: data.payload,
+            },
+          });
+          break;
+        case PacketType.DeleteTriggerPacket:
+          packet = Packet.toBinary({
+            payload: {
+              oneofKind: ProtoType.DeleteTrigger,
+              deleteTrigger: data.payload,
+            },
+          });
+          break;
+        case PacketType.AddOperationPacket:
+          packet = Packet.toBinary({
+            payload: {
+              oneofKind: ProtoType.AddOperation,
+              addOperation: data.payload,
+            },
+          });
+          break;
+        case PacketType.EditOperationPacket:
+          packet = Packet.toBinary({
+            payload: {
+              oneofKind: ProtoType.EditOperation,
+              editOperation: data.payload,
+            },
+          });
+          break;
+        case PacketType.MoveOperationOrderPacket:
+          packet = Packet.toBinary({
+            payload: {
+              oneofKind: ProtoType.ReorderOperation,
+              reorderOperation: data.payload,
+            },
+          });
+          break;
+        case PacketType.RemoveOperationPacket:
+          packet = Packet.toBinary({
+            payload: {
+              oneofKind: ProtoType.RemoveOperation,
+              removeOperation: data.payload,
+            },
+          });
+          break;
+        case PacketType.PlayerDataPacket:
+          packet = Packet.toBinary({
+            payload: {
+              oneofKind: ProtoType.PlayerData,
+              playerData: data.payload,
+            },
+          });
+          break;
+        case PacketType.AckResPacket:
+          packet = Packet.toBinary({
+            payload: {
+              oneofKind: ProtoType.AckPacket,
+              ackPacket: data.payload,
             },
           });
           break;
@@ -378,6 +437,51 @@ export class ProtobufManager {
           return {
             packet: PacketType.RemoveBlockFromGroupPacket,
             payload: packet.payload.removeBlockFromGroup,
+          };
+        case ProtoType.CreateTrigger:
+          return {
+            packet: PacketType.CreateTriggerPacket,
+            payload: packet.payload.createTrigger,
+          };
+        case ProtoType.ChangeTrigger:
+          return {
+            packet: PacketType.ChangeTriggerPacket,
+            payload: packet.payload.changeTrigger,
+          };
+        case ProtoType.DeleteTrigger:
+          return {
+            packet: PacketType.DeleteTriggerPacket,
+            payload: packet.payload.deleteTrigger,
+          };
+        case ProtoType.AddOperation:
+          return {
+            packet: PacketType.AddOperationPacket,
+            payload: packet.payload.addOperation,
+          };
+        case ProtoType.EditOperation:
+          return {
+            packet: PacketType.EditOperationPacket,
+            payload: packet.payload.editOperation,
+          };
+        case ProtoType.ReorderOperation:
+          return {
+            packet: PacketType.MoveOperationOrderPacket,
+            payload: packet.payload.reorderOperation,
+          };
+        case ProtoType.RemoveOperation:
+          return {
+            packet: PacketType.RemoveOperationPacket,
+            payload: packet.payload.removeOperation,
+          };
+        case ProtoType.PlayerData:
+          return {
+            packet: PacketType.PlayerDataPacket,
+            payload: packet.payload.playerData,
+          };
+        case ProtoType.AckPacket:
+          return {
+            packet: PacketType.AckResPacket,
+            payload: packet.payload.ackPacket,
           };
         default:
           return {

@@ -1,5 +1,6 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { CommandsService } from '../commands.service';
+import { C } from '../../types/multiplayer';
 
 @Injectable()
 export class HelpCommand implements OnModuleInit {
@@ -17,7 +18,7 @@ export class HelpCommand implements OnModuleInit {
     const commands = [...this.commandsService.commands.values()];
     const commandsDescription = commands.map(
       (command) =>
-        `${command.aliases[0]}${command.aliases.length > 1 ? ` (or ${command.aliases.slice(1).join('|')})` : ''} ${command.args?.join(' ') ?? ''} - ${command.description}`,
+        `<color=${C.blue}>${command.aliases[0]}${command.aliases.length > 1 ? ` (or ${command.aliases.slice(1).join('|')})` : ''}</color> <color=${C.green}>${command.args?.join(' ') ?? ''}</color> - ${command.description}`,
     );
 
     return commandsDescription.join('\n');
