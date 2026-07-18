@@ -3,14 +3,19 @@ import { CommandsService } from '../commands.service';
 import {
   C,
   CommandsContext,
+  Ref,
   SessionCollab,
   SessionPlayer,
 } from '../../types/multiplayer';
 import { Events, GameMode, PacketType } from 'src/generated/protos/multiplayer';
+import { CollabService } from '../collab.service';
 
 @Injectable()
 export class CollabCommand implements OnModuleInit {
-  constructor(private readonly commandsService: CommandsService) {}
+  constructor(
+    private readonly commandsService: CommandsService,
+    private readonly collabService: CollabService,
+  ) {}
 
   onModuleInit() {
     this.commandsService.register({
@@ -37,16 +42,29 @@ export class CollabCommand implements OnModuleInit {
         return this.leaveCollab(player, context);
       case 'close':
         return this.closeCollab(player, context);
+      case 'save':
+        return this.saveCollab(player, context);
+      case 'restore':
+        if (!args[1]) return `<color=${C.yellow}>Type name</color>`;
+        return this.createCollab(player, context, args[1], true);
+      case 'delete':
+        if (!args[1]) return `<color=${C.yellow}>Type name</color>`;
+        return this.deleteCollab(player, context, args[1]);
+      case 'enable':
+        return this.enable(player, context, args[1]);
+      case 'disable':
+        return this.disable(player, context, args[1]);
       default:
-        return `<color=${C.yellow}>Unknown argument. Use create, join or leave</color>`;
+        return `<color=${C.yellow}>Unknown argument. Use create, join, leave, save, restore, delete, enable or disable</color>`;
     }
   }
 
-  private createCollab(
+  private async createCollab(
     player: SessionPlayer,
     context: CommandsContext,
     name: string,
-  ): string {
+    restore?: boolean,
+  ): Promise<string> {
     if (player.collabId) return `You're already in a collab.`;
 
     if (context.playerData.get(player.id)?.mode.value !== GameMode.T_EDITOR)
@@ -57,7 +75,7 @@ export class CollabCommand implements OnModuleInit {
       `<color=${C.blue}>Creating collab... Please wait a moment, transfering blocks data may take a while</color>`,
     );
 
-    const collab: SessionCollab = {
+    let collab: SessionCollab = {
       id: name,
       ownerId: player.id,
       players: new Set([player.id]),
@@ -66,7 +84,21 @@ export class CollabCommand implements OnModuleInit {
       settings: new Map(),
       color: new Map(),
       triggers: new Map(),
+      autosaveEnabled: new Ref(
+        await this.collabService.isSavedCollabExists(player, name),
+      ),
     };
+
+    if (restore || collab.autosaveEnabled?.value) {
+      const restoreData = await this.collabService.restoreCollab(player, name);
+
+      if (restoreData) {
+        collab = restoreData;
+        collab.autosaveEnabled = new Ref(true);
+      } else {
+        return `<color=${C.red}>Restore data not found.</color>`;
+      }
+    }
 
     player.collabId = name;
     context.players.set(player.id, player);
@@ -74,7 +106,7 @@ export class CollabCommand implements OnModuleInit {
 
     this.commandsService.sendEvent(player, Events.StartCollab);
 
-    // void this.test(player, context);
+    await this.sendData(player, collab);
 
     return `<color=${C.green}>Collab opened!</color>`;
   }
@@ -111,6 +143,12 @@ export class CollabCommand implements OnModuleInit {
 
     this.commandsService.sendEvent(player, Events.JoinCollab);
 
+    await this.sendData(player, collab);
+
+    return `<color=${C.yellow}>You have joined the collab</color>`;
+  }
+
+  private async sendData(player: SessionPlayer, collab: SessionCollab) {
     for (const setting of collab.settings) {
       this.commandsService.sendPacket(player, {
         packet: PacketType.MapSettingsPacket,
@@ -134,7 +172,6 @@ export class CollabCommand implements OnModuleInit {
       return `<color=${C.red}>Collab connection failed: blocks transfer timeout.</color>`;
     }
 
-    console.log('Sending groups...');
     for (const group of collab.groups.values()) {
       const groupPromise = await this.commandsService.sendPacketAsync(player, {
         packet: PacketType.CreateGroupPacket,
@@ -159,8 +196,6 @@ export class CollabCommand implements OnModuleInit {
       );
       if (!triggerPromise) break;
     }
-
-    return `<color=${C.yellow}>You have joined the collab</color>`;
   }
 
   private leaveCollab(player: SessionPlayer, context: CommandsContext) {
@@ -220,27 +255,75 @@ export class CollabCommand implements OnModuleInit {
     );
   }
 
-  // private async test(player: SessionPlayer, context: CommandsContext) {
-  //   for (let i = 0; i < 3; i++) {
-  //     const id = v4();
-  //     const block = JSON.parse(
-  //       `{"instanceID":"${id}","blockID":191013585,"scale":1,"color":0,"position":{"x":${-19.5 - i * 2},"y":-2.875188975792753e-10,"z":-2.5},"rotation":{"x":0,"y":0,"z":3.660806102701031e-9},"customColor":{"r":1,"g":1,"b":1,"a":1}}`,
-  //     ) as Block;
-  //     const trigger = JSON.parse(
-  //       `{"instanceId":"${id}","triggerId":"ID123${i}","retriggerable":true,"triggerWhenRunning":true,"resetOnRetrigger":false,"operations":[{"isEnabled":true,"isLinked":false,"operation":{"oneofKind":"move","move":{"currentOffsetMode":0,"duration":1,"currentDurationMode":0,"currentEasingMode":0,"targetGroupName":"Group","offset":{"x":0,"y":1,"z":0},"currentSpaceMode":0,"currentPivotSource":0,"pivotSourceGroupName":"Group"}}},{"isEnabled":true,"isLinked":false,"operation":{"oneofKind":"rotate","rotate":{"currentOffsetMode":0,"duration":1,"currentDurationMode":0,"currentEasingMode":0,"targetGroupName":"Group","offset":{"x":2,"y":0,"z":0},"currentPivotSource":0,"pivotSourceGroupName":"Group","currentSpaceMode":0,"currentSpacePivotSource":0,"spacePivotSourceGroupName":"Group"}}},{"isEnabled":true,"isLinked":true,"operation":{"oneofKind":"color","color":{"targetMode":0,"targetGroupName":"dd","blendMode":0,"duration":3,"color":{"r":1,"g":1,"b":1,"a":1},"colorMode":0}}},{"isEnabled":true,"isLinked":false,"operation":{"oneofKind":"sound","sound":{"soundObjectName":"-","playMode":0,"soundId":"ID","volume":1,"fadeIn":2,"fadeOut":0,"pitch":1,"startOffset":0,"maxPlaytime":0,"loop":false,"panningMode":0,"range":10,"attach":true,"useVolumeSettings":true}}},{"isEnabled":true,"isLinked":false,"operation":{"oneofKind":"wait","wait":{"duration":2}}},{"isEnabled":true,"isLinked":false,"operation":{"oneofKind":"restart","restart":{"restart":false,"reset":true}}},{"isEnabled":true,"isLinked":false,"operation":{"oneofKind":"sendEvent","sendEvent":{"targetGroup":"w","eventName":"Event","targetMode":0,"targetTriggerId":"Trigger ID"}}},{"isEnabled":true,"isLinked":true,"operation":{"oneofKind":"receiveEvent","receiveEvent":{"eventName":"Event","jump":true,"canTrigger":false,"wait":true}}}]}`,
-  //     ) as Trigger;
+  private async saveCollab(player: SessionPlayer, context: CommandsContext) {
+    if (!player.collabId) return `<color=${C.red}>You're not in collab</color>`;
 
-  //     console.log('Sending blocks...');
-  //     await this.commandsService.sendPacketAsync(player, {
-  //       packet: PacketType.PlaceBlockPacket,
-  //       payload: { id: player.id, block },
-  //     });
+    const collab = context.collabSessions.get(player.collabId);
 
-  //     console.log('Sending triggers...');
-  //     await this.commandsService.sendPacketAsync(player, {
-  //       packet: PacketType.ChangeTriggerPacket,
-  //       payload: { id: player.id, trigger },
-  //     });
-  //   }
-  // }
+    if (!collab) return `<color=${C.red}>Collab not found</color>`;
+    if (collab.ownerId !== player.id)
+      return `<color=${C.red}>You're not collab owner</color>`;
+
+    return (await this.collabService.saveCollab(player)) ?? '';
+  }
+
+  private async deleteCollab(
+    player: SessionPlayer,
+    context: CommandsContext,
+    name: string,
+  ) {
+    const collab = context.collabSessions.get(name);
+
+    if (collab && collab.ownerId === player.id) {
+      collab.autosaveEnabled?.set(false);
+    }
+
+    return await this.collabService.deleteCollab(player, name);
+  }
+
+  private enable(
+    player: SessionPlayer,
+    context: CommandsContext,
+    param: string,
+  ) {
+    if (!player.collabId) return `<color=${C.red}>You're not in collab</color>`;
+
+    const collab = context.collabSessions.get(player.collabId);
+
+    if (!collab) return `<color=${C.red}>Collab not found</color>`;
+    if (collab.ownerId !== player.id)
+      return `<color=${C.red}>You're not collab owner</color>`;
+
+    switch (param) {
+      case 'autosave':
+      case 'save':
+        collab.autosaveEnabled?.set(true);
+        return `<color=${C.green}>Autosave enabled`;
+      default:
+        return 'Unknown param. Please use one of these params: [autosave]';
+    }
+  }
+
+  private disable(
+    player: SessionPlayer,
+    context: CommandsContext,
+    param: string,
+  ) {
+    if (!player.collabId) return `<color=${C.red}>You're not in collab</color>`;
+
+    const collab = context.collabSessions.get(player.collabId);
+
+    if (!collab) return `<color=${C.red}>Collab not found</color>`;
+    if (collab.ownerId !== player.id)
+      return `<color=${C.red}>You're not collab owner</color>`;
+
+    switch (param) {
+      case 'autosave':
+      case 'save':
+        collab.autosaveEnabled?.set(false);
+        return `<color=${C.green}>Autosave disabled`;
+      default:
+        return 'Unknown param. Please use one of these params: [autosave]';
+    }
+  }
 }

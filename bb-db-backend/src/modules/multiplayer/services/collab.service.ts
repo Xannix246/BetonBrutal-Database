@@ -3,11 +3,16 @@ import { MultiplayerService } from './multiplayer.service';
 import { SessionCollab, SessionPlayer } from '../types/multiplayer';
 import * as Proto from 'src/generated/protos/multiplayer';
 import { PacketType } from 'src/generated/protos/multiplayer';
+import { PrismaService } from 'src/modules/prisma/prisma.service';
+import { deserializeCollab, serializeCollab } from 'src/shared/bbmapUtility';
 
 @Injectable()
 export class CollabService {
   private readonly collabSessions: Map<string, SessionCollab>;
-  constructor(private readonly multiplayer: MultiplayerService) {
+  constructor(
+    private readonly multiplayer: MultiplayerService,
+    private readonly prisma: PrismaService,
+  ) {
     this.collabSessions = this.multiplayer.collabSessions;
   }
 
@@ -285,8 +290,6 @@ export class CollabService {
       [player.id],
       [...collab.players],
     );
-
-    // console.log('Added operation', trigger.operations);
   }
 
   editOperation(player: SessionPlayer, packet: Proto.EditOperation) {
@@ -303,8 +306,6 @@ export class CollabService {
       [player.id],
       [...collab.players],
     );
-
-    // console.log('Edited operation', trigger.operations);
   }
 
   moveOperation(player: SessionPlayer, packet: Proto.ReorderOperation) {
@@ -329,8 +330,6 @@ export class CollabService {
       [player.id],
       [...collab.players],
     );
-
-    // console.log('Moved operation', trigger.operations);
   }
 
   removeOperation(player: SessionPlayer, packet: Proto.RemoveOperation) {
@@ -347,7 +346,79 @@ export class CollabService {
       [player.id],
       [...collab.players],
     );
+  }
 
-    // console.log('Removed operation', trigger.operations);
+  async saveCollab(player: SessionPlayer, checkAutosave = false) {
+    if (!player.userId) return 'User not found. Did you linked your account?';
+    if (!player.collabId) return;
+
+    const collab = this.collabSessions.get(player.collabId);
+
+    if (!collab || collab.ownerId !== player.id) return;
+    if (checkAutosave && !collab.autosaveEnabled) return;
+
+    try {
+      await this.prisma.mapSave.upsert({
+        where: {
+          userId_saveName: { userId: player.userId, saveName: collab.id },
+        },
+        update: {
+          data: serializeCollab(collab),
+        },
+        create: {
+          userId: player.userId,
+          saveName: collab.id,
+          data: serializeCollab(collab),
+        },
+      });
+
+      return 'Collab was saved';
+    } catch (err) {
+      return `Failed to save collab: ${err}`;
+    }
+  }
+
+  async restoreCollab(player: SessionPlayer, name: string) {
+    if (!player.userId) return;
+
+    const collab = await this.prisma.mapSave.findUnique({
+      where: { userId_saveName: { userId: player.userId, saveName: name } },
+    });
+
+    if (collab) {
+      return deserializeCollab(Buffer.from(collab.data));
+    }
+  }
+
+  async deleteCollab(player: SessionPlayer, name: string) {
+    if (!player.userId) return 'User not found. Did you linked your account?';
+
+    const collab = await this.prisma.mapSave.findUnique({
+      where: { userId_saveName: { userId: player.userId, saveName: name } },
+    });
+
+    if (collab) {
+      await this.prisma.mapSave.delete({ where: { id: collab.id } });
+      return 'Collab was deleted';
+    } else {
+      return 'Collab not found';
+    }
+  }
+
+  async isSavedCollabExists(player: SessionPlayer, name: string) {
+    if (!player.userId) return false;
+
+    const collab = await this.prisma.mapSave.findUnique({
+      where: { userId_saveName: { userId: player.userId, saveName: name } },
+      select: {
+        id: true,
+      },
+    });
+
+    if (collab?.id) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

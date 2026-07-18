@@ -214,6 +214,7 @@ export class WorkshopController {
   }
 
   @Post(':id/tier')
+  @OptionalAuth()
   async postTier(
     @Param('id') id: string,
     @Session() session: UserRoleSession,

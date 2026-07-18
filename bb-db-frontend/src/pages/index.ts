@@ -14,3 +14,4 @@ export { default as Rankings } from "./Rankings/Rankings";
 export { default as Search } from "./Search/Search";
 export { default as Workshop } from "./Workshop/Workshop";
 export { default as WorkshopItem } from "./WorkshopItem/WorkshopItem";
+export { default as GetToken } from "./GetToken/GetToken";

@@ -1,0 +1,10 @@
+model MapSave {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  userId   String
+  saveName String
+  data     Bytes
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, saveName])
+}

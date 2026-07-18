@@ -1,5 +1,5 @@
 import { createAuthClient } from "better-auth/client";
-import { adminClient } from "better-auth/client/plugins"
+import { adminClient, apiKeyClient } from "better-auth/client/plugins"
 import axios from "axios";
 import { setUser } from "../../store/store";
 import { config } from "@config";
@@ -8,7 +8,8 @@ export const authClient = createAuthClient({
   baseURL: config.baseAuthUrl,
   basePath: 'api/auth',
   plugins: [
-    adminClient()
+    adminClient(),
+    apiKeyClient(),
   ],
 });
 

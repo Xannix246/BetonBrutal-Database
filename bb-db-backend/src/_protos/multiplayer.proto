@@ -337,6 +337,7 @@ message Join {
   MapType map_mode = 4;
   string map_id = 5;
   optional string map_name = 6;
+  optional string token = 7;
 }
 
 message PlayerList {

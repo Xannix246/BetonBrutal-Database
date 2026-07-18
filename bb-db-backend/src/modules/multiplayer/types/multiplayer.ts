@@ -102,6 +102,7 @@ export type SessionCollab = {
   settings: Map<ProtoMapSetting, boolean>;
   color: Map<ProtoMapSetting, ProtoColor>;
   triggers: Map<string, Trigger>;
+  autosaveEnabled?: Ref<boolean>;
 };
 
 // can be stored in prisma
@@ -143,6 +144,7 @@ export type SessionPlayer = {
   collabId?: string; // SessionCollab id
   proxyMode?: boolean;
   color?: ProtoColor;
+  userId?: string;
 };
 
 export type SessionPlayerData = {

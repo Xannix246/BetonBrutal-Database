@@ -16,6 +16,7 @@ import { ProtoPacket } from '../types/proto.types';
 import { ProtobufManager } from './protobuf-manager.service';
 import { PacketType } from 'src/generated/protos/multiplayer';
 import * as Proto from 'src/generated/protos/multiplayer';
+import { auth } from 'src/modules/auth/services/auth.shared';
 
 @Injectable()
 export class MultiplayerService implements OnModuleInit {
@@ -146,6 +147,14 @@ export class MultiplayerService implements OnModuleInit {
       mapId: packet.mapId,
       color: { r: 0.5, g: 0.5, b: 0.5, a: 1 },
     };
+
+    if (packet.token) {
+      const verifiedToken = await auth.api.verifyApiKey({
+        body: { key: packet.token },
+      });
+
+      player.userId = verifiedToken.key?.userId;
+    }
 
     const data: SessionPlayerData = {
       mode: new Ref(packet.mode),

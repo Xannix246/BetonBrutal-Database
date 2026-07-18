@@ -48,6 +48,7 @@ export class MultiplayerWebsocketGateway implements OnModuleInit {
       const user = this.users.get(uuid);
 
       if (user) {
+        if (player) void this.collab.saveCollab(player, true);
         void this.multiplayer.onDisconnect(user);
         console.log(`${user} disconnected`);
       }
@@ -89,13 +90,13 @@ export class MultiplayerWebsocketGateway implements OnModuleInit {
         void this.multiplayer.join(socket, setPlayer, packet.payload);
         break;
       case PacketType.EventPacket:
+        if (!player) return;
         switch (packet.payload.type) {
           case Events.Ping:
-            if (!player) return;
             this.events.ping(player);
             break;
           case Events.RunComplete:
-            this.events.completeRun(player!);
+            this.events.completeRun(player);
         }
         break;
       case PacketType.AckResPacket:
@@ -106,72 +107,92 @@ export class MultiplayerWebsocketGateway implements OnModuleInit {
         this.multiplayer.playerMove(player, packet.payload);
         break;
       case PacketType.BodyColorPacket:
-        this.multiplayer.setColor(player!, packet.payload);
+        if (!player) return;
+        this.multiplayer.setColor(player, packet.payload);
         break;
       case PacketType.MapPacket:
         if (!player) return;
         this.multiplayer.joinMap(player, packet.payload);
         break;
       case PacketType.MessagePacket:
-        this.multiplayer.sendMessage(player!, packet.payload);
+        if (!player) return;
+        this.multiplayer.sendMessage(player, packet.payload);
         break;
       case PacketType.CommandPacket:
-        void this.multiplayer.sendCommand(player!, packet.payload);
+        if (!player) return;
+        void this.multiplayer.sendCommand(player, packet.payload);
         break;
       case PacketType.PlaceBlocksPacket:
       case PacketType.PlaceBlockPacket:
-        this.collab.placeBlock(player!, packet.payload);
+        if (!player) return;
+        this.collab.placeBlock(player, packet.payload);
         break;
       case PacketType.DeleteBlockPacket:
-        this.collab.deleteBlock(player!, packet.payload);
+        if (!player) return;
+        this.collab.deleteBlock(player, packet.payload);
         break;
       case PacketType.ChangeBlockPacket:
-        this.collab.changeBlock(player!, packet.payload);
+        if (!player) return;
+        this.collab.changeBlock(player, packet.payload);
         break;
       case PacketType.MapSettingsPacket:
-        this.collab.setMapSettings(player!, packet.payload);
+        if (!player) return;
+        this.collab.setMapSettings(player, packet.payload);
         break;
       case PacketType.MapColorPacket:
-        this.collab.setMapColor(player!, packet.payload);
+        if (!player) return;
+        this.collab.setMapColor(player, packet.payload);
         break;
       case PacketType.CreateGroupPacket:
         this.collab.createGroup(player!, packet.payload);
         break;
       case PacketType.ChangeGroupPacket:
-        this.collab.changeGroup(player!, packet.payload);
+        if (!player) return;
+        this.collab.changeGroup(player, packet.payload);
         break;
       case PacketType.DeleteGroupPacket:
-        this.collab.deleteGroup(player!, packet.payload);
+        if (!player) return;
+        this.collab.deleteGroup(player, packet.payload);
         break;
       case PacketType.AddBlockToGroupPacket:
-        this.collab.addBlockToGroup(player!, packet.payload);
+        if (!player) return;
+        this.collab.addBlockToGroup(player, packet.payload);
         break;
       case PacketType.RemoveBlockFromGroupPacket:
-        this.collab.removeBlockFromGroup(player!, packet.payload);
+        if (!player) return;
+        this.collab.removeBlockFromGroup(player, packet.payload);
         break;
       case PacketType.CreateTriggerPacket:
-        this.collab.createTrigger(player!, packet.payload);
+        if (!player) return;
+        this.collab.createTrigger(player, packet.payload);
         break;
       case PacketType.ChangeTriggerPacket:
-        this.collab.changeTrigger(player!, packet.payload);
+        if (!player) return;
+        this.collab.changeTrigger(player, packet.payload);
         break;
       case PacketType.DeleteTriggerPacket:
-        this.collab.deleteTrigger(player!, packet.payload);
+        if (!player) return;
+        this.collab.deleteTrigger(player, packet.payload);
         break;
       case PacketType.AddOperationPacket:
-        this.collab.addOperation(player!, packet.payload);
+        if (!player) return;
+        this.collab.addOperation(player, packet.payload);
         break;
       case PacketType.EditOperationPacket:
-        this.collab.editOperation(player!, packet.payload);
+        if (!player) return;
+        this.collab.editOperation(player, packet.payload);
         break;
       case PacketType.MoveOperationOrderPacket:
-        this.collab.moveOperation(player!, packet.payload);
+        if (!player) return;
+        this.collab.moveOperation(player, packet.payload);
         break;
       case PacketType.RemoveOperationPacket:
-        this.collab.removeOperation(player!, packet.payload);
+        if (!player) return;
+        this.collab.removeOperation(player, packet.payload);
         break;
       case PacketType.PlayerDataPacket:
-        this.multiplayer.updatePlayerData(player!, packet.payload);
+        if (!player) return;
+        this.multiplayer.updatePlayerData(player, packet.payload);
     }
   }
 }
