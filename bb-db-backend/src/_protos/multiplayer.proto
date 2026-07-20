@@ -40,6 +40,7 @@ enum PacketType {
   MoveOperationOrderPacket = 34;
   RemoveOperationPacket = 35;
   PlayerDataPacket = 36;
+  ActivateTriggerPacket = 47;
   AckResPacket = 100;
   UnknownPacket = 404;
 }
@@ -203,8 +204,8 @@ message PingEntry {
 }
 
 message Block {
-  string instanceID = 1;
-  int32 blockID = 2;
+  string instance_id = 1;
+  int32 block_id = 2;
   Vector3 position = 3;
   Vector3 rotation = 4;
   float scale = 5;
@@ -215,7 +216,7 @@ message Block {
 // triggers and groups
 
 message Group {
-  string instanceID = 1;
+  string instance_id = 1;
   string name = 2;
   repeated string blocks = 3;
   optional Block pivot = 4;
@@ -407,7 +408,7 @@ message PlaceBlock {
 
 message DeleteBlock {
   int64 id = 1;
-  string instanceID = 2;
+  string instance_id = 2;
 }
 
 message ChangeBlock {
@@ -430,7 +431,7 @@ message MapColor {
 
 message CreateGroup {
   int64 id = 1;
-  Group group = 2;
+  repeated Group groups = 2;
 }
 
 message ChangeGroup {
@@ -440,7 +441,7 @@ message ChangeGroup {
 
 message DeleteGroup {
   int64 id = 1;
-  string instanceID = 2;
+  string instance_id = 2;
 }
 
 message AddBlockToGroup {
@@ -467,7 +468,7 @@ message ChangeTrigger {
 
 message DeleteTrigger {
   int64 id = 1;
-  string instanceID = 2;
+  string instance_id = 2;
 }
 
 message AddOperation {
@@ -502,8 +503,14 @@ message PlayerData {
   MapType map_mode = 3;
 }
 
+message ActivateTrigger {
+  int64 id = 1;
+  string trigger_id = 2;
+  bool active = 3;
+}
+
 message AckPacket {
-  string id = 1;
+  string id = 1; //uuid
   optional PacketType packet_type = 2;
 }
 
@@ -545,6 +552,7 @@ message Packet {
     ReorderOperation reorder_operation = 34;
     RemoveOperation remove_operation = 35;
     PlayerData player_data = 36;
+    ActivateTrigger activate_trigger = 37;
     AckPacket ack_packet = 100;
   }
 }

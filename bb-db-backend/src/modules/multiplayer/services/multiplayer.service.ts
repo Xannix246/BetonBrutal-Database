@@ -315,6 +315,7 @@ export class MultiplayerService implements OnModuleInit {
       map = {
         id: packet.mapId,
         players: new Set(),
+        activeTriggers: new Map(),
       };
     }
 
@@ -395,6 +396,34 @@ export class MultiplayerService implements OnModuleInit {
       mapRecords: this.mapRecords,
       asyncPackets: this.asyncPackets,
     });
+  }
+
+  changeTriggerState(player: SessionPlayer, packet: Proto.ActivateTrigger) {
+    if (player.collabId || !player.mapId) return;
+
+    const map = this.mapSessions.get(player.mapId);
+    const trigger = map?.activeTriggers.get(packet.triggerId);
+
+    if (!map) return;
+    if (!trigger) {
+      map.activeTriggers.set(packet.triggerId, false);
+    }
+
+    if (packet.active && !trigger) {
+      map.activeTriggers.set(packet.triggerId, true);
+      this.broadcastPacket(
+        { packet: PacketType.ActivateTriggerPacket, payload: packet },
+        [player.id],
+        [...map.players],
+      );
+    } else if (!packet.active && trigger) {
+      map.activeTriggers.set(packet.triggerId, false);
+      this.broadcastPacket(
+        { packet: PacketType.ActivateTriggerPacket, payload: packet },
+        [player.id],
+        [...map.players],
+      );
+    }
   }
 
   onDisconnect(playerId: string) {

@@ -285,6 +285,14 @@ export class ProtobufManager {
             },
           });
           break;
+        case PacketType.ActivateTriggerPacket:
+          packet = Packet.toBinary({
+            payload: {
+              oneofKind: ProtoType.ActivateTrigger,
+              activateTrigger: data.payload,
+            },
+          });
+          break;
         case PacketType.AckResPacket:
           packet = Packet.toBinary({
             payload: {
@@ -477,6 +485,11 @@ export class ProtobufManager {
           return {
             packet: PacketType.PlayerDataPacket,
             payload: packet.payload.playerData,
+          };
+        case ProtoType.ActivateTrigger:
+          return {
+            packet: PacketType.ActivateTriggerPacket,
+            payload: packet.payload.activateTrigger,
           };
         case ProtoType.AckPacket:
           return {

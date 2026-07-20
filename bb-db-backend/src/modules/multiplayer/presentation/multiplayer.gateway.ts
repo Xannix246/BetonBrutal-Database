@@ -75,7 +75,8 @@ export class MultiplayerWebsocketGateway implements OnModuleInit {
     if (
       packet.packet !== PacketType.EventPacket &&
       packet.packet !== PacketType.MovePacket &&
-      packet.packet !== PacketType.PlayerDataPacket
+      packet.packet !== PacketType.PlayerDataPacket &&
+      packet.packet !== PacketType.ActivateTriggerPacket
     ) {
       this.logger.log(packet);
     }
@@ -193,6 +194,12 @@ export class MultiplayerWebsocketGateway implements OnModuleInit {
       case PacketType.PlayerDataPacket:
         if (!player) return;
         this.multiplayer.updatePlayerData(player, packet.payload);
+        break;
+      case PacketType.ActivateTriggerPacket:
+        if (!player) return;
+        this.collab.changeTriggerState(player, packet.payload);
+        this.multiplayer.changeTriggerState(player, packet.payload);
+        break;
     }
   }
 }

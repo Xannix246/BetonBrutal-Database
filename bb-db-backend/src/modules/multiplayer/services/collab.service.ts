@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { MultiplayerService } from './multiplayer.service';
-import { SessionCollab, SessionPlayer } from '../types/multiplayer';
+import { Ref, SessionCollab, SessionPlayer } from '../types/multiplayer';
 import * as Proto from 'src/generated/protos/multiplayer';
 import { PacketType } from 'src/generated/protos/multiplayer';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
@@ -28,8 +28,7 @@ export class CollabService {
 
     if (Array.isArray(packet.block)) {
       for (const block of packet.block) {
-        console.log(JSON.stringify(block));
-        collab.blocks.set(block.instanceID, block);
+        collab.blocks.set(block.instanceId, block);
       }
 
       this.multiplayer.broadcastPacket(
@@ -41,7 +40,7 @@ export class CollabService {
         [...collab.players],
       );
     } else {
-      collab.blocks.set(packet.block.instanceID, packet.block);
+      collab.blocks.set(packet.block.instanceId, packet.block);
       this.multiplayer.broadcastPacket(
         {
           packet: PacketType.PlaceBlockPacket,
@@ -60,7 +59,7 @@ export class CollabService {
 
     if (!collab) return;
 
-    collab.blocks.delete(packet.instanceID);
+    collab.blocks.delete(packet.instanceId);
     this.multiplayer.broadcastPacket(
       { packet: PacketType.DeleteBlockPacket, payload: packet },
       [player.id],
@@ -75,7 +74,7 @@ export class CollabService {
 
     if (!collab) return;
 
-    collab.blocks.set(packet.block!.instanceID, {
+    collab.blocks.set(packet.block!.instanceId, {
       ...packet.block!,
     });
 
@@ -121,18 +120,21 @@ export class CollabService {
 
     const collab = this.collabSessions.get(player.collabId);
 
-    if (!collab || !packet.group) return;
+    if (!collab || !packet.groups) return;
 
-    const group = {
-      instanceID: packet.group.instanceID,
-      name: packet.group.name,
-      blocks: new Set(packet.group.blocks),
-      pivot: packet.group.pivot
-        ? collab.blocks.get(packet.group.pivot.instanceID)
-        : undefined,
-    };
+    for (const group of packet.groups) {
+      const newGroup = {
+        instanceId: group.instanceId,
+        name: group.name,
+        blocks: new Set(group.blocks),
+        pivot: group.pivot
+          ? collab.blocks.get(group.pivot.instanceId)
+          : undefined,
+      };
 
-    collab.groups.set(packet.group.instanceID, group);
+      collab.groups.set(group.instanceId, newGroup);
+    }
+
     this.multiplayer.broadcastPacket(
       { packet: PacketType.CreateGroupPacket, payload: packet },
       [player.id],
@@ -147,7 +149,7 @@ export class CollabService {
 
     if (!collab || !packet.group) return;
 
-    collab.groups.set(packet.group.instanceID, {
+    collab.groups.set(packet.group.instanceId, {
       ...packet.group,
       blocks: new Set(packet.group.blocks),
     });
@@ -166,7 +168,7 @@ export class CollabService {
 
     if (!collab) return;
 
-    collab.groups.delete(packet.instanceID);
+    collab.groups.delete(packet.instanceId);
     this.multiplayer.broadcastPacket(
       { packet: PacketType.DeleteGroupPacket, payload: packet },
       [player.id],
@@ -223,6 +225,7 @@ export class CollabService {
       triggerWhenRunning: packet.trigger.triggerWhenRunning,
       resetOnRetrigger: packet.trigger.resetOnRetrigger,
       operations: packet.trigger.operations,
+      isActive: new Ref(false),
     };
 
     collab.triggers.set(trigger.instanceId, trigger);
@@ -260,7 +263,7 @@ export class CollabService {
 
     if (!collab) return;
 
-    collab.triggers.delete(packet.instanceID);
+    collab.triggers.delete(packet.instanceId);
     // this.multiplayer.broadcastPacket(
     //   { packet: PacketType.DeleteTriggerPacket, payload: packet },
     //   [player.id],
@@ -347,6 +350,34 @@ export class CollabService {
       [...collab.players],
     );
   }
+
+  changeTriggerState(player: SessionPlayer, packet: Proto.ActivateTrigger) {
+    if (!player.collabId) return;
+
+    const collab = this.collabSessions.get(player.collabId);
+    const trigger = collab?.triggers.get(packet.triggerId);
+
+    if (!collab || !trigger || !trigger.isActive) return;
+    if (!collab.triggersSyncEnabled?.value) return;
+
+    if (packet.active && !trigger.isActive.value) {
+      trigger.isActive.set(true);
+      this.multiplayer.broadcastPacket(
+        { packet: PacketType.ActivateTriggerPacket, payload: packet },
+        [player.id],
+        [...collab.players],
+      );
+    } else if (!packet.active && trigger.isActive.value) {
+      trigger.isActive.set(false);
+      this.multiplayer.broadcastPacket(
+        { packet: PacketType.ActivateTriggerPacket, payload: packet },
+        [player.id],
+        [...collab.players],
+      );
+    }
+  }
+
+  // only for internal use
 
   async saveCollab(player: SessionPlayer, checkAutosave = false) {
     if (!player.userId) return 'User not found. Did you linked your account?';

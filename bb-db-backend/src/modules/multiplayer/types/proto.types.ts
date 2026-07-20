@@ -165,6 +165,11 @@ type PlayerData = {
   payload: Proto.PlayerData;
 };
 
+type ActivateTrigger = {
+  packet: Proto.PacketType.ActivateTriggerPacket;
+  payload: Proto.ActivateTrigger;
+};
+
 type AckPacket = {
   packet: Proto.PacketType.AckResPacket;
   payload: Proto.AckPacket;
@@ -209,6 +214,7 @@ export type ProtoPacket =
   | ReorderOperation
   | RemoveOperation
   | PlayerData
+  | ActivateTrigger
   | AckPacket
   | UnknownPacket;
 
@@ -246,5 +252,6 @@ export enum ProtoType {
   ReorderOperation = 'reorderOperation',
   RemoveOperation = 'removeOperation',
   PlayerData = 'playerData',
+  ActivateTrigger = 'activateTrigger',
   AckPacket = 'ackPacket',
 }

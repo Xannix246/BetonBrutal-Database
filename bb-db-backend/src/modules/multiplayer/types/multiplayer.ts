@@ -76,8 +76,8 @@ export type Vector3 = { x: number; y: number; z: number };
 export type Color = { r: number; g: number; b: number; a: number };
 
 export type Block = {
-  blockID: number;
-  instanceID: string;
+  blockId: number;
+  instanceId: string;
   color: number;
   position: ProtoVector3;
   rotation: ProtoVector3;
@@ -86,7 +86,7 @@ export type Block = {
 };
 
 export type Group = {
-  instanceID: string;
+  instanceId: string;
   name: string;
   blocks: Set<string>;
   pivot?: ProtoBlock;
@@ -101,8 +101,9 @@ export type SessionCollab = {
   groups: Map<string, Group>;
   settings: Map<ProtoMapSetting, boolean>;
   color: Map<ProtoMapSetting, ProtoColor>;
-  triggers: Map<string, Trigger>;
+  triggers: Map<string, Trigger & { isActive?: Ref<boolean> }>;
   autosaveEnabled?: Ref<boolean>;
+  triggersSyncEnabled?: Ref<boolean>;
 };
 
 // can be stored in prisma
@@ -123,6 +124,7 @@ export type MapSession = {
   id: string;
   // type: ProtoMapType;
   players: Set<string>; // SessionPlayer id's
+  activeTriggers: Map<string, boolean>;
   // blocks: Block[]; // instead of storing all map data with thousands of blocks we could just take map archive
   // in the ./maps folder, unpack it, decompile Map.bbmap and send blocks data from it
   // settings: ProtoMapSetting[];

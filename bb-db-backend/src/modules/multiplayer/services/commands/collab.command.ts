@@ -87,6 +87,7 @@ export class CollabCommand implements OnModuleInit {
       autosaveEnabled: new Ref(
         await this.collabService.isSavedCollabExists(player, name),
       ),
+      triggersSyncEnabled: new Ref(false),
     };
 
     if (restore || collab.autosaveEnabled?.value) {
@@ -172,19 +173,16 @@ export class CollabCommand implements OnModuleInit {
       return `<color=${C.red}>Collab connection failed: blocks transfer timeout.</color>`;
     }
 
-    for (const group of collab.groups.values()) {
-      const groupPromise = await this.commandsService.sendPacketAsync(player, {
-        packet: PacketType.CreateGroupPacket,
-        payload: {
-          id: player.id,
-          group: {
-            ...group,
-            blocks: [...group.blocks],
-          },
-        },
-      });
-      if (!groupPromise) break;
-    }
+    await this.commandsService.sendPacketAsync(player, {
+      packet: PacketType.CreateGroupPacket,
+      payload: {
+        id: player.id,
+        groups: [...collab.groups.values()].map((group) => ({
+          ...group,
+          blocks: [...group.blocks],
+        })),
+      },
+    });
 
     for (const trigger of collab.triggers.values()) {
       const triggerPromise = await this.commandsService.sendPacketAsync(
@@ -299,8 +297,11 @@ export class CollabCommand implements OnModuleInit {
       case 'save':
         collab.autosaveEnabled?.set(true);
         return `<color=${C.green}>Autosave enabled`;
+      case 'triggersync':
+        collab.triggersSyncEnabled?.set(true);
+        return `<color=${C.green}>Trigger sync enabled`;
       default:
-        return 'Unknown param. Please use one of these params: [autosave]';
+        return 'Unknown param. Please use one of these params: [autosave | triggersync]';
     }
   }
 
@@ -321,9 +322,12 @@ export class CollabCommand implements OnModuleInit {
       case 'autosave':
       case 'save':
         collab.autosaveEnabled?.set(false);
-        return `<color=${C.green}>Autosave disabled`;
+        return `<color=${C.red}>Autosave disabled`;
+      case 'triggersync':
+        collab.triggersSyncEnabled?.set(false);
+        return `<color=${C.red}>Trigger sync disabled`;
       default:
-        return 'Unknown param. Please use one of these params: [autosave]';
+        return 'Unknown param. Please use one of these params: [autosave | triggersync]';
     }
   }
 }

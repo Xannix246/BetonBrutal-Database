@@ -167,7 +167,7 @@ export function serializeCollab(session: SessionCollab): Buffer<ArrayBuffer> {
     writer.writeString(key);
     writer.writeProtoMessage(
       {
-        instanceID: group.instanceID,
+        instanceId: group.instanceId,
         name: group.name,
         blocks: [...group.blocks],
         pivot: group.pivot,
@@ -222,7 +222,7 @@ export function deserializeCollab(buffer: Buffer): SessionCollab {
     const key = reader.readString();
     const readGroup = reader.readProtoMessage(ProtoGroup);
     groups.set(key, {
-      instanceID: readGroup.instanceID,
+      instanceId: readGroup.instanceId,
       name: readGroup.name,
       blocks: new Set(readGroup.blocks),
       pivot: readGroup.pivot,
