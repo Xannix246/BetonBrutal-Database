@@ -246,7 +246,7 @@ export function deserializeCollab(
     triggers.set(key, reader.readProtoMessage(Trigger));
   }
 
-  return new SessionCollab(
+  return new SessionCollab({
     id,
     owner,
     players,
@@ -255,5 +255,5 @@ export function deserializeCollab(
     settings,
     color,
     triggers,
-  );
+  });
 }
