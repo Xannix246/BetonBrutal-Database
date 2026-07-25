@@ -182,7 +182,7 @@ export class MultiplayerService implements OnModuleInit {
           id: player.id,
           username: player.name,
           mode: packet.mode,
-          mapId: player.map.value!.id,
+          mapId: player.map.value?.id ?? '',
           mapMode: packet.mapMode,
           mapName:
             this.mapRecords.find((record) => record.id === player.map.value?.id)
@@ -387,7 +387,7 @@ export class MultiplayerService implements OnModuleInit {
 
   async sendCommand(player: SessionPlayer, packet: Proto.Command) {
     if (
-      player.proxyMode &&
+      player.proxyMode.value &&
       !['/compatibility', '/cb', '/proxy'].includes(packet.command!)
     ) {
       return this.csm.sendPacket(
@@ -516,6 +516,7 @@ export class MultiplayerService implements OnModuleInit {
     const team = player.team.value;
 
     team.map.set(player.map.value!);
+    team.activeTriggers.clear();
 
     for (const teamPlayer of team.players) {
       teamPlayer.socket.send(

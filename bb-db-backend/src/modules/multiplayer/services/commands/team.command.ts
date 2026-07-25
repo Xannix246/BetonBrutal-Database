@@ -52,6 +52,9 @@ export class TeamCommand implements OnModuleInit {
   ) {
     const isNameReserved = context.teamSessions.get(name);
 
+    if (player.team.value)
+      return `<color=${C.red}>You're already in the team</color>`;
+
     if (isNameReserved)
       return `<color=${C.red}>A team with this name already exists</color>`;
 
