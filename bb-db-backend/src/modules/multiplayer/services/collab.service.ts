@@ -20,11 +20,9 @@ export class CollabService {
     player: SessionPlayer,
     packet: Proto.PlaceBlocks | Proto.PlaceBlock,
   ) {
-    if (!player.collabId) return;
+    if (!player.collab.value || !packet.block) return;
 
-    const collab = this.collabSessions.get(player.collabId);
-
-    if (!collab || !packet.block) return;
+    const collab = player.collab.value;
 
     if (Array.isArray(packet.block)) {
       for (const block of packet.block) {
@@ -37,7 +35,7 @@ export class CollabService {
           payload: { block: packet.block, id: player.id },
         },
         [player.id],
-        [...collab.players],
+        collab.getIds(),
       );
     } else {
       collab.blocks.set(packet.block.instanceId, packet.block);
@@ -47,32 +45,28 @@ export class CollabService {
           payload: { block: packet.block, id: player.id },
         },
         [player.id],
-        [...collab.players],
+        collab.getIds(),
       );
     }
   }
 
   deleteBlock(player: SessionPlayer, packet: Proto.DeleteBlock) {
-    if (!player.collabId) return;
+    if (!player.collab.value) return;
 
-    const collab = this.collabSessions.get(player.collabId);
-
-    if (!collab) return;
+    const collab = player.collab.value;
 
     collab.blocks.delete(packet.instanceId);
     this.multiplayer.broadcastPacket(
       { packet: PacketType.DeleteBlockPacket, payload: packet },
       [player.id],
-      [...collab.players],
+      collab.getIds(),
     );
   }
 
   changeBlock(player: SessionPlayer, packet: Proto.ChangeBlock) {
-    if (!player.collabId) return;
+    if (!player.collab.value) return;
 
-    const collab = this.collabSessions.get(player.collabId);
-
-    if (!collab) return;
+    const collab = player.collab.value;
 
     collab.blocks.set(packet.block!.instanceId, {
       ...packet.block!,
@@ -81,46 +75,40 @@ export class CollabService {
     this.multiplayer.broadcastPacket(
       { packet: PacketType.ChangeBlockPacket, payload: packet },
       [player.id],
-      [...collab.players],
+      collab.getIds(),
     );
   }
 
   setMapSettings(player: SessionPlayer, packet: Proto.MapSettings) {
-    if (!player.collabId) return;
+    if (!player.collab.value) return;
 
-    const collab = this.collabSessions.get(player.collabId);
-
-    if (!collab) return;
+    const collab = player.collab.value;
 
     collab.settings.set(packet.setting, packet.state);
     this.multiplayer.broadcastPacket(
       { packet: PacketType.MapSettingsPacket, payload: packet },
       [player.id],
-      [...collab.players],
+      collab.getIds(),
     );
   }
 
   setMapColor(player: SessionPlayer, packet: Proto.MapColor) {
-    if (!player.collabId) return;
+    if (!player.collab.value) return;
 
-    const collab = this.collabSessions.get(player.collabId);
-
-    if (!collab) return;
+    const collab = player.collab.value;
 
     collab.color.set(packet.settings, packet.color!);
     this.multiplayer.broadcastPacket(
       { packet: PacketType.MapColorPacket, payload: packet },
       [player.id],
-      [...collab.players],
+      collab.getIds(),
     );
   }
 
   createGroup(player: SessionPlayer, packet: Proto.CreateGroup) {
-    if (!player.collabId) return;
+    if (!player.collab.value || !packet.groups) return;
 
-    const collab = this.collabSessions.get(player.collabId);
-
-    if (!collab || !packet.groups) return;
+    const collab = player.collab.value;
 
     for (const group of packet.groups) {
       const newGroup = {
@@ -138,16 +126,14 @@ export class CollabService {
     this.multiplayer.broadcastPacket(
       { packet: PacketType.CreateGroupPacket, payload: packet },
       [player.id],
-      [...collab.players],
+      collab.getIds(),
     );
   }
 
   changeGroup(player: SessionPlayer, packet: Proto.ChangeGroup) {
-    if (!player.collabId) return;
+    if (!player.collab.value || !packet.group) return;
 
-    const collab = this.collabSessions.get(player.collabId);
-
-    if (!collab || !packet.group) return;
+    const collab = player.collab.value;
 
     collab.groups.set(packet.group.instanceId, {
       ...packet.group,
@@ -157,38 +143,36 @@ export class CollabService {
     this.multiplayer.broadcastPacket(
       { packet: PacketType.ChangeGroupPacket, payload: packet },
       [player.id],
-      [...collab.players],
+      collab.getIds(),
     );
   }
 
   deleteGroup(player: SessionPlayer, packet: Proto.DeleteGroup) {
-    if (!player.collabId) return;
+    if (!player.collab.value) return;
 
-    const collab = this.collabSessions.get(player.collabId);
-
-    if (!collab) return;
+    const collab = player.collab.value;
 
     collab.groups.delete(packet.instanceId);
     this.multiplayer.broadcastPacket(
       { packet: PacketType.DeleteGroupPacket, payload: packet },
       [player.id],
-      [...collab.players],
+      collab.getIds(),
     );
   }
 
   addBlockToGroup(player: SessionPlayer, packet: Proto.AddBlockToGroup) {
-    if (!player.collabId) return;
+    if (!player.collab.value) return;
 
-    const collab = this.collabSessions.get(player.collabId);
+    const collab = player.collab.value;
     const group = collab?.groups.get(packet.groupInstanceId);
 
-    if (!collab || !group) return;
+    if (!group) return;
 
     group.blocks.add(packet.blockInstanceId);
     this.multiplayer.broadcastPacket(
       { packet: PacketType.AddBlockToGroupPacket, payload: packet },
       [player.id],
-      [...collab.players],
+      collab.getIds(),
     );
   }
 
@@ -196,27 +180,25 @@ export class CollabService {
     player: SessionPlayer,
     packet: Proto.RemoveBlockFromGroup,
   ) {
-    if (!player.collabId) return;
+    if (!player.collab.value) return;
 
-    const collab = this.collabSessions.get(player.collabId);
+    const collab = player.collab.value;
     const group = collab?.groups.get(packet.groupInstanceId);
 
-    if (!collab || !group) return;
+    if (!group) return;
 
     group.blocks.delete(packet.blockInstanceId);
     this.multiplayer.broadcastPacket(
       { packet: PacketType.RemoveBlockFromGroupPacket, payload: packet },
       [player.id],
-      [...collab.players],
+      collab.getIds(),
     );
   }
 
   createTrigger(player: SessionPlayer, packet: Proto.CreateTrigger) {
-    if (!player.collabId || !packet.trigger) return;
+    if (!player.collab.value || !packet.trigger) return;
 
-    const collab = this.collabSessions.get(player.collabId);
-
-    if (!collab) return;
+    const collab = player.collab.value;
 
     const trigger = {
       instanceId: packet.trigger.instanceId,
@@ -232,17 +214,17 @@ export class CollabService {
     // this.multiplayer.broadcastPacket(
     //   { packet: PacketType.CreateTriggerPacket, payload: packet },
     //   [player.id],
-    //   [...collab.players],
+    //   collab.getIds(),
     // );
   }
 
   changeTrigger(player: SessionPlayer, packet: Proto.ChangeTrigger) {
-    if (!player.collabId || !packet.trigger) return;
+    if (!player.collab.value || !packet.trigger) return;
 
-    const collab = this.collabSessions.get(player.collabId);
+    const collab = player.collab.value;
     const trigger = collab?.triggers.get(packet.trigger.instanceId);
 
-    if (!collab || !trigger) return;
+    if (!trigger) return;
 
     collab.triggers.set(packet.trigger.instanceId, {
       ...packet.trigger,
@@ -252,74 +234,64 @@ export class CollabService {
     this.multiplayer.broadcastPacket(
       { packet: PacketType.ChangeTriggerPacket, payload: packet },
       [player.id],
-      [...collab.players],
+      collab.getIds(),
     );
   }
 
   deleteTrigger(player: SessionPlayer, packet: Proto.DeleteTrigger) {
-    if (!player.collabId) return;
+    if (!player.collab.value) return;
 
-    const collab = this.collabSessions.get(player.collabId);
-
-    if (!collab) return;
+    const collab = player.collab.value;
 
     collab.triggers.delete(packet.instanceId);
     // this.multiplayer.broadcastPacket(
     //   { packet: PacketType.DeleteTriggerPacket, payload: packet },
     //   [player.id],
-    //   [...collab.players],
+    //   collab.getIds(),
     // );
   }
 
   addOperation(player: SessionPlayer, packet: Proto.AddOperation) {
-    if (!player.collabId || !packet.operation) return;
+    if (!player.collab.value || !packet.operation) return;
 
-    const collab = this.collabSessions.get(player.collabId);
+    const collab = player.collab.value;
     const trigger = collab?.triggers.get(packet.triggerInstanceId);
 
-    // if (!collab || !trigger) return;
-
-    if (!collab) {
-      return console.log('Collab not found');
-    }
-
-    if (!trigger) {
-      return console.log('Trigger not found', collab.triggers);
-    }
+    if (!trigger) return;
 
     trigger.operations.push(packet.operation);
     this.multiplayer.broadcastPacket(
       { packet: PacketType.AddOperationPacket, payload: packet },
       [player.id],
-      [...collab.players],
+      collab.getIds(),
     );
   }
 
   editOperation(player: SessionPlayer, packet: Proto.EditOperation) {
-    if (!player.collabId || !packet.operation) return;
+    if (!player.collab.value || !packet.operation) return;
 
-    const collab = this.collabSessions.get(player.collabId);
+    const collab = player.collab.value;
     const trigger = collab?.triggers.get(packet.triggerInstanceId);
 
-    if (!collab || !trigger) return;
+    if (!trigger) return;
 
     trigger.operations.splice(packet.opIndex, 1, packet.operation);
     this.multiplayer.broadcastPacket(
       { packet: PacketType.EditOperationPacket, payload: packet },
       [player.id],
-      [...collab.players],
+      collab.getIds(),
     );
   }
 
   moveOperation(player: SessionPlayer, packet: Proto.ReorderOperation) {
-    if (!player.collabId) return;
+    if (!player.collab.value) return;
 
-    const collab = this.collabSessions.get(player.collabId);
+    const collab = player.collab.value;
     const trigger = collab?.triggers.get(packet.triggerInstanceId);
     const opIndex = packet.opIndex;
     const moveTo = packet.moveTo;
 
-    if (!collab || !trigger) return;
+    if (!trigger) return;
     if (opIndex + moveTo < 0 || opIndex + moveTo >= trigger.operations.length) {
       return;
     }
@@ -331,14 +303,14 @@ export class CollabService {
     this.multiplayer.broadcastPacket(
       { packet: PacketType.MoveOperationOrderPacket, payload: packet },
       [player.id],
-      [...collab.players],
+      collab.getIds(),
     );
   }
 
   removeOperation(player: SessionPlayer, packet: Proto.RemoveOperation) {
-    if (!player.collabId) return;
+    if (!player.collab.value) return;
 
-    const collab = this.collabSessions.get(player.collabId);
+    const collab = player.collab.value;
     const trigger = collab?.triggers.get(packet.triggerInstanceId);
 
     if (!collab || !trigger) return;
@@ -347,14 +319,14 @@ export class CollabService {
     this.multiplayer.broadcastPacket(
       { packet: PacketType.RemoveOperationPacket, payload: packet },
       [player.id],
-      [...collab.players],
+      collab.getIds(),
     );
   }
 
   changeTriggerState(player: SessionPlayer, packet: Proto.ActivateTrigger) {
-    if (!player.collabId) return;
+    if (!player.collab.value) return;
 
-    const collab = this.collabSessions.get(player.collabId);
+    const collab = player.collab.value;
     const trigger = collab?.triggers.get(packet.triggerId);
 
     if (!collab || !trigger || !trigger.isActive) return;
@@ -365,14 +337,14 @@ export class CollabService {
       this.multiplayer.broadcastPacket(
         { packet: PacketType.ActivateTriggerPacket, payload: packet },
         [player.id],
-        [...collab.players],
+        collab.getIds(),
       );
     } else if (!packet.active && trigger.isActive.value) {
       trigger.isActive.set(false);
       this.multiplayer.broadcastPacket(
         { packet: PacketType.ActivateTriggerPacket, payload: packet },
         [player.id],
-        [...collab.players],
+        collab.getIds(),
       );
     }
   }
@@ -381,11 +353,11 @@ export class CollabService {
 
   async saveCollab(player: SessionPlayer, checkAutosave = false) {
     if (!player.userId) return 'User not found. Did you linked your account?';
-    if (!player.collabId) return;
+    if (!player.collab.value) return;
 
-    const collab = this.collabSessions.get(player.collabId);
+    const collab = player.collab.value;
 
-    if (!collab || collab.ownerId !== player.id) return;
+    if (collab.owner.id !== player.id) return;
     if (checkAutosave && !collab.autosaveEnabled) return;
 
     try {
@@ -417,7 +389,7 @@ export class CollabService {
     });
 
     if (collab) {
-      return deserializeCollab(Buffer.from(collab.data));
+      return deserializeCollab(Buffer.from(collab.data), player);
     }
   }
 

@@ -43,13 +43,13 @@ export class CollabCommand implements OnModuleInit {
       case 'close':
         return this.closeCollab(player, context);
       case 'save':
-        return this.saveCollab(player, context);
+        return this.saveCollab(player);
       case 'restore':
         if (!args[1]) return `<color=${C.yellow}>Type name</color>`;
         return this.createCollab(player, context, args[1], true);
       case 'delete':
         if (!args[1]) return `<color=${C.yellow}>Type name</color>`;
-        return this.deleteCollab(player, context, args[1]);
+        return this.deleteCollab(player, args[1]);
       case 'enable':
         return this.enable(player, context, args[1]);
       case 'disable':
@@ -65,7 +65,7 @@ export class CollabCommand implements OnModuleInit {
     name: string,
     restore?: boolean,
   ): Promise<string> {
-    if (player.collabId) return `You're already in a collab.`;
+    if (player.collab.value) return `You're already in a collab.`;
 
     if (context.playerData.get(player.id)?.mode.value !== GameMode.T_EDITOR)
       return `You must in the editor to collab.`;
@@ -75,10 +75,10 @@ export class CollabCommand implements OnModuleInit {
       `<color=${C.blue}>Creating collab... Please wait a moment, transfering blocks data may take a while</color>`,
     );
 
-    let collab: SessionCollab = {
+    let collab = new SessionCollab({
       id: name,
-      ownerId: player.id,
-      players: new Set([player.id]),
+      owner: player,
+      players: new Set([player]),
       blocks: new Map(),
       groups: new Map(),
       settings: new Map(),
@@ -87,8 +87,8 @@ export class CollabCommand implements OnModuleInit {
       autosaveEnabled: new Ref(
         await this.collabService.isSavedCollabExists(player, name),
       ),
-      triggersSyncEnabled: new Ref(false),
-    };
+      triggersSyncEnabled: new Ref(true),
+    });
 
     if (restore || collab.autosaveEnabled?.value) {
       const restoreData = await this.collabService.restoreCollab(player, name);
@@ -101,7 +101,7 @@ export class CollabCommand implements OnModuleInit {
       }
     }
 
-    player.collabId = name;
+    player.collab.set(collab);
     context.players.set(player.id, player);
     context.collabSessions.set(name, collab);
 
@@ -117,7 +117,7 @@ export class CollabCommand implements OnModuleInit {
     context: CommandsContext,
     name: string,
   ): Promise<string> {
-    if (player.collabId)
+    if (player.collab.value)
       return `<color=${C.yellow}>You're already in a collab.</color>`;
 
     if (context.playerData.get(player.id)?.mode.value !== GameMode.T_EDITOR)
@@ -126,14 +126,12 @@ export class CollabCommand implements OnModuleInit {
     const collab = context.collabSessions.get(name);
     if (!collab) return `<color=${C.yellow}>Collab not found</color>`;
 
-    const owner = context.players.get(collab.ownerId)!;
-    const map = context.mapSessions.get(owner.mapId!)!;
+    const map = collab.owner.map.value!;
 
-    player.collabId = name;
-    player.mapId = map.id;
-    map.players.add(player.id);
-    context.players.set(player.id, player);
-    collab.players.add(player.id);
+    player.collab.set(collab);
+    player.map.set(map);
+    map.players.add(player);
+    collab.players.add(player);
 
     if (collab.blocks.size > 2000) {
       this.commandsService.sendMessage(
@@ -197,23 +195,21 @@ export class CollabCommand implements OnModuleInit {
   }
 
   private leaveCollab(player: SessionPlayer, context: CommandsContext) {
-    if (!player.collabId)
+    if (!player.collab.value)
       return `<color=${C.yellow}>You're not in collab</color>`;
 
-    const collab = context.collabSessions.get(player.collabId);
+    const collab = player.collab.value;
 
-    if (!collab) return `<color=${C.red}>Collab not found</color>`;
-
-    if (collab.ownerId === player.id) {
+    if (collab.owner.id === player.id) {
       return this.closeCollab(player, context);
     }
 
-    collab.players.delete(player.id);
+    collab.players.delete(player);
     this.commandsService.sendEvent(player, Events.CloseCollab);
 
     this.commandsService.broadcastMessage(
-      `<color=${C.blue}>${player.nick} has left the collab!</color>`,
-      [...collab.players],
+      `<color=${C.blue}>${player.nick.value} has left the collab!</color>`,
+      collab.getIds(),
       [player.id],
     );
 
@@ -224,58 +220,45 @@ export class CollabCommand implements OnModuleInit {
   }
 
   private closeCollab(player: SessionPlayer, context: CommandsContext) {
-    if (!player.collabId) return `<color=${C.red}>You're not in collab</color>`;
+    if (!player.collab.value)
+      return `<color=${C.red}>You're not in collab</color>`;
 
-    const collab = context.collabSessions.get(player.collabId);
+    const collab = player.collab.value;
 
-    if (!collab) return `<color=${C.red}>Collab not found</color>`;
-    if (collab.ownerId !== player.id)
+    if (collab.owner.id !== player.id)
       return `<color=${C.red}>You're not collab owner</color>`;
 
-    for (const playerId of collab.players) {
-      const player = context.players.get(playerId)!;
-      player.collabId = undefined;
-      context.players.set(playerId, player);
+    for (const player of collab.players) {
+      player.collab.set(undefined);
       this.commandsService.sendEvent(player, Events.CloseCollab);
     }
 
     context.collabSessions.delete(collab.id);
 
-    this.commandsService.broadcastEvent(
-      Events.CloseCollab,
-      [...collab.players],
-      [player.id],
-    );
+    this.commandsService.broadcastEvent(Events.CloseCollab, collab.getIds(), [
+      player.id,
+    ]);
 
     this.commandsService.broadcastMessage(
       `<color=${C.blue}>Collab has been closed!</color>`,
-      [...collab.players],
+      collab.getIds(),
     );
   }
 
-  private async saveCollab(player: SessionPlayer, context: CommandsContext) {
-    if (!player.collabId) return `<color=${C.red}>You're not in collab</color>`;
+  private async saveCollab(player: SessionPlayer) {
+    if (!player.collab.value)
+      return `<color=${C.red}>You're not in collab</color>`;
 
-    const collab = context.collabSessions.get(player.collabId);
+    const collab = player.collab.value;
 
     if (!collab) return `<color=${C.red}>Collab not found</color>`;
-    if (collab.ownerId !== player.id)
+    if (collab.owner.id !== player.id)
       return `<color=${C.red}>You're not collab owner</color>`;
 
     return (await this.collabService.saveCollab(player)) ?? '';
   }
 
-  private async deleteCollab(
-    player: SessionPlayer,
-    context: CommandsContext,
-    name: string,
-  ) {
-    const collab = context.collabSessions.get(name);
-
-    if (collab && collab.ownerId === player.id) {
-      collab.autosaveEnabled?.set(false);
-    }
-
+  private async deleteCollab(player: SessionPlayer, name: string) {
     return await this.collabService.deleteCollab(player, name);
   }
 
@@ -284,12 +267,12 @@ export class CollabCommand implements OnModuleInit {
     context: CommandsContext,
     param: string,
   ) {
-    if (!player.collabId) return `<color=${C.red}>You're not in collab</color>`;
+    if (!player.collab.value)
+      return `<color=${C.red}>You're not in collab</color>`;
 
-    const collab = context.collabSessions.get(player.collabId);
+    const collab = player.collab.value;
 
-    if (!collab) return `<color=${C.red}>Collab not found</color>`;
-    if (collab.ownerId !== player.id)
+    if (collab.owner.id !== player.id)
       return `<color=${C.red}>You're not collab owner</color>`;
 
     switch (param) {
@@ -310,12 +293,12 @@ export class CollabCommand implements OnModuleInit {
     context: CommandsContext,
     param: string,
   ) {
-    if (!player.collabId) return `<color=${C.red}>You're not in collab</color>`;
+    if (!player.collab.value)
+      return `<color=${C.red}>You're not in collab</color>`;
 
-    const collab = context.collabSessions.get(player.collabId);
+    const collab = player.collab.value;
 
-    if (!collab) return `<color=${C.red}>Collab not found</color>`;
-    if (collab.ownerId !== player.id)
+    if (collab.owner.id !== player.id)
       return `<color=${C.red}>You're not collab owner</color>`;
 
     switch (param) {

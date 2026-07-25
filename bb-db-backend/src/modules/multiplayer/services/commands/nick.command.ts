@@ -1,6 +1,6 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { CommandsService } from '../commands.service';
-import { C, CommandsContext, SessionPlayer } from '../../types/multiplayer';
+import { C, SessionPlayer } from '../../types/multiplayer';
 import { PacketType } from 'src/generated/protos/multiplayer';
 
 @Injectable()
@@ -12,24 +12,18 @@ export class NickCommand implements OnModuleInit {
       aliases: ['/nick'],
       args: ['[nickname]'],
       description: 'change your nickname',
-      execute: (...args) => this.nickCommand(...args),
+      execute: (player, args) => this.nickCommand(player, args),
     });
   }
 
-  nickCommand(
-    player: SessionPlayer,
-    args: string[],
-    context: CommandsContext,
-  ): string {
+  nickCommand(player: SessionPlayer, args: string[]): string {
     const nickname = args[0];
     if (!nickname) return `<color=${C.yellow}>Write your nickname</color>`;
 
-    player.nick = nickname;
-
-    context.players.set(player.id, player);
+    player.nick.set(nickname);
     this.commandsService.broadcastPacket({
       packet: PacketType.NicknamePacket,
-      payload: { id: player.id, nickname: player.nick },
+      payload: { id: player.id, nickname: player.nick.value },
     });
 
     return `<color=${C.green}>Nickname set to: ${nickname}</color>`;

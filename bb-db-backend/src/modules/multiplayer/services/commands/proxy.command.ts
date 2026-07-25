@@ -1,6 +1,6 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { CommandsService } from '../commands.service';
-import { C, CommandsContext, SessionPlayer } from '../../types/multiplayer';
+import { C, SessionPlayer } from '../../types/multiplayer';
 
 @Injectable()
 export class ProxyCommand implements OnModuleInit {
@@ -11,20 +11,17 @@ export class ProxyCommand implements OnModuleInit {
       aliases: ['/compatibility', '/cb', '/proxy'],
       description:
         'in case if you want to use commands for original BT server, this server will act as proxy',
-      execute: (player, args: string[], context: CommandsContext) =>
-        this.proxyCommand(player, context),
+      execute: (player) => this.proxyCommand(player),
     });
   }
 
-  proxyCommand(player: SessionPlayer, context: CommandsContext): string {
-    if (!player.proxyMode) {
-      player.proxyMode = true;
-      context.players.set(player.id, player);
+  proxyCommand(player: SessionPlayer): string {
+    if (!player.proxyMode.value) {
+      player.proxyMode.set(true);
       return `<color=${C.yellow}>Proxy mode enabled</color>`;
     }
     {
-      player.proxyMode = false;
-      context.players.set(player.id, player);
+      player.proxyMode.set(false);
       return `<color=${C.green}>Proxy mode disabled</color>`;
     }
   }

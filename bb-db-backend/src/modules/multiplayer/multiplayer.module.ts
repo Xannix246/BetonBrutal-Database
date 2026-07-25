@@ -18,6 +18,7 @@ import { CheckPingScheduler } from './infrastructure/schedulers/check-ping.sched
 import { CollabService } from './services/collab.service';
 import { EventsService } from './services/events.service';
 import { DummyCommands } from './services/commands/dummy-commands';
+import { TeamCommand } from './services/commands/team.command';
 
 @Module({
   imports: [PrismaModule, WorkshopModule],
@@ -36,6 +37,7 @@ import { DummyCommands } from './services/commands/dummy-commands';
     CollabCommand,
     ProxyCommand,
     DummyCommands,
+    TeamCommand,
     CheckRacesScheduler,
     CheckPingScheduler,
     CompatibilityService,

@@ -10,6 +10,7 @@ import {
   SessionPlayer,
   SessionPlayerData,
   SessionRace,
+  SessionTeam,
 } from '../types/multiplayer';
 import { CompatibilityService } from './compatibility.service';
 import { ProtoPacket } from '../types/proto.types';
@@ -28,6 +29,7 @@ export class MultiplayerService implements OnModuleInit {
   public readonly mapSessions: Map<string, MapSession> = new Map();
   public readonly raceSessions: Map<string, SessionRace> = new Map();
   public readonly collabSessions: Map<string, SessionCollab> = new Map();
+  public readonly teamSessions: Map<string, SessionTeam> = new Map();
   public readonly asyncPackets: Map<string, (value: void) => void> = new Map();
 
   constructor(
@@ -44,6 +46,7 @@ export class MultiplayerService implements OnModuleInit {
       raceSessions: this.raceSessions,
       collabSessions: this.collabSessions,
       asyncPackets: this.asyncPackets,
+      teamSessions: this.teamSessions,
     };
   }
 
@@ -137,15 +140,20 @@ export class MultiplayerService implements OnModuleInit {
 
     const player: SessionPlayer = {
       id: packet.id,
-      nick: packet.username,
+      nick: new Ref(packet.username),
       name: packet.username,
       socket,
       ping: {
         lastSync: new Date(),
         latencyMs: 0,
       },
-      mapId: packet.mapId,
-      color: { r: 0.5, g: 0.5, b: 0.5, a: 1 },
+      map: new Ref(this.mapSessions.get(packet.mapId)),
+      race: new Ref<SessionRace | undefined>(undefined),
+      collab: new Ref<SessionCollab | undefined>(undefined),
+      proxyMode: new Ref(false),
+      team: new Ref<SessionTeam | undefined>(undefined),
+      playerData: new Ref<SessionPlayerData | undefined>(undefined),
+      color: new Ref<Proto.Color | undefined>({ r: 0.5, g: 0.5, b: 0.5, a: 1 }),
     };
 
     if (packet.token) {
@@ -156,7 +164,7 @@ export class MultiplayerService implements OnModuleInit {
       player.userId = verifiedToken.key?.userId;
     }
 
-    const data: SessionPlayerData = {
+    const playerData: SessionPlayerData = {
       mode: new Ref(packet.mode),
       mapMode: new Ref(packet.mapMode),
       position: new Ref({ x: 0, y: 0, z: 0 }),
@@ -165,7 +173,8 @@ export class MultiplayerService implements OnModuleInit {
 
     setPlayer(player);
     this.players.set(packet.id, player);
-    this.playerData.set(packet.id, data);
+    this.playerData.set(packet.id, playerData);
+    player.playerData.set(playerData);
     this.broadcastPacket(
       {
         packet: PacketType.JoinPacket,
@@ -173,10 +182,10 @@ export class MultiplayerService implements OnModuleInit {
           id: player.id,
           username: player.name,
           mode: packet.mode,
-          mapId: player.mapId!,
+          mapId: player.map.value!.id,
           mapMode: packet.mapMode,
           mapName:
-            this.mapRecords.find((record) => record.id === player.mapId)
+            this.mapRecords.find((record) => record.id === player.map.value?.id)
               ?.name ?? packet.mapName,
         },
       },
@@ -197,14 +206,15 @@ export class MultiplayerService implements OnModuleInit {
               id: player.id,
               nickname: player.name,
               mode: this.playerData.get(player.id)?.mode.value,
-              mapId: player.mapId!,
+              mapId: player.map.value!.id,
               mapMode:
                 this.playerData.get(player.id)?.mapMode.value ??
                 Proto.MapType.MAIN,
               mapName:
-                this.mapRecords.find((record) => record.id === player.mapId)
-                  ?.name ?? player.mapId,
-              playerColor: player.color,
+                this.mapRecords.find(
+                  (record) => record.id === player.map.value!.id,
+                )?.name ?? player.map.value!.id,
+              playerColor: player.color.value,
             };
           }),
         },
@@ -223,7 +233,7 @@ export class MultiplayerService implements OnModuleInit {
     );
 
     this.broadcastServer(
-      `Player ${player.nick} <color=${C.green}>joined</color> the server`,
+      `Player ${player.nick.value} <color=${C.green}>joined</color> the server`,
       [...this.players.values()]
         .filter((p) => p.id !== packet.id)
         .map((p) => p.id),
@@ -233,8 +243,8 @@ export class MultiplayerService implements OnModuleInit {
   }
 
   playerMove(player: SessionPlayer, packet: Proto.Move) {
-    if (!player.mapId) return;
-    const map = this.mapSessions.get(player.mapId);
+    if (!player.map.value) return;
+    const map = player.map.value;
     const playerData = this.playerData.get(player.id);
 
     if (!map || !playerData) return;
@@ -249,7 +259,7 @@ export class MultiplayerService implements OnModuleInit {
         payload: { id: player.id, ...packet },
       },
       [player.id],
-      [...map.players],
+      map.getIds(),
     );
 
     this.csm.sendPacket(
@@ -271,6 +281,7 @@ export class MultiplayerService implements OnModuleInit {
       };
 
       this.playerData.set(player.id, playerData);
+      player.playerData.set(playerData);
     }
 
     playerData.mode.set(packet.mode);
@@ -285,7 +296,7 @@ export class MultiplayerService implements OnModuleInit {
   }
 
   setColor(player: SessionPlayer, packet: Proto.BodyColor) {
-    player.color = packet.customColor;
+    player.color.set(packet.customColor);
 
     this.players.set(player.id, player);
 
@@ -300,53 +311,49 @@ export class MultiplayerService implements OnModuleInit {
 
   joinMap(player: SessionPlayer, packet: Proto.Map) {
     // if (!packet.mapId) return;
-    const collab = this.collabSessions.get(player.collabId ?? '');
-    const race = this.raceSessions.get(player.raceId ?? '');
     let map = this.mapSessions.get(packet.mapId);
 
-    if (player.mapId) {
-      const map = this.mapSessions.get(player.mapId);
-      if (map) {
-        map.players.delete(player.id);
-      }
+    if (player.map.value) {
+      player.map.value.players.delete(player);
+      player.map.set(undefined);
     }
 
     if (!map) {
-      map = {
+      map = new MapSession({
         id: packet.mapId,
         players: new Set(),
-        activeTriggers: new Map(),
-      };
+      });
     }
 
-    if (collab) {
-      if (collab.ownerId === player.id) {
-        this.closeCollab(collab.id);
+    if (player.collab.value) {
+      if (player.collab.value.owner.id === player.id) {
+        this.closeCollab(player.collab.value.id);
       } else {
         this.broadcastServer(
-          `<color=${C.yellow}>${player.nick} left the collab`,
-          [...collab.players],
+          `<color=${C.yellow}>${player.nick.value} left the collab`,
+          player.collab.value.getIds(),
         );
-        collab.players.delete(player.id);
+        player.collab.value.players.delete(player);
       }
+      player.collab.set(undefined);
     }
 
-    if (race) {
-      this.broadcastServer(`<color=${C.yellow}>${player.nick} left the race`, [
-        ...race.players,
-      ]);
-      race.players.delete(player.id);
-      if (race.players.size === 0) {
-        this.raceSessions.delete(race.id);
+    if (player.race.value) {
+      this.broadcastServer(
+        `<color=${C.yellow}>${player.nick.value} left the race`,
+        player.race.value.getIds(),
+      );
+      player.race.value.players.delete(player);
+      if (player.race.value.players.size === 0) {
+        this.raceSessions.delete(player.race.value.id);
       }
+      player.race.set(undefined);
     }
 
-    player.mapId = packet.mapId;
-    player.collabId = undefined;
-    player.raceId = undefined;
-    map.players.add(player.id);
+    map.players.add(player);
     this.players.set(player.id, player);
     this.mapSessions.set(map.id, map);
+    player.map.set(map);
 
     this.broadcastPacket({
       packet: PacketType.MapPacket,
@@ -358,6 +365,8 @@ export class MultiplayerService implements OnModuleInit {
       player.id,
     );
 
+    this.changeTeamMap(player);
+
     this.logger.log(`${player.name} joined map: ${map.id}`);
   }
 
@@ -366,7 +375,7 @@ export class MultiplayerService implements OnModuleInit {
       packet: PacketType.MessagePacket,
       payload: {
         id: player.id,
-        message: `<color=${C.yellow}>${player.nick ?? player.name}</color>: ${packet.message}`,
+        message: `<color=${C.yellow}>${player.nick.value ?? player.name}</color>: ${packet.message}`,
       },
     });
 
@@ -395,33 +404,34 @@ export class MultiplayerService implements OnModuleInit {
       collabSessions: this.collabSessions,
       mapRecords: this.mapRecords,
       asyncPackets: this.asyncPackets,
+      teamSessions: this.teamSessions,
     });
   }
 
   changeTriggerState(player: SessionPlayer, packet: Proto.ActivateTrigger) {
-    if (player.collabId || !player.mapId) return;
+    if (player.collab.value || !player.team.value) return;
 
-    const map = this.mapSessions.get(player.mapId);
-    const trigger = map?.activeTriggers.get(packet.triggerId);
+    const team = player.team.value;
 
-    if (!map) return;
-    if (!trigger) {
-      map.activeTriggers.set(packet.triggerId, false);
+    const trigger = team.activeTriggers.get(packet.triggerId);
+
+    if (trigger === undefined) {
+      team.activeTriggers.set(packet.triggerId, false);
     }
 
     if (packet.active && !trigger) {
-      map.activeTriggers.set(packet.triggerId, true);
+      team.activeTriggers.set(packet.triggerId, true);
       this.broadcastPacket(
         { packet: PacketType.ActivateTriggerPacket, payload: packet },
         [player.id],
-        [...map.players],
+        team.getIds(),
       );
     } else if (!packet.active && trigger) {
-      map.activeTriggers.set(packet.triggerId, false);
+      team.activeTriggers.set(packet.triggerId, false);
       this.broadcastPacket(
         { packet: PacketType.ActivateTriggerPacket, payload: packet },
         [player.id],
-        [...map.players],
+        team.getIds(),
       );
     }
   }
@@ -432,26 +442,25 @@ export class MultiplayerService implements OnModuleInit {
     if (!player) return;
 
     const collabs = [...this.collabSessions.values()];
-    const collab = collabs.find((collab) => collab.players.has(playerId));
+    const collab = collabs.find((collab) => collab.players.has(player));
     if (collab) {
-      collab.players.delete(playerId);
-      if (collab.players.size === 0 || collab.ownerId === playerId) {
+      collab.players.delete(player);
+      if (collab.players.size === 0 || collab.owner.id === player.id) {
         this.closeCollab(collab.id);
       }
     }
 
     const races = [...this.raceSessions.values()];
-    const race = races.find((race) => race.players.has(playerId));
+    const race = races.find((race) => race.players.has(player));
     if (race) {
-      race.players.delete(playerId);
+      race.players.delete(player);
       if (race.players.size === 0) {
         this.raceSessions.delete(race.id);
       }
     }
 
-    const map = this.mapSessions.get(player.mapId ?? '');
-    if (map) {
-      map.players.delete(playerId);
+    if (player.map.value) {
+      player.map.value.players.delete(player);
     }
 
     this.broadcastPacket({
@@ -462,7 +471,7 @@ export class MultiplayerService implements OnModuleInit {
     this.csm.disconnectPlayer(playerId);
     this.players.delete(playerId);
     this.broadcastServer(
-      `Player ${player?.nick} <color=${C.red}>left</color> the server`,
+      `Player ${player?.nick.value} <color=${C.red}>left</color> the server`,
     );
   }
 
@@ -471,18 +480,58 @@ export class MultiplayerService implements OnModuleInit {
 
     if (!collab) return;
 
-    for (const playerId of collab.players) {
-      const player = this.players.get(playerId)!;
-
-      player.collabId = undefined;
-      this.players.set(playerId, player);
+    for (const player of collab.players) {
+      player.collab.set(undefined);
       this.sendEvent(player, Proto.Events.CloseCollab);
     }
 
-    this.broadcastServer(`<color=${C.yellow}>Collab has been closed`, [
-      ...collab.players,
-    ]);
+    this.broadcastServer(
+      `<color=${C.yellow}>Collab has been closed`,
+      collab.getIds(),
+    );
 
     this.collabSessions.delete(collab.id);
+  }
+
+  private closeTeam(teamId: string) {
+    const team = this.teamSessions.get(teamId);
+
+    if (!team) return;
+
+    for (const player of team.players) {
+      player.team.set(undefined);
+    }
+
+    this.broadcastServer(
+      `<color=${C.yellow}>Team has been closed`,
+      team.getIds(),
+    );
+
+    this.teamSessions.delete(team.id);
+  }
+
+  private changeTeamMap(player: SessionPlayer) {
+    if (!player.team.value || player.team.value.owner.id !== player.id) return;
+
+    const team = player.team.value;
+
+    team.map.set(player.map.value!);
+
+    for (const teamPlayer of team.players) {
+      teamPlayer.socket.send(
+        this.packetManager.serialize({
+          packet: PacketType.LoadMapPacket,
+          payload: {
+            id: teamPlayer.id,
+            mapId: player.map.value!.id,
+          },
+        }),
+      );
+    }
+
+    this.broadcastServer(
+      `<color=${C.yellow}>Team owner changed map`,
+      team.getIds(),
+    );
   }
 }

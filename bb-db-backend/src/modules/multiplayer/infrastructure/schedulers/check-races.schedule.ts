@@ -19,7 +19,7 @@ export class CheckRacesScheduler {
         const time = 15 - this.getSeconds(race.time.valueOf());
         this.multiplayer.broadcastServer(
           `${this.getColor(time)}Race starting in ${time} seconds...</color>`,
-          [...race.players],
+          race.getIds(),
         );
       } else if (!race.started && this.getSeconds(race.time.valueOf()) >= 15) {
         this.raceStart(race);
@@ -54,9 +54,11 @@ export class CheckRacesScheduler {
     race.started = true;
     race.time = new Date();
 
+    this.multiplayer.raceSessions.set(race.id, race);
+
     this.multiplayer.broadcastServer(
       `<color=green># Race has started, GO!</color>`,
-      [...race.players],
+      race.getIds(),
     );
 
     this.multiplayer.broadcastPacket({
@@ -70,16 +72,14 @@ export class CheckRacesScheduler {
 
     for (const result of race.results) {
       summary.push(
-        `<color=${C.blue}>${this.formatTime(result.time)}</color> - ${this.multiplayer.players.get(result.playerId)?.nick}`,
+        `<color=${C.blue}>${this.formatTime(result.time)}</color> - ${this.multiplayer.players.get(result.playerId)?.nick.value}`,
       );
     }
 
-    this.multiplayer.broadcastServer(summary.join('\n'), [...race.players]);
+    this.multiplayer.broadcastServer(summary.join('\n'), race.getIds());
 
-    for (const playerId of race.players) {
-      const player = this.multiplayer.players.get(playerId)!;
-      player.raceId = undefined;
-      this.multiplayer.players.set(playerId, player);
+    for (const player of race.players) {
+      player.race.set(undefined);
     }
 
     this.multiplayer.raceSessions.delete(race.id);

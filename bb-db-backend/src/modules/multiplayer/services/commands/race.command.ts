@@ -1,6 +1,12 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { CommandsService } from '../commands.service';
-import { C, CommandsContext, SessionPlayer } from '../../types/multiplayer';
+import {
+  C,
+  CommandsContext,
+  SessionPlayer,
+  SessionRace,
+} from '../../types/multiplayer';
+import { MapType } from 'src/generated/protos/multiplayer';
 
 @Injectable()
 export class RaceCommand implements OnModuleInit {
@@ -29,47 +35,42 @@ export class RaceCommand implements OnModuleInit {
   }
 
   private raceJoin(player: SessionPlayer, context: CommandsContext): string {
-    console.log(player, context.mapSessions);
-    if (!player.mapId) return `<color=${C.red}>You're not in map</color>`;
+    if (!player.map.value) return `<color=${C.red}>You're not in map</color>`;
 
-    const map = context.mapSessions.get(player.mapId);
+    const map = player.map.value;
 
-    console.log(player.mapId, context.mapSessions);
-
-    if (player.mapId?.startsWith('E'))
+    if (player.playerData.value?.mapMode.value === MapType.M_EDITOR)
       return `<color=${C.red}>Cannot race in editor</color>`;
-    if (!map) return `<color=${C.red}>Map not found</color>`;
     // if (map.players.size === 0) return 'No player to race';
 
     let race = context.raceSessions.get(map.id);
-    if (race?.players.has(player.id)) {
+    if (race?.players.has(player)) {
       return `<color=${C.yellow}>You already in race</color>`;
     }
 
     if (!race) {
-      race = {
+      race = new SessionRace({
         id: map.id,
-        players: new Set([player.id]),
+        players: new Set([player]),
         time: new Date(),
         started: false,
         finished: false,
         results: [],
-      };
+      });
     }
 
-    player.raceId = race.id;
-    context.players.set(player.id, player);
     context.raceSessions.set(race.id, race);
+    player.race.set(race);
 
     this.commandsService.broadcastMessage(
       `<color=${C.blue}>Race is starting. Type /race to join!</color>`,
-      [...map.players],
+      map.getIds(),
       [player.id],
     );
 
     this.commandsService.broadcastMessage(
-      `<color=${C.blue}>${player.nick} has joined the race.</color>`,
-      [...race.players],
+      `<color=${C.blue}>${player.nick.value} has joined the race.</color>`,
+      race.getIds(),
     );
 
     if (!race.started)
@@ -80,14 +81,13 @@ export class RaceCommand implements OnModuleInit {
   }
 
   private raceQuit(player: SessionPlayer, context: CommandsContext): string {
-    if (!player.raceId) return `<color=${C.yellow}>You're not in race</color>`;
+    if (!player.race.value)
+      return `<color=${C.yellow}>You're not in race</color>`;
 
-    const race = context.raceSessions.get(player.raceId);
+    const race = player.race.value;
 
-    if (!race) return `<color=${C.red}>Race not found</color>`;
-
-    player.raceId = undefined;
-    context.players.set(player.id, player);
+    player.race.set(undefined);
+    race.players.delete(player);
 
     // if (race.players.size < 2) {
     //   const player = context.players.get(race.players[0]);

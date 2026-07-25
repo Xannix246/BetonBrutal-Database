@@ -92,11 +92,10 @@ export type Group = {
   pivot?: ProtoBlock;
 };
 
-// blocks can be changed quickly, so maybe it's better to save in ram but idk
-export type SessionCollab = {
+export type SessionCollabParams = {
   id: string;
-  ownerId: string;
-  players: Set<string>;
+  owner: SessionPlayer;
+  players: Set<SessionPlayer>;
   blocks: Map<string, ProtoBlock>;
   groups: Map<string, Group>;
   settings: Map<ProtoMapSetting, boolean>;
@@ -106,10 +105,38 @@ export type SessionCollab = {
   triggersSyncEnabled?: Ref<boolean>;
 };
 
-// can be stored in prisma
-export type SessionRace = {
+// blocks can be changed quickly, so maybe it's better to save in ram but idk
+export class SessionCollab {
+  public id: string;
+  public owner: SessionPlayer;
+  public players: Set<SessionPlayer>;
+  public blocks: Map<string, ProtoBlock>;
+  public groups: Map<string, Group>;
+  public settings: Map<ProtoMapSetting, boolean>;
+  public color: Map<ProtoMapSetting, ProtoColor>;
+  public triggers: Map<string, Trigger & { isActive?: Ref<boolean> }>;
+  public autosaveEnabled?: Ref<boolean>;
+  public triggersSyncEnabled?: Ref<boolean>;
+
+  constructor(params: SessionCollabParams) {
+    this.id = params.id;
+    this.owner = params.owner;
+    this.players = params.players;
+    this.blocks = params.blocks;
+    this.groups = params.groups;
+    this.settings = params.settings;
+    this.color = params.color;
+    this.triggers = params.triggers;
+    this.autosaveEnabled = params.autosaveEnabled;
+    this.triggersSyncEnabled = params.triggersSyncEnabled;
+  }
+
+  getIds = () => [...this.players].map((p) => p.id);
+}
+
+export type SessionRaceParams = {
   id: string;
-  players: Set<string>;
+  players: Set<SessionPlayer>;
   time: Date;
   started: boolean;
   finished: boolean;
@@ -120,32 +147,71 @@ export type SessionRace = {
 };
 
 // can be stored in prisma
-export type MapSession = {
+export class SessionRace {
+  public id: string;
+  public players: Set<SessionPlayer>;
+  public time: Date;
+  public started: boolean;
+  public finished: boolean;
+  public results: {
+    playerId: string;
+    time: number;
+  }[];
+
+  constructor(params: SessionRaceParams) {
+    this.id = params.id;
+    this.players = params.players;
+    this.time = params.time;
+    this.started = params.started;
+    this.finished = params.finished;
+    this.results = params.results;
+  }
+
+  getIds = () => [...this.players].map((p) => p.id);
+}
+
+export type MapSessionParams = {
   id: string;
+  players: Set<SessionPlayer>;
+};
+
+// can be stored in prisma
+export class MapSession {
+  id: string;
+  players: Set<SessionPlayer>;
+
+  constructor(params: MapSessionParams) {
+    this.id = params.id;
+    this.players = params.players;
+  }
+
+  getIds = () => [...this.players].map((p) => p.id);
+  // id: string;
   // type: ProtoMapType;
-  players: Set<string>; // SessionPlayer id's
-  activeTriggers: Map<string, boolean>;
+  // players: Set<SessionPlayer>; // SessionPlayers
   // blocks: Block[]; // instead of storing all map data with thousands of blocks we could just take map archive
   // in the ./maps folder, unpack it, decompile Map.bbmap and send blocks data from it
   // settings: ProtoMapSetting[];
   // createdAt: Date; don't see the point in that
-};
+}
 
 // can be stored in prisma
 export type SessionPlayer = {
   id: string;
   name: string;
-  nick: string;
+  nick: Ref<string>;
   ping: {
     lastSync: Date;
     latencyMs: number;
   };
   socket: WebSocket;
-  mapId?: string; // MapSession id
-  raceId?: string; // SessionRace id
-  collabId?: string; // SessionCollab id
-  proxyMode?: boolean;
-  color?: ProtoColor;
+  map: Ref<MapSession | undefined>; // MapSession
+  race: Ref<SessionRace | undefined>; // SessionRace
+  collab: Ref<SessionCollab | undefined>; // SessionCollab
+  team: Ref<SessionTeam | undefined>; // SessionTeam
+  playerData: Ref<SessionPlayerData | undefined>;
+  proxyMode: Ref<boolean>;
+  color: Ref<ProtoColor | undefined>;
   userId?: string;
 };
 
@@ -157,6 +223,35 @@ export type SessionPlayerData = {
   // packetId?: Ref<string>;
 };
 
+export type SessionTeamParams = {
+  id: string;
+  owner: SessionPlayer;
+  players: Set<SessionPlayer>;
+  activeTriggers: Map<string, boolean>;
+  map: Ref<MapSession>;
+  triggersSyncEnabled?: Ref<boolean>;
+};
+
+export class SessionTeam {
+  public id: string;
+  public owner: SessionPlayer;
+  public players: Set<SessionPlayer>;
+  public activeTriggers: Map<string, boolean>;
+  public map: Ref<MapSession>;
+  public triggersSyncEnabled: Ref<boolean>;
+
+  constructor(params: SessionTeamParams) {
+    this.id = params.id;
+    this.owner = params.owner;
+    this.players = params.players;
+    this.activeTriggers = params.activeTriggers;
+    this.map = params.map;
+    this.triggersSyncEnabled = new Ref(true);
+  }
+
+  getIds = () => [...this.players].map((p) => p.id);
+}
+
 export type CommandsContext = {
   players: Map<string, SessionPlayer>;
   playerData: Map<string, SessionPlayerData>;
@@ -165,6 +260,7 @@ export type CommandsContext = {
   collabSessions: Map<string, SessionCollab>;
   mapRecords: Record<string, string>[];
   asyncPackets: Map<string, (value: void) => void>;
+  teamSessions: Map<string, SessionTeam>;
 };
 
 export type CommandDefinition = {

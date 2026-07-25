@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { MultiplayerService } from './multiplayer.service';
 import { SessionPlayer, SessionRace } from '../types/multiplayer';
+import { Events, PacketType } from 'src/generated/protos/multiplayer';
 
 @Injectable()
 export class EventsService {
@@ -12,9 +13,9 @@ export class EventsService {
   }
 
   completeRun(player: SessionPlayer) {
-    if (!player.raceId) return;
+    if (!player.race.value) return;
 
-    const race = this.raceSessions.get(player.raceId)!;
+    const race = player.race.value;
 
     if (!race.started) return;
 
@@ -48,6 +49,27 @@ export class EventsService {
     this.multiplayer.sendPrivateMessage(
       player,
       `You finished in place #${race.results.length}`,
+    );
+  }
+
+  resetTeamRun(player: SessionPlayer) {
+    if (!player.team.value || player.team.value.owner.id !== player.id) return;
+
+    const team = player.team.value;
+
+    for (const trigger of team.activeTriggers.keys()) {
+      team.activeTriggers.set(trigger, false);
+    }
+
+    this.multiplayer.broadcastPacket(
+      {
+        packet: PacketType.EventPacket,
+        payload: {
+          type: Events.ResetTeamRun,
+        },
+      },
+      [player.id],
+      team.getIds(),
     );
   }
 

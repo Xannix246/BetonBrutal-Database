@@ -11,5 +11,11 @@ export class DummyCommands implements OnModuleInit {
       args: ['[color|rgb]'],
       description: 'change player color',
     });
+
+    this.commandsService.register({
+      aliases: ['/alpha'],
+      args: ['[0-1]'],
+      description: 'change players alpha',
+    });
   }
 }

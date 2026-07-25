@@ -8,6 +8,7 @@ import {
 import {
   Group,
   SessionCollab,
+  SessionPlayer,
 } from 'src/modules/multiplayer/types/multiplayer';
 
 class BinaryWriter {
@@ -149,12 +150,6 @@ export function serializeCollab(session: SessionCollab): Buffer<ArrayBuffer> {
   const writer = new BinaryWriter();
 
   writer.writeString(session.id);
-  writer.writeString(session.ownerId);
-
-  writer.writeInt32LE(session.players.size);
-  for (const player of session.players) {
-    writer.writeString(player);
-  }
 
   writer.writeInt32LE(session.blocks.size);
   for (const [key, block] of session.blocks) {
@@ -197,17 +192,16 @@ export function serializeCollab(session: SessionCollab): Buffer<ArrayBuffer> {
   return writer.toBuffer();
 }
 
-export function deserializeCollab(buffer: Buffer): SessionCollab {
+export function deserializeCollab(
+  buffer: Buffer,
+  player: SessionPlayer,
+): SessionCollab {
   const reader = new BinaryReader(buffer);
 
   const id = reader.readString();
-  const ownerId = reader.readString();
+  const owner = player;
 
-  const players = new Set<string>();
-  const playersCount = reader.readInt32LE();
-  for (let i = 0; i < playersCount; i++) {
-    players.add(reader.readString());
-  }
+  const players = new Set<SessionPlayer>();
 
   const blocks = new Map<string, Block>();
   const blocksCount = reader.readInt32LE();
@@ -252,5 +246,14 @@ export function deserializeCollab(buffer: Buffer): SessionCollab {
     triggers.set(key, reader.readProtoMessage(Trigger));
   }
 
-  return { id, ownerId, players, blocks, groups, settings, color, triggers };
+  return new SessionCollab(
+    id,
+    owner,
+    players,
+    blocks,
+    groups,
+    settings,
+    color,
+    triggers,
+  );
 }

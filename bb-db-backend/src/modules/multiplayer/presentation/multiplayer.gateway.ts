@@ -98,6 +98,9 @@ export class MultiplayerWebsocketGateway implements OnModuleInit {
             break;
           case Events.RunComplete:
             this.events.completeRun(player);
+            break;
+          case Events.ResetTeamRun:
+            this.events.resetTeamRun(player);
         }
         break;
       case PacketType.AckResPacket:

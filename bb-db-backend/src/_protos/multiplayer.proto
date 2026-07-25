@@ -52,6 +52,7 @@ enum Events {
   StartCollab = 3;
   JoinCollab = 4;
   CloseCollab = 5;
+  ResetTeamRun = 6;
 }
 
 enum GameMode {

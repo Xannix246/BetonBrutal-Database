@@ -57,12 +57,12 @@ export class CompatibilityService {
           this.legacyPacketManager.serialize({
             packet: LegacyPacketType.Join,
             id: playerId,
-            name: player?.nick ?? player.name,
+            name: player?.nick.value ?? player.name,
             map:
               this.convertMapTypeL(
                 this.context!.playerData.get(playerId)?.mapMode.value ??
                   MapType.MAIN,
-              ) + player.mapId,
+              ) + player.map.value?.id,
           }),
         );
         resolve();
