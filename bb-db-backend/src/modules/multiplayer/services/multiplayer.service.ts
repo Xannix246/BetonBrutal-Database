@@ -459,6 +459,15 @@ export class MultiplayerService implements OnModuleInit {
       }
     }
 
+    const teams = [...this.teamSessions.values()];
+    const team = teams.find((team) => team.players.has(player));
+    if (team) {
+      team.players.delete(player);
+      if (team.owner.id === player.id) {
+        this.closeTeam(team.id);
+      }
+    }
+
     if (player.map.value) {
       player.map.value.players.delete(player);
     }
