@@ -329,8 +329,13 @@ export class CollabService {
     const collab = player.collab.value;
     const trigger = collab?.triggers.get(packet.triggerId);
 
-    if (!collab || !trigger || !trigger.isActive) return;
+    if (!collab || !trigger) return;
     if (!collab.triggersSyncEnabled?.value) return;
+
+    if (trigger.isActive === undefined) {
+      trigger.isActive = new Ref(false);
+      collab.triggers.set(trigger.instanceId, trigger);
+    }
 
     if (packet.active && !trigger.isActive.value) {
       trigger.isActive.set(true);
