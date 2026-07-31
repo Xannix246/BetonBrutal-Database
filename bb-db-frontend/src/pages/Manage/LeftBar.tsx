@@ -1,4 +1,4 @@
-import { setActiveMap } from "../../store/store";
+import { setActiveMap } from "@store";
 
 const LeftBar = () => {
   return (

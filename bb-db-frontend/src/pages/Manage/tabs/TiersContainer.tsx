@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
-import { getActiveMap } from "../../../store/store";
-import Button from "../../../shared/Button/Button";
-import { getItems, getTierVoteRequests, updateTierEntry } from "../requests";
-import TierCard from "../../../entities/TierCard";
 import { AnimatePresence, motion } from "motion/react";
+import { Button } from "@shared";
+import { TierCard } from "@entities";
+import { getItems, getTierVoteRequests, updateTierEntry } from "../requests";
 
 const TiersContainer = ({ mapId }: { mapId?: string }) => {
   const [entries, setEntries] = useState<TierEntry[]>([]);

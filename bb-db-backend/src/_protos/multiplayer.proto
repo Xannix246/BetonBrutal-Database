@@ -1,0 +1,566 @@
+syntax = "proto3";
+
+package multiplayer;
+
+enum PacketType {
+  VersionPacket = 0;
+  EventPacket = 1;
+  JoinPacket = 2;
+  GetPlayersPacket = 3;
+  DisconnectPacket = 4;
+  NicknamePacket = 5;
+  BodyColorPacket = 6;
+  // LightColorPacket = 7;
+  MovePacket = 8;
+  GameModePacket = 9;
+  MapPacket = 10;
+  MessagePacket = 11;
+  CommandPacket = 12;
+  PlayersPingPacket = 13;
+  // PlayerJoinPacket = 14;
+  LoadMapPacket = 15;
+  // ToggleLightPacket = 16;
+  // LightColorPacket = 17;
+  PlaceBlocksPacket = 18;
+  PlaceBlockPacket = 19;
+  DeleteBlockPacket = 20;
+  ChangeBlockPacket = 21;
+  MapSettingsPacket = 22;
+  MapColorPacket = 23;
+  CreateGroupPacket = 24;
+  ChangeGroupPacket = 25;
+  DeleteGroupPacket = 26;
+  AddBlockToGroupPacket = 27;
+  RemoveBlockFromGroupPacket = 28;
+  CreateTriggerPacket = 29;
+  ChangeTriggerPacket = 30;
+  DeleteTriggerPacket = 31;
+  AddOperationPacket = 32;
+  EditOperationPacket = 33;
+  MoveOperationOrderPacket = 34;
+  RemoveOperationPacket = 35;
+  PlayerDataPacket = 36;
+  ActivateTriggerPacket = 47;
+  AckResPacket = 100;
+  UnknownPacket = 404;
+}
+
+enum Events {
+  Ping = 0;
+  RunComplete = 1;
+  RaceStart = 2;
+  StartCollab = 3;
+  JoinCollab = 4;
+  CloseCollab = 5;
+  ResetTeamRun = 6;
+}
+
+enum GameMode {
+  MENU = 0;
+  PLAY = 1;
+  SCOUT = 2;
+  PRACTICE = 3;
+  REPLAY = 4;
+  T_EDITOR = 5;
+  UNKNOWN = 6;
+}
+
+enum MapType {
+  MAIN = 0;
+  CUSTOM = 1;
+  M_EDITOR = 2;
+  HUB = 3;
+}
+
+enum MapSetting {
+  LightScaling = 0;
+  SuppressBackgroundMusic = 1;
+  SuppressAmbience = 2;
+  HideVoidPlatform = 3;
+  DefaultBackgroundColor = 4;
+  DefaultAmbientLight = 5;
+}
+
+enum Operations {
+  MoveBlock = 0;
+  PaintBlock = 1;
+}
+
+enum EasingMode {
+  Linear = 0;
+  InQuad = 1;
+  OutQuad = 2;
+  InOutQuad = 3;
+  InBack = 4;
+  OutBack = 5;
+  InOutBack = 6;
+  InElastic = 7;
+  OutElastic = 8;
+  InOutElastic = 9;
+  InBounce = 10;
+  OutBounce = 11;
+  InOutBounce = 12;
+  NumEasingModes = 13;
+}
+
+enum TargetMode {
+  TARGET_GROUP = 0;
+  TARGET_TRIGGER = 1;
+  TARGET_SELF = 2;
+  TARGET_NUM_TARGET_MODES = 3;
+}
+
+enum OffsetMode {
+  Relative = 0;
+  Absolute = 1;
+}
+
+enum DurationMode {
+  Time = 0;
+  Speed = 1;
+}
+
+enum SpaceMode {
+  Global = 0;
+  Local = 1;
+}
+
+enum PivotSource {
+  Self = 0;
+  Custom = 1;
+}
+
+enum TargetColoringMode {
+  TARGET_COLORING_GROUP = 0;
+  TARGET_COLORING_AMBIENT_LIGHT = 1;
+  TARGET_COLORING_BACKGROUND = 2;
+  TARGET_COLORING_NUM_BLEND_MODES = 3;
+}
+
+enum ColorMode {
+  RGB = 0;
+  HSV = 1;
+  NumColorModes = 2;
+}
+
+enum BlendMode {
+  Blend = 0;
+  Multiply = 1;
+  Add = 2;
+  Subtract = 3;
+  BLEND_MODE_NUM_BLEND_MODES = 4;
+}
+
+enum TriggerOpType {
+  OP_TYPE_UNSPECIFIED = 0;
+  OP_TYPE_MOVE = 1;
+  OP_TYPE_ROTATE = 2;
+  OP_TYPE_WAIT = 3;
+  OP_TYPE_RESTART = 4;
+  OP_TYPE_SEND_EVENT = 5;
+  OP_TYPE_RECEIVE_EVENT = 6;
+  OP_TYPE_COLOR = 7;
+  OP_TYPE_SOUND = 8;
+}
+
+enum PlayMode {
+  Play = 0;
+  Stop = 1;
+  Pause = 2;
+  Resume = 3;
+  NumPlayModes = 4;
+}
+
+enum PanningMode {
+  TwoD = 0;
+  ThreeD = 1;
+  NumPanningModes = 2;
+}
+
+enum VersionType {
+  Latest = 0;
+  Outdated = 1;
+  Incompatible = 2;
+}
+
+message Vector3 {
+  float x = 1;
+  float y = 2;
+  float z = 3;
+}
+
+message Color {
+  float r = 1;
+  float g = 2;
+  float b = 3;
+  float a = 4;
+}
+
+message PlayerEntry {
+  int64 id = 1;
+  string nickname = 2;
+  MapType map_mode = 3;
+  string map_id = 4;
+  optional string map_name = 5;
+  optional Color player_color = 6;
+}
+
+message PingEntry {
+  int64 id = 1;
+  int32 ping = 2;
+}
+
+message Block {
+  string instance_id = 1;
+  int32 block_id = 2;
+  Vector3 position = 3;
+  Vector3 rotation = 4;
+  float scale = 5;
+  int32 color = 6;
+  optional Color custom_color = 7;
+}
+
+// triggers and groups
+
+message Group {
+  string instance_id = 1;
+  string name = 2;
+  repeated string blocks = 3;
+  optional Block pivot = 4;
+}
+
+message MoveOperation {
+  optional string target_group_name = 1;
+  Vector3 offset = 2;
+  OffsetMode current_offset_mode = 3;
+  float duration = 4;
+  DurationMode current_duration_mode = 5;
+  EasingMode current_easing_mode = 6;
+  optional SpaceMode current_space_mode = 7;
+  optional PivotSource current_pivot_source = 8;
+  optional string pivot_source_group_name = 9;
+}
+
+message RotateOperation {
+  optional string target_group_name = 1;
+  Vector3 offset = 2;
+  OffsetMode current_offset_mode = 3;
+  float duration = 4;
+  DurationMode current_duration_mode = 5;
+  EasingMode current_easing_mode = 6;
+  optional PivotSource current_pivot_source = 7;
+  optional string pivot_source_group_name = 8;
+  optional SpaceMode current_space_mode = 9;
+  optional PivotSource current_space_pivot_source = 10;
+  optional string space_pivot_source_group_name = 11;
+}
+
+message WaitOperation {
+  float duration = 1;
+}
+
+message RestartOperation {
+  bool restart = 1;
+  bool reset = 2;
+}
+
+message SendEventOperation {
+  optional TargetMode target_mode = 1;
+  optional string target_trigger_id = 2;
+  string target_group = 3;
+  string event_name = 4;
+}
+
+message ReceiveEventOperation {
+  string event_name = 1;
+  bool jump = 2;
+  optional bool can_trigger = 3;
+  optional bool wait = 4;
+}
+
+message ColorOperation {
+  TargetColoringMode target_mode = 1;
+  string target_group_name = 2;
+  Color color = 3;
+  optional ColorMode color_mode = 4;
+  BlendMode blend_mode = 5;
+  float duration = 6;
+}
+
+message SoundOperation {
+  string sound_object_name = 1;
+  PlayMode play_mode = 2;
+  string sound_id = 3;
+  float volume = 4;
+  float fade_in = 5;
+  float fade_out = 6;
+  float pitch = 7;
+  float start_offset = 8;
+  float max_playtime = 9;
+  bool loop = 10;
+  PanningMode panning_mode = 11;
+  float range = 12;
+  bool attach = 13;
+  optional bool use_volume_settings = 14;
+}
+
+message TriggerOperation {
+  bool is_enabled = 1;
+  bool is_linked = 2;
+  oneof operation {
+    MoveOperation move = 10;
+    RotateOperation rotate = 11;
+    WaitOperation wait = 12;
+    RestartOperation restart = 13;
+    SendEventOperation send_event = 14;
+    ReceiveEventOperation receive_event = 15;
+    ColorOperation color = 16;
+    SoundOperation sound = 17;
+  }
+}
+
+message Trigger {
+  string instance_id = 1;
+  string trigger_id = 2;
+  bool retriggerable = 3;
+  bool trigger_when_running = 4;
+  bool reset_on_retrigger = 5;
+  repeated TriggerOperation operations = 6;
+}
+
+// Packets
+
+message Version {
+  string version = 1;
+  optional VersionType type = 2;
+}
+
+message Event {
+  Events type = 1;
+}
+
+message Join {
+  int64 id = 1;
+  string username = 2;
+  GameMode mode = 3;
+  MapType map_mode = 4;
+  string map_id = 5;
+  optional string map_name = 6;
+  optional string token = 7;
+}
+
+message PlayerList {
+  repeated PlayerEntry players = 1;
+}
+
+message Disconnect {
+  int64 id = 1;
+}
+
+message Nickname {
+  int64 id = 1;
+  string nickname = 2;
+}
+
+message BodyColor {
+  int64 id = 1;
+  Color customColor = 2;
+}
+
+message Move {
+  optional int64 id = 1;
+  Vector3 position = 2;
+  Vector3 rotation = 3;
+  optional uint64 packet_id = 4;
+}
+
+message ChangeGameMode {
+  int64 id = 1;
+  GameMode mode = 2;
+}
+
+message Map {
+  int64 id = 1;
+  string map_id = 2;
+}
+
+message Message {
+  int64 id = 1;
+  string message = 2;
+}
+
+message Command {
+  optional int64 id = 1;
+  optional string command = 2;
+  optional string message = 3;
+}
+
+message PlayersPing {
+  repeated PingEntry players = 1;
+}
+
+message LoadMap {
+  int64 id = 1;
+  string map_id = 2;
+}
+
+message PlaceBlocks {
+  int64 id = 1;
+  repeated Block block = 2;
+}
+
+message PlaceBlock {
+  int64 id = 1;
+  Block block = 2;
+}
+
+message DeleteBlock {
+  int64 id = 1;
+  string instance_id = 2;
+}
+
+message ChangeBlock {
+  int64 id = 1;
+  Block block = 2;
+  Operations operation = 3;
+}
+
+message MapSettings {
+  int64 id = 1;
+  MapSetting setting = 2;
+  bool state = 3;
+}
+
+message MapColor {
+  int64 id = 1;
+  int32 settings = 2;
+  Color color = 3;
+}
+
+message CreateGroup {
+  int64 id = 1;
+  repeated Group groups = 2;
+}
+
+message ChangeGroup {
+  int64 id = 1;
+  Group group = 2;
+}
+
+message DeleteGroup {
+  int64 id = 1;
+  string instance_id = 2;
+}
+
+message AddBlockToGroup {
+  int64 id = 1;
+  string group_instance_id = 2;
+  string block_instance_id = 3;
+}
+
+message RemoveBlockFromGroup {
+  int64 id = 1;
+  string group_instance_id = 2;
+  string block_instance_id = 3;
+}
+
+message CreateTrigger {
+  int64 id = 1;
+  Trigger trigger = 2;
+}
+
+message ChangeTrigger {
+  int64 id = 1;
+  Trigger trigger = 2;
+}
+
+message DeleteTrigger {
+  int64 id = 1;
+  string instance_id = 2;
+}
+
+message AddOperation {
+  int64 id = 1;
+  string trigger_instance_id = 2;
+  TriggerOperation operation = 3;
+}
+
+message EditOperation {
+  int64 id = 1;
+  string trigger_instance_id = 2;
+  int32 op_index = 3;
+  TriggerOperation operation = 4;
+}
+
+message ReorderOperation {
+  int64 id = 1;
+  string trigger_instance_id = 2;
+  int32 op_index = 3;
+  int32 move_to = 4;
+}
+
+message RemoveOperation {
+  int64 id = 1;
+  string trigger_instance_id = 2;
+  int32 op_index = 3;
+}
+
+message PlayerData {
+  int64 id = 1;
+  GameMode mode = 2;
+  MapType map_mode = 3;
+}
+
+message ActivateTrigger {
+  int64 id = 1;
+  string trigger_id = 2;
+  bool active = 3;
+}
+
+message AckPacket {
+  string id = 1; //uuid
+  optional PacketType packet_type = 2;
+}
+
+message Packet {
+  oneof payload {
+    Version version = 1;
+    Event Event = 2;
+    Join join = 3;
+    PlayerList player_list = 4;
+    Disconnect disconnect = 5;
+    Nickname nickname = 6;
+    BodyColor body_color = 7;
+    Move move = 8;
+    ChangeGameMode game_mode = 9;
+    Map map = 10;
+    Message message = 11;
+    Command command = 12;
+    PlayersPing players_ping = 13;
+    // PlayerJoin = 14;
+    LoadMap load_map = 15;
+    // ToggleLight = 16;
+    // LightColor = 17;
+    PlaceBlocks place_blocks = 18;
+    PlaceBlock place_block = 19;
+    DeleteBlock delete_block = 20;
+    ChangeBlock change_block = 21;
+    MapSettings map_settings = 22;
+    MapColor map_color = 23;
+    CreateGroup create_group = 24;
+    ChangeGroup change_group = 25;
+    DeleteGroup delete_group = 26;
+    AddBlockToGroup add_block_to_group = 27;
+    RemoveBlockFromGroup remove_block_from_group = 28;
+    CreateTrigger create_trigger = 29;
+    ChangeTrigger change_trigger = 30;
+    DeleteTrigger delete_trigger = 31;
+    AddOperation add_operation = 32;
+    EditOperation edit_operation = 33;
+    ReorderOperation reorder_operation = 34;
+    RemoveOperation remove_operation = 35;
+    PlayerData player_data = 36;
+    ActivateTrigger activate_trigger = 37;
+    AckPacket ack_packet = 100;
+  }
+}

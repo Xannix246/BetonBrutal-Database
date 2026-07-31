@@ -1,6 +1,24 @@
 import { useEffect, useRef, useState } from "react";
-import Footer from "../../widgets/Footer/Footer";
-import Header from "../../widgets/Header/Header";
+import { navigate } from "vike/client/router";
+import { io } from "socket.io-client";
+import clsx from "clsx";
+import { t } from "i18next";
+import { Container, Input, Button, ContextMenu } from "@shared";
+import { Comment } from "@entities";
+import { Footer, Header, Background, LeaderboardTable, MapTier } from "@widgets";
+import {
+  DescriptionFormatter,
+  addFavorites,
+  removeFavorites,
+  banReplay,
+  deleteReplay,
+  authClient,
+} from "@features";
+import { $prevLink, getFavorites, getTargetData, setTargetData } from "@store";
+import { config } from "@config";
+import { formatTime } from "@utils";
+import { Keys } from "@locales/keys";
+import getMedianTime from "./getMedianTime";
 import {
   getComments,
   getMap,
@@ -10,32 +28,6 @@ import {
   postComment,
   uploadMap,
 } from "./requests";
-import Container from "../../shared/Containter/Container";
-import DescriptionFormatter from "../../features/DescriptionFormatter";
-import Background from "../../widgets/Background/Background";
-import Input from "../../shared/Input/Input";
-import Comment from "../../entities/Comment/Comment";
-import LeaderboardTable from "../../widgets/LeaderboardTable/LeaderboardTable";
-import {
-  $prevLink,
-  getFavorites,
-  getTargetData,
-  setTargetData,
-} from "../../store/store";
-import { navigate } from "vike/client/router";
-import Button from "../../shared/Button/Button";
-import { addFavorites, removeFavorites } from "../../features/FavoriteManager";
-import clsx from "clsx";
-import { io } from "socket.io-client";
-import { config } from "../../../config/config";
-import { banReplay, deleteReplay } from "../../features/DataManager";
-import ContextMenu from "../../shared/ContextMenu/ContextMenu";
-import getMedianTime from "./getMedianTime";
-import formatTime from "../../features/FormatTime";
-import { t } from "i18next";
-import { Keys } from "../../../i18n/keys";
-import MapTier from "../../widgets/MapTier/MapTier";
-import { authClient } from "../../features/Auth";
 
 const WorkshopItemPage = ({ id }: { id: string }) => {
   const [mapData, setMapData] = useState<WorkshopItem | null>();
@@ -225,7 +217,9 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                       className="uppercase bg-blue/60 text-2xl sm:text-4xl p-3 w-full"
                       onClick={() => fileInputRef.current?.click()}
                     >
-                      {mapData?.tags.length === 0 ? t(key.upload) : t(key.prefupload)}
+                      {mapData?.tags.length === 0
+                        ? t(key.upload)
+                        : t(key.prefupload)}
                     </Button>
                   </div>
                 )}
@@ -234,11 +228,13 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                     className="uppercase bg-green/60 text-2xl sm:text-4xl p-3 w-full flex justify-center text-white hover:text-pink transition duration-150"
                     href={`${config.serverUri}/db/download?id=${id}`}
                   >
-                    {mapData?.tags.length === 0 ? t(key.download) : t(key.prefdownload)}
+                    {mapData?.tags.length === 0
+                      ? t(key.download)
+                      : t(key.prefdownload)}
                   </a>
                 )}
               </div>
-              {tierData && <MapTier tierData={tierData} userVote={userVote}/>}
+              {tierData && <MapTier tierData={tierData} userVote={userVote} />}
               <div className="flex flex-col w-full gap-2">
                 <Container className="text-white text-5xl lg:text-8xl w-full text-center">
                   <a
@@ -278,69 +274,78 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                         : t(key.favAdd)}
                     </Button>
                   )}
-                  {mapData?.tags.length === 0 && <a
-                    target="_blank"
-                    href={`https://josiahshields.com/beton/leaderboard/?lb=${mapData?.id}`}
-                    rel="noreferrer"
-                    className="hover:text-white hover:underline uppercase"
-                  >
-                    {t(key.bblb)}
-                  </a>}
+                  {mapData?.tags.length === 0 && (
+                    <a
+                      target="_blank"
+                      href={`https://josiahshields.com/beton/leaderboard/?lb=${mapData?.id}`}
+                      rel="noreferrer"
+                      className="hover:text-white hover:underline uppercase"
+                    >
+                      {t(key.bblb)}
+                    </a>
+                  )}
                 </Container>
                 <Container className="flex flex-col gap-6 text-2xl lg:text-3xl text-white">
                   <div className="flex gap-4">
                     <h4 className="uppercase text-blue">{t(key.release)}</h4>
                     <h4 className="uppercase">
-                      {mapData && new Date(mapData.createDate).toLocaleDateString()}
+                      {mapData &&
+                        new Date(mapData.createDate).toLocaleDateString()}
                     </h4>
                   </div>
-                  {mapData?.tags.length === 0 && <div className="flex gap-4">
-                    <h4 className="uppercase text-green">{t(key.time)}</h4>
-                    <h4 className="uppercase">
-                      {getMedianTime(replays) ? formatTime(getMedianTime(replays)!) : "N/A"}
-                    </h4>
-                  </div>}
+                  {mapData?.tags.length === 0 && (
+                    <div className="flex gap-4">
+                      <h4 className="uppercase text-green">{t(key.time)}</h4>
+                      <h4 className="uppercase">
+                        {getMedianTime(replays)
+                          ? formatTime(getMedianTime(replays)!)
+                          : "N/A"}
+                      </h4>
+                    </div>
+                  )}
                 </Container>
                 <Container className="text-2xl w-full">
                   <DescriptionFormatter content={mapData?.description} />
                 </Container>
               </div>
             </div>
-            {mapData?.tags.length === 0 && <div className="flex flex-col-reverse gap-16 mt-16 md:mt-0 md:flex-row md:gap-2 w-full">
-              <div className="flex flex-col gap-2 w-full uppercase">
-                <Container>
-                  <h2 className="text-white tracking-wider text-xl">
-                    {t(key.comments)}
-                  </h2>
-                </Container>
-                {user ? (
-                  <Input
-                    className="text-xl md:mx-2 p-3 bg-white/10"
-                    placeholder={t(key.placeholder)}
-                    value={value}
-                    onChange={(e) => {
-                      setValue(e.target.value);
-                    }}
-                    onKeyDown={handleSendComment}
-                  />
-                ) : (
-                  <Container className="text-white text-xl md:mx-2">
-                    {t(key.commentsNoAuth)}
-                  </Container>
-                )}
-                {comments.map((comment) => (
-                  <Comment comment={comment} key={comment.id} />
-                ))}
-                {comments.length === 0 && (
-                  <Container className="md:mx-2">
-                    <h2 className="text-[#f1e4c7] tracking-wider text-xl text-center">
-                      {t(key.noComments)}
+            {mapData?.tags.length === 0 && (
+              <div className="flex flex-col-reverse gap-16 mt-16 md:mt-0 md:flex-row md:gap-2 w-full">
+                <div className="flex flex-col gap-2 w-full uppercase">
+                  <Container>
+                    <h2 className="text-white tracking-wider text-xl">
+                      {t(key.comments)}
                     </h2>
                   </Container>
-                )}
+                  {user ? (
+                    <Input
+                      className="text-xl md:mx-2 p-3 bg-white/10"
+                      placeholder={t(key.placeholder)}
+                      value={value}
+                      onChange={(e) => {
+                        setValue(e.target.value);
+                      }}
+                      onKeyDown={handleSendComment}
+                    />
+                  ) : (
+                    <Container className="text-white text-xl md:mx-2">
+                      {t(key.commentsNoAuth)}
+                    </Container>
+                  )}
+                  {comments.map((comment) => (
+                    <Comment comment={comment} key={comment.id} />
+                  ))}
+                  {comments.length === 0 && (
+                    <Container className="md:mx-2">
+                      <h2 className="text-[#f1e4c7] tracking-wider text-xl text-center">
+                        {t(key.noComments)}
+                      </h2>
+                    </Container>
+                  )}
+                </div>
+                <LeaderboardTable replays={replays} />
               </div>
-              <LeaderboardTable replays={replays} />
-            </div>}
+            )}
           </div>
         ) : (
           <div className="flex gap-2 pt-32 px-4 h-screen w-full">

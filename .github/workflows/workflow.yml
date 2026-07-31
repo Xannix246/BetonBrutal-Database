@@ -27,6 +27,8 @@ jobs:
 
             cd bb-db-backend
             pnpm i --frozen-lockfile
+            mkdir -p ./src/generated/protos/
+            pnpm protoc --ts_out ./src/generated/protos/ --proto_path ./src/_protos/ ./src/_protos/multiplayer.proto --ts_opt long_type_string
             npx prisma generate
             pnpm build
             pm2 restart bb-backend || pm2 start "pnpm start:prod" --name bb-backend

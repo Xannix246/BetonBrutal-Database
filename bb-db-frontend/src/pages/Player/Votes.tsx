@@ -1,13 +1,11 @@
 import { useEffect, useState } from "react";
-import Footer from "../../widgets/Footer/Footer";
-import Header from "../../widgets/Header/Header";
-import Background from "../../widgets/Background/Background";
-import TierCard from "../../entities/TierCard";
-import { getItems, getTierVoteRequests } from "./requests";
-import { getUser } from "../../store/store";
 import { navigate } from "vike/client/router";
-import { Keys } from "../../../i18n/keys";
 import { t } from "i18next";
+import { TierCard } from "@entities";
+import { Footer, Header, Background } from "@widgets";
+import { getUser } from "@store";
+import { Keys } from "@locales/keys";
+import { getItems, getTierVoteRequests } from "./requests";
 
 const key = Keys.mapTiers;
 

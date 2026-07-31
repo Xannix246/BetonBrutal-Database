@@ -1,5 +1,5 @@
-import { config } from "../../../config/config";
-import { api } from "../../features/Auth";
+import { api } from "@features";
+import { config } from "@config";
 
 export const getMaps = async (
   sortBy: SortBy = "newest",

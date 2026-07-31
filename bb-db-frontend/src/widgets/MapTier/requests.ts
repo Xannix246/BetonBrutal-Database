@@ -1,6 +1,6 @@
 import { v4 } from "uuid";
-import { api } from "../../features/Auth";
-import { addToast } from "../../store/toast-manager";
+import { api } from "@features";
+import { addToast } from "@store";
 
 export const submitTierVote = async (mapId: string, tier: number) => {
   const response = (await api.post(`/workshop/${mapId}/tier`, {

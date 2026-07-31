@@ -8,16 +8,16 @@ enum Color {
 }
 
 model Collection {
-  id                String   @id @default(auto()) @map("_id") @db.ObjectId
-  title             String
-  description       String?
-  mapsId            String[]
-  showOnMain        Boolean  @default(false)
-  isPublic          Boolean  @default(false)
-  descColor         Color    @default(black)
-  previewUrl        String?
-  authorId          String?
-  user              User?    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String?
+  mapsId      String[]
+  showOnMain  Boolean  @default(false)
+  isPublic    Boolean  @default(false)
+  descColor   Color    @default(black)
+  previewUrl  String?
+  authorId    String?
+  user        User?    @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
   workshopItems WorkshopItem[]
   stat          CollectionStats?
@@ -37,6 +37,7 @@ model Vote {
   date   DateTime
 
   stat CollectionStats @relation(fields: [statId], references: [id], onDelete: Cascade)
+
   @@unique([userId, statId])
 }
 

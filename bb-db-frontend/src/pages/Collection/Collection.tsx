@@ -1,19 +1,15 @@
-import { t } from "i18next";
-import { Keys } from "../../../i18n/keys";
-import Container from "../../shared/Containter/Container";
-import Background from "../../widgets/Background/Background";
-import Footer from "../../widgets/Footer/Footer";
-import Header from "../../widgets/Header/Header";
 import { useEffect, useState } from "react";
-import { getCollection, getItem, getItemData, getStats, getVote, voteCollection } from "./requests";
-import { $prevLink, getFavorites, getUser } from "../../store/store";
-import Button from "../../shared/Button/Button";
-import { addFavorites, removeFavorites } from "../../features/FavoriteManager";
-import clsx from "clsx";
-import DescriptionFormatter from "../../features/DescriptionFormatter";
-import MapTile from "../../entities/MapTile";
-import { v4 } from "uuid";
 import { navigate } from "vike/client/router";
+import clsx from "clsx";
+import { t } from "i18next";
+import { v4 } from "uuid";
+import { Button, Container } from "@shared";
+import { MapTile } from "@entities";
+import { addFavorites, removeFavorites, DescriptionFormatter } from "@features";
+import { Background, Header, Footer } from "@widgets";
+import { $prevLink, getFavorites, getUser } from "@store";
+import { Keys } from "@locales/keys";
+import { getCollection, getItem, getItemData, getStats, getVote, voteCollection } from "./requests";
 
 const key = Keys.collection.item;
 
@@ -24,7 +20,6 @@ const Collection = ({ id }: { id: string }) => {
   const [collection, setCollection] = useState<Collection>();
   const [stats, setStats] = useState<CollectionStats>();
   const [vote, setVote] = useState<Vote | null>(null);
-  // const [comments, setComments] = useState<UserComment[]>([]);
   const [hydrated, setHydrated] = useState(false);
   const user = getUser();
   const favorites = getFavorites();

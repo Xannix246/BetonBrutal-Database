@@ -1,14 +1,13 @@
 import "./tailwind.css";
 import "./descStyles.css";
 import { useEffect } from "react";
-import { getFavorites } from "../src/features/FavoriteManager";
-import { setUser } from "../src/store/store";
-import { authClient } from "../src/features/Auth";
 import { usePageContext } from "vike-react/usePageContext";
-import i18n from "../i18n/config";
-import { config } from "../config/config";
-import Toasts from "../src/widgets/Header/Toasts";
 // import Snowfall from "react-snowfall";
+import { getFavorites, authClient } from "@features";
+import { Toasts } from "@widgets";
+import { setUser } from "@store";
+import { config } from "@config";
+import i18n from "@locales/config";
 
 export const LayoutDefault = ({ children }: { children: React.ReactNode }) => {
   const pageContext = usePageContext();
@@ -40,8 +39,8 @@ export const LayoutDefault = ({ children }: { children: React.ReactNode }) => {
   }, [locale]);
 
   return (
-    <div className={"w-full h-full"}>
-      <Toasts/>
+    <div className={"w-full min-h-screen"}>
+      <Toasts />
       {/* <Snowfall
         style={{
           zIndex: 100,

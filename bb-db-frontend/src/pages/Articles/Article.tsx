@@ -1,11 +1,8 @@
 import { useEffect, useState } from "react";
-import Background from "../../widgets/Background/Background";
-import Footer from "../../widgets/Footer/Footer";
-import Header from "../../widgets/Header/Header";
-import Link from "../../shared/Link/Link";
-import PreviewPane from "../../features/editor/Preview";
+import { Link, Container } from "@shared";
+import { PreviewPanel } from "@features";
+import { Background, Footer, Header } from "@widgets";
 import { getArticle } from "./requests";
-import Container from "../../shared/Containter/Container";
 
 const Article = ({ id }: { id: string }) => {
   const [article, setArticle] = useState<Article | null | undefined>(undefined);
@@ -56,7 +53,7 @@ const Article = ({ id }: { id: string }) => {
 
               <div className="relative">
                 <div className="h-64 bg-gradient-to-t from-transparent to-black absolute inset-0 -z-10" />
-                <PreviewPane document={article?.content} />
+                <PreviewPanel document={article?.content} className="min-h-screen" />
               </div>
             </div>
             <div className="lg:w-sm">

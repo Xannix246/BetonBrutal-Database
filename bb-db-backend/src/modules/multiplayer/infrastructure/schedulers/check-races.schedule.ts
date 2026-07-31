@@ -1,0 +1,117 @@
+import { Injectable } from '@nestjs/common';
+import { MultiplayerService } from '../../services/multiplayer.service';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import { C, SessionRace } from '../../types/multiplayer';
+import { Events, PacketType } from 'src/generated/protos/multiplayer';
+
+@Injectable()
+export class CheckRacesScheduler {
+  constructor(private readonly multiplayer: MultiplayerService) {}
+
+  @Cron(CronExpression.EVERY_SECOND)
+  handleCron() {
+    const races = this.multiplayer.raceSessions.values();
+
+    for (const race of races) {
+      if (!race.started && this.getSeconds(race.time.valueOf()) < 15) {
+        // if (race.players.length < 2) continue;
+        if (this.getSeconds(race.time.valueOf()) < 10) continue;
+        const time = 15 - this.getSeconds(race.time.valueOf());
+        this.multiplayer.broadcastServer(
+          `${this.getColor(time)}Race starting in ${time} seconds...</color>`,
+          race.getIds(),
+        );
+      } else if (!race.started && this.getSeconds(race.time.valueOf()) >= 15) {
+        this.raceStart(race);
+      } else if (
+        race.players.size === race.results.length ||
+        (race.finished &&
+          this.getSeconds(race.time.valueOf()) >
+            (race.results[0].time / 1000) * 4)
+      ) {
+        this.raceEnd(race);
+      }
+    }
+  }
+
+  private raceStart(race: SessionRace) {
+    // if (race.players.length < 2) {
+    //   for (const playerId of race.players) {
+    //     const player = this.multiplayer.players.get(playerId)!;
+    //     player.raceId = undefined;
+    //     this.multiplayer.players.set(playerId, player);
+    //   }
+
+    //   this.multiplayer.broadcastServer(
+    //     'Race canceled: Not enough players.',
+    //     race.players,
+    //   );
+
+    //   this.multiplayer.raceSessions.delete(race.id);
+    //   return;
+    // }
+
+    race.started = true;
+    race.time = new Date();
+
+    this.multiplayer.raceSessions.set(race.id, race);
+
+    this.multiplayer.broadcastServer(
+      `<color=green># Race has started, GO!</color>`,
+      race.getIds(),
+    );
+
+    this.multiplayer.broadcastPacket({
+      packet: PacketType.EventPacket,
+      payload: { type: Events.RaceStart },
+    });
+  }
+
+  private raceEnd(race: SessionRace) {
+    const summary: string[] = [];
+
+    for (const result of race.results) {
+      summary.push(
+        `<color=${C.blue}>${this.formatTime(result.time)}</color> - ${this.multiplayer.players.get(result.playerId)?.nick.value}`,
+      );
+    }
+
+    this.multiplayer.broadcastServer(summary.join('\n'), race.getIds());
+
+    for (const player of race.players) {
+      player.race.set(undefined);
+    }
+
+    this.multiplayer.raceSessions.delete(race.id);
+  }
+
+  private formatTime(score: number): string {
+    const seconds = score / 1000;
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const remainingSeconds = seconds % 60;
+
+    if (hours > 0) {
+      return `${hours}:${String(minutes % 60).padStart(2, '0')}:${remainingSeconds
+        .toFixed(2)
+        .padStart(5, '0')}`;
+    } else {
+      return `${minutes}:${remainingSeconds.toFixed(2).padStart(5, '0')}`;
+    }
+  }
+
+  private getColor(seconds: number) {
+    switch (seconds) {
+      case 3:
+        return `<color=${C.red}>`;
+      case 2:
+        return `<color=${C.yellow}>`;
+      default:
+        return `<color=${C.blue}>`;
+    }
+  }
+
+  private getSeconds(time: number) {
+    return Math.floor((new Date().valueOf() - time) / 1000);
+  }
+}

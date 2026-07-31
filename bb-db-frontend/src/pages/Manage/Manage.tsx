@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { navigate } from "vike/client/router";
-import Background from "../../widgets/Background/Background";
-import { authClient } from "../../features/Auth";
+import { Button } from "@shared";
+import { Background } from "@widgets";
+import { authClient } from "@features";
+import { getActiveMap, setActiveMap } from "@store";
 import LeftBar from "./LeftBar";
 import MapContainer from "./tabs/MapContainer";
-import { getActiveMap, setActiveMap } from "../../store/store";
 import UpsertMapContainer from "./tabs/UpsertMapContainer";
 import ReplaysContainer from "./tabs/ReplaysContainer";
-import Button from "../../shared/Button/Button";
 import CommentsContainer from "./tabs/CommentsContainer";
 import TiersContainer from "./tabs/TiersContainer";
 

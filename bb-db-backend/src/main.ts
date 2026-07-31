@@ -24,7 +24,6 @@ async function bootstrap() {
 
     bodyParser.json()(req, res, next);
   });
-
   setEventEmitter(app.get(EventEmitter2));
 
   app.enableCors({

@@ -2,7 +2,11 @@ import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { PrismaClient } from '@prisma/client';
 import { env } from 'process';
-import { admin as BAdmin, createAuthMiddleware } from 'better-auth/plugins';
+import {
+  apiKey,
+  admin as BAdmin,
+  createAuthMiddleware,
+} from 'better-auth/plugins';
 import { createAccessControl } from 'better-auth/plugins/access';
 import { getEventEmitter } from 'src/shared/event-emitter';
 
@@ -55,6 +59,14 @@ export const auth = betterAuth({
         writer,
         moderator,
         admin,
+      },
+    }),
+    apiKey({
+      apiKeyHeaders: ['x-api-key', 'api-key'],
+      enableSessionForAPIKeys: true,
+      rateLimit: {
+        timeWindow: 60000,
+        maxRequests: 600,
       },
     }),
   ],

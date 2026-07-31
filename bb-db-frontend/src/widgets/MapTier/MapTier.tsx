@@ -1,15 +1,14 @@
-import Container from "../../shared/Containter/Container";
-import { PiArrowsCounterClockwise } from "react-icons/pi";
-import TierLabel from "../../entities/TierLabel";
-import RateTierModal from "../../features/RateTierModal";
 import { useState } from "react";
-import { getColor } from "../../features/GetColor";
 import clsx from "clsx";
+import { Container } from "@shared";
+import { TierLabel } from "@entities";
+import { RateTierModal } from "@features";
+import { getColor } from "@utils";
+import { tiersLabels, tiersTooltips } from "@utils";
+import { getUser } from "@store";
+import { Keys } from "@locales/keys";
 import { submitTierVote, updateTierVote } from "./requests";
-import { getUser } from "../../store/store";
-import { tiersLabels, tiersTooltips } from "./data";
-import { Keys } from "../../../i18n/keys";
-import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 const key = Keys.mapTiers;
 
@@ -17,6 +16,7 @@ const MapTier = ({ tierData, userVote }: { tierData: TierData, userVote?: TierEn
   const user = getUser();
   const [open, setOpen] = useState(false);
   const color = getColor(tierData.avgTier, 13);
+  const { t } = useTranslation();
 
   const handleSubmit = (tier: number) => {
     if (userVote) {
@@ -47,14 +47,14 @@ const MapTier = ({ tierData, userVote }: { tierData: TierData, userVote?: TierEn
         tooltip={t(key.tierTooltip, {
           avgTier: tierData.avgTier.toFixed(1),
           modTier: tierData.modTier,
-          tooltip: tiersTooltips[`tier${tierData.avgTier.toFixed(0)}`],
+          tooltip: t(tiersTooltips[`tier${tierData.avgTier.toFixed(0)}`]),
         })}
       />
       {tierData.labels.map((label) => (
         <div className={tiersLabels[label].color}>
           <TierLabel
             icon={tiersLabels[label].icon}
-            tooltip={tiersLabels[label].tooltip}
+            tooltip={t(tiersLabels[label].tooltip)}
           />
         </div>
       ))}

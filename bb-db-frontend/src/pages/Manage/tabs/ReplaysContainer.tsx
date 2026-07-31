@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { getActiveMap } from "../../../store/store";
-import { getReplayById, getReplays } from "../requests";
-import LeaderboardEntry from "../../../entities/LeaderboardEntry";
-import Button from "../../../shared/Button/Button";
 import clsx from "clsx";
-import { banReplay, unbanReplay } from "../../../features/DataManager";
+import { Button } from "@shared";
+import { LeaderboardEntry } from "@entities";
+import { banReplay, unbanReplay } from "@features";
+import { getActiveMap } from "@store";
+import { getReplayById, getReplays } from "../requests";
 
 const ReplaysContainer = () => {
   const activeMap = getActiveMap();

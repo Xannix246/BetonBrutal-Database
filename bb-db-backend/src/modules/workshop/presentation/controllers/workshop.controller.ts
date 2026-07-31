@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  ForbiddenException,
   Get,
   HttpStatus,
   Param,
@@ -25,6 +26,7 @@ import { GetQueryListDto, GetQueryReplaysDto } from '../dto/workshop.dto';
 import { MapTierService } from '../../domain/services/map-tier.service';
 import { TierData, TierEntry } from '@prisma/client';
 import { type UserRoleSession } from 'src/modules/auth/auth.module';
+import { EventsService } from '../../domain/services/events.service';
 
 @Controller('workshop')
 export class WorkshopController {
@@ -33,6 +35,7 @@ export class WorkshopController {
     private readonly refreshDb: RefreshDatabaseUseCase,
     private readonly fetchBblb: FetchBBLBUseCase,
     private readonly tierService: MapTierService,
+    private readonly eventsService: EventsService,
   ) {}
 
   @Get()
@@ -175,6 +178,30 @@ export class WorkshopController {
     return res.status(HttpStatus.OK).json({ message: 'done' }).send();
   }
 
+  @Get('event')
+  @OptionalAuth()
+  async getEventData() {
+    return await this.eventsService.getEventData();
+  }
+
+  @Post('event')
+  @OptionalAuth()
+  async postEventData(@Body() body: { secret: string; data: ItemData }) {
+    if (body.secret !== env.FORCE_UPDATE_SECRET) {
+      throw new ForbiddenException();
+    }
+
+    return await this.eventsService.setEventData(body.data);
+  }
+
+  @Post('event/vote')
+  async voteEvent(
+    @Session() session: UserRoleSession,
+    @Body() body: { mapId: string },
+  ) {
+    return await this.eventsService.setVote(session, body.mapId);
+  }
+
   @Get('player/:id')
   @OptionalAuth()
   async getPlayer(@Param('id') id: string): Promise<Player | null> {
@@ -214,6 +241,7 @@ export class WorkshopController {
   }
 
   @Post(':id/tier')
+  @OptionalAuth()
   async postTier(
     @Param('id') id: string,
     @Session() session: UserRoleSession,

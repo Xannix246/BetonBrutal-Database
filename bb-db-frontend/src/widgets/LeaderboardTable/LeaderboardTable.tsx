@@ -1,10 +1,9 @@
 import { useState, useMemo, useEffect } from "react";
-import LeaderboardEntry from "../../entities/LeaderboardEntry";
-import Container from "../../shared/Containter/Container";
-// import { List, RowComponentProps } from "react-window";
 import clsx from "clsx";
 import { t } from "i18next";
-import { Keys } from "../../../i18n/keys";
+import { Container } from "@shared";
+import { LeaderboardEntry } from "@entities";
+import { Keys } from "@locales/keys";
 
 type Props = {
   replays: Replay[];
@@ -115,15 +114,6 @@ const LeaderboardTable = ({
         </div>
       </Container>
 
-      {/* <List
-        rowComponent={Row}
-        rowCount={sortedReplays.length}
-        rowHeight={68}
-        rowProps={{
-          replays: sortedReplays,
-        }}
-      /> */}
-
       {sortedReplays.map((replay, i) => (
         <LeaderboardEntry replay={replay} key={i} />
       ))}
@@ -138,21 +128,5 @@ const LeaderboardTable = ({
     </div>
   );
 };
-
-// const Row = ({
-//   index,
-//   replays,
-//   style,
-// }: RowComponentProps<{
-//   replays: Replay[];
-// }>) => {
-//   const replay = replays[index];
-
-//   return (
-//     <div style={style}>
-//       <LeaderboardEntry replay={replay} />
-//     </div>
-//   );
-// };
 
 export default LeaderboardTable;

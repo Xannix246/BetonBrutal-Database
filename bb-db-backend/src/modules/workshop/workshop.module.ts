@@ -10,6 +10,7 @@ import { BanReplayProcessor } from './processors/replay-ban.processor';
 import { DataRequesterModule } from '../data-requester/data-requester.module';
 import { StorageModule } from '../storage/storage.module';
 import { MapTierService } from './domain/services/map-tier.service';
+import { EventsService } from './domain/services/events.service';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { MapTierService } from './domain/services/map-tier.service';
     MapDownloaderProcessor,
     MapRequesterProcessor,
     BanReplayProcessor,
+    EventsService,
   ],
   exports: [WorkshopService, MapTierService],
 })

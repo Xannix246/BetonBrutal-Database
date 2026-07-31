@@ -1,21 +1,16 @@
 import { useEffect, useState, useRef } from "react";
-import Footer from "../../widgets/Footer/Footer";
-import Header from "../../widgets/Header/Header";
-import Container from "../../shared/Containter/Container";
+import { navigate } from "vike/client/router";
 import { Button } from "@headlessui/react";
 import clsx from "clsx";
-import { getMaps, getRandomMap } from "./requests";
-import MapTile from "../../entities/MapTile";
-import Background from "../../widgets/Background/Background";
-import { navigate } from "vike/client/router";
-import ContextMenu from "../../shared/ContextMenu/ContextMenu";
-import { getTargetData, getUser, setTargetData } from "../../store/store";
-import { DeleteMap } from "../../features/DataManager";
 import { v4 } from "uuid";
 import { t } from "i18next";
-import { Keys } from "../../../i18n/keys";
-import Dropdown from "../../shared/Dropdown/Dropdown";
-import RateTierModal from "../../features/RateTierModal";
+import { Container, ContextMenu, Dropdown } from "@shared";
+import { MapTile } from "@entities";
+import { Footer, Header, Background } from "@widgets";
+import { DeleteMap, RateTierModal } from "@features";
+import { getTargetData, getUser, setTargetData } from "@store";
+import { Keys } from "@locales/keys";
+import { getMaps, getRandomMap } from "./requests";
 
 const key = Keys.workshop;
 

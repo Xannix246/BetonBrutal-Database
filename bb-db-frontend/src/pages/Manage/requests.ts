@@ -1,8 +1,8 @@
 import { v4 } from "uuid";
-import { config } from "../../../config/config";
-import { api } from "../../features/Auth";
-import { addToast } from "../../store/toast-manager";
-import { Labels } from "../../widgets/MapTier/labels";
+import { api } from "@features";
+import { config } from "@config";
+import { addToast } from "@store";
+import { Labels } from "@utils";
 
 export const getMaps = async (
   searchQuery: string,

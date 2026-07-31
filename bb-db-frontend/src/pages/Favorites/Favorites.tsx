@@ -1,13 +1,11 @@
 import { useEffect, useState } from "react";
-import Footer from "../../widgets/Footer/Footer";
-import Header from "../../widgets/Header/Header";
-import Container from "../../shared/Containter/Container";
-import MapTile from "../../entities/MapTile";
-import Background from "../../widgets/Background/Background";
-import { getUser, getUserFavorites } from "./requests";
 import { navigate } from "vike/client/router";
-import { setPrevLink } from "../../store/store";
 import { t } from "i18next";
+import { Container } from "@shared";
+import { MapTile } from "@entities";
+import { Footer, Header, Background } from "@widgets";
+import { setPrevLink } from "@store";
+import { getUser, getUserFavorites } from "./requests";
 
 const Favorites = ({ id }: { id: string }) => {
   const [user, setUser] = useState<User>();

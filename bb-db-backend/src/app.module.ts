@@ -13,6 +13,7 @@ import { join } from 'path';
 import { CollectionsModule } from './modules/collections/collections.module';
 import { BullModule } from '@nestjs/bullmq';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { MultiplayerModule } from './modules/multiplayer/multiplayer.module';
 
 @Controller()
 class AppController {
@@ -45,6 +46,7 @@ class AppController {
       },
     }),
     EventEmitterModule.forRoot(),
+    // MultiplayerModule,
   ],
   controllers: [AppController],
   providers: [],

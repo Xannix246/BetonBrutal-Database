@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import DummyTile from "../../entities/DummyTile";
+import { DummyTile } from "@entities";
 
 const bg = (placeTiles = 30) => {
   const tiles = [];

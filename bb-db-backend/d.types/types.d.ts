@@ -172,3 +172,25 @@ declare type PublicData = {
   about?: string | null;
   links?: Link[];
 }
+
+declare type ItemData = {
+  id: string;
+  title: string;
+  creator: string;
+  originality: number;
+  aesthetic: number;
+  fun: number;
+  theme: number;
+  totalScore: number;
+  userVotes: string[];
+}
+
+declare type EventData = {
+  title: string;
+  description: string;
+  start: Date;
+  end: Date;
+  imageUrl: string;
+  themeWords: string;
+  items: ItemData[];
+}

@@ -1,18 +1,13 @@
 import { useEffect, useState } from "react";
-import Button from "../../shared/Button/Button";
-import Input from "../../shared/Input/Input";
-import Header from "../../widgets/Header/Header";
-import { getCollections, getFollowedMaps } from "./requests";
-import MapCard from "../../entities/MapCard";
-import Footer from "../../widgets/Footer/Footer";
-import clsx from "clsx";
-import MapTile from "../../entities/MapTile";
 import { navigate } from "vike/client/router";
-import { handleEnterSearch, handleSearch } from "../../features/SearchManager";
-import Background from "../../widgets/Background/Background";
-import CollectionContainer from "../../features/CollectionContainer/CollectionContainer";
 import { t } from "i18next";
-import { Keys } from "../../../i18n/keys";
+import clsx from "clsx";
+import { Button } from "@shared";
+import { MapCard, MapTile } from "@entities";
+import { Header, Footer, Background, TitleMain, PoolContainer } from "@widgets";
+import { CollectionContainer } from "@features";
+import { Keys } from "@locales/keys";
+import { getCollections, getFollowedMaps } from "./requests";
 
 const key = Keys.main;
 
@@ -21,7 +16,6 @@ const Main = () => {
   const [lastestMaps, setLastestMaps] = useState<WorkshopItemHeader[]>([]);
   const [collections, setCollections] = useState<Collection[]>([]);
   const [isSticky, setIsSticky] = useState(false);
-  const [search, setSearch] = useState("");
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -58,43 +52,21 @@ const Main = () => {
   return (
     <div className="w-full h-full">
       <Background />
-      <div
-        className={clsx(
-          isSticky
-            ? "fixed top-0 left-0 w-full z-50"
-            : "absolute top-64 left-0 w-full z-50",
-        )}
-      >
-        <Header isAbsolute={isSticky} />
+      <div className="mb-32">
+        <TitleMain />
+        <div
+          className={clsx(
+            isSticky
+              ? "fixed top-0 left-0 w-full z-50"
+              : "absolute top-64 left-0 w-full z-50",
+          )}
+        >
+          <Header isAbsolute={isSticky} />
+        </div>
       </div>
       <div className="flex flex-col gap-32 justify-center">
-        <div className="flex flex-col uppercase">
-          <div className="bg-black/80 w-full h-64 flex flex-col place-items-center px-4 py-8 md:p-8 gap-8">
-            <div className="relative">
-              <h1 className="text-[#ffd884] text-6xl tracking-wider text-shadow-lg/30 text-center">
-                BETON BRUTAL DATABASE
-              </h1>
-            </div>
-
-            <div className="flex w-full drop-shadow-md justify-center">
-              <Input
-                className="text-2xl w-full sm:text-4xl md:w-2xl lg:w-4xl bg-white/10"
-                placeholder={t(Keys.header.placeholder)}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                onKeyDown={(e) => handleEnterSearch(search, e)}
-              />
-              <Button
-                className="text-3xl sm:text-4xl bg-white/10 uppercase"
-                onClick={() => handleSearch(search)}
-              >
-                {t(Keys.header.search)}
-              </Button>
-            </div>
-          </div>
-        </div>
-
         <div className="flex flex-col gap-4 place-items-center w-full mt-16">
+          <PoolContainer/>
           {collections.length > 0 && (
             <div className="grid gap-16 w-full mb-32">
               {collections.map((collection, i) => (
