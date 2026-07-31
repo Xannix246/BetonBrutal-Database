@@ -17,7 +17,9 @@ const PoolContainer = () => {
     (async () => {
       setEventData(await getEvent());
     })();
+  }, []);
 
+  useEffect(() => {
     if (!ref.current) return;
 
     const handlePointerMove = (e: PointerEvent) => {
@@ -32,7 +34,7 @@ const PoolContainer = () => {
 
     window.addEventListener("pointermove", handlePointerMove);
     return () => window.removeEventListener("pointermove", handlePointerMove);
-  }, []);
+  }, [eventData]);
 
   if (!eventData) return null;
 
@@ -50,7 +52,9 @@ const PoolContainer = () => {
       panelClassName: "w-full pt-2",
       data: {
         type: "customData",
-        elements: [<ShowcaseDataContent key="showcase" items={eventData.items} />],
+        elements: [
+          <ShowcaseDataContent key="showcase" items={eventData.items} />,
+        ],
       },
     },
   ];
@@ -82,9 +86,11 @@ const PoolContainer = () => {
             </h4>
           </div>
           <InfoBlock data={eventData} />
-          {eventData.items.length > 0 && <div className="w-full flex flex-col gap-4">
-            <Tabs categories={tabsData} />
-          </div>}
+          {eventData.items.length > 0 && (
+            <div className="w-full flex flex-col gap-4">
+              <Tabs categories={tabsData} />
+            </div>
+          )}
         </div>
       </Container>
     </div>
