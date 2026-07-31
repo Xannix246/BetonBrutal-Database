@@ -163,3 +163,26 @@ declare type TierEntry = {
   mapId: string;
   status: "accepted" | "denied" | "pending";
 }
+
+declare type ItemData = {
+  id: string;
+  title: string;
+  creator: string;
+  originality: number;
+  aesthetic: number;
+  fun: number;
+  theme: number;
+  totalScore: number;
+  userVotes: string[];
+}
+
+declare type EventData = {
+  title: string;
+  description: string;
+  start: Date;
+  end: Date;
+  imageUrl: string;
+  themeWords: string[];
+  items: ItemData[];
+}
+

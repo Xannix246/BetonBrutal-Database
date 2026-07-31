@@ -130,7 +130,7 @@ const Editor = () => {
 
                 <div className="relative">
                   <div className="h-64 bg-gradient-to-t from-transparent to-black absolute inset-0 -z-10" />
-                  <PreviewPanel />
+                  <PreviewPanel className="min-h-screen" />
                 </div>
               </div>
             ) : (

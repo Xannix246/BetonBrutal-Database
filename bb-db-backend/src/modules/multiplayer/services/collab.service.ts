@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { MultiplayerService } from './multiplayer.service';
-import { Ref, SessionCollab, SessionPlayer } from '../types/multiplayer';
+import { Ref, SessionPlayer } from '../types/multiplayer';
 import * as Proto from 'src/generated/protos/multiplayer';
 import { PacketType } from 'src/generated/protos/multiplayer';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
@@ -8,13 +8,10 @@ import { deserializeCollab, serializeCollab } from 'src/shared/bbmapUtility';
 
 @Injectable()
 export class CollabService {
-  private readonly collabSessions: Map<string, SessionCollab>;
   constructor(
     private readonly multiplayer: MultiplayerService,
     private readonly prisma: PrismaService,
-  ) {
-    this.collabSessions = this.multiplayer.collabSessions;
-  }
+  ) {}
 
   placeBlock(
     player: SessionPlayer,

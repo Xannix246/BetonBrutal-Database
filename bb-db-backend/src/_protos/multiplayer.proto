@@ -177,6 +177,12 @@ enum PanningMode {
   NumPanningModes = 2;
 }
 
+enum VersionType {
+  Latest = 0;
+  Outdated = 1;
+  Incompatible = 2;
+}
+
 message Vector3 {
   float x = 1;
   float y = 2;
@@ -326,6 +332,7 @@ message Trigger {
 
 message Version {
   string version = 1;
+  optional VersionType type = 2;
 }
 
 message Event {

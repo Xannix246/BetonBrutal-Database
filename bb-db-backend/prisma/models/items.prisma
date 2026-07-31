@@ -110,3 +110,27 @@ model TierData {
   map         WorkshopItem @relation(fields: [mapId], references: [steamId], onDelete: Cascade)
   tierEntries TierEntry[]
 }
+
+type ItemData {
+  id          String
+  title       String
+  creator     String
+  originality Int
+  aesthetic   Int
+  fun         Int
+  theme       Int
+  totalScore  Int
+  userVotes   String[]
+}
+
+model EventData {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String
+  start       DateTime
+  end         DateTime
+  isVisible   Boolean
+  imageUrl    String
+  themeWords  String[]
+  items       ItemData[]
+}

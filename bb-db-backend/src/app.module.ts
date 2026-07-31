@@ -46,7 +46,7 @@ class AppController {
       },
     }),
     EventEmitterModule.forRoot(),
-    MultiplayerModule,
+    // MultiplayerModule,
   ],
   controllers: [AppController],
   providers: [],

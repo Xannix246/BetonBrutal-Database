@@ -1,11 +1,18 @@
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useMemo } from "react";
+import clsx from "clsx";
 import { getDoc, getFiles } from "@store";
 
-const PreviewPanel = ({ document }: { document?: string }) => {
+type Props = {
+  document?: string;
+  children?: React.ReactNode;
+  className?: string;
+};
+
+const PreviewPanel = ({ document, children, className }: Props) => {
   const files = getFiles();
-  const markdown = document || getDoc();
+  const markdown = document || children?.toString() || getDoc();
 
   const objectUrls = useMemo(() => {
     const map = new Map<string, string>();
@@ -22,7 +29,7 @@ const PreviewPanel = ({ document }: { document?: string }) => {
   }, [objectUrls]);
 
   return (
-    <div className="prose prose-2xl max-w-none bg-black/80 p-6 text-white min-h-screen overflow-y-auto">
+    <div className={clsx("prose prose-2xl max-w-none bg-black/80 p-6 text-white overflow-y-auto", className)}>
       <Markdown
         remarkPlugins={[remarkGfm]}
         components={{

@@ -4,7 +4,7 @@ import { t } from "i18next";
 import clsx from "clsx";
 import { Button } from "@shared";
 import { MapCard, MapTile } from "@entities";
-import { Header, Footer, Background, TitleMain } from "@widgets";
+import { Header, Footer, Background, TitleMain, PoolContainer } from "@widgets";
 import { CollectionContainer } from "@features";
 import { Keys } from "@locales/keys";
 import { getCollections, getFollowedMaps } from "./requests";
@@ -66,6 +66,7 @@ const Main = () => {
       </div>
       <div className="flex flex-col gap-32 justify-center">
         <div className="flex flex-col gap-4 place-items-center w-full mt-16">
+          <PoolContainer/>
           {collections.length > 0 && (
             <div className="grid gap-16 w-full mb-32">
               {collections.map((collection, i) => (

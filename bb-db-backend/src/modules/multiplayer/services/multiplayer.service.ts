@@ -18,6 +18,7 @@ import { ProtobufManager } from './protobuf-manager.service';
 import { PacketType } from 'src/generated/protos/multiplayer';
 import * as Proto from 'src/generated/protos/multiplayer';
 import { auth } from 'src/modules/auth/services/auth.shared';
+import { checkVersion, getLatestVersionString } from 'src/shared/checkVersion';
 
 @Injectable()
 export class MultiplayerService implements OnModuleInit {
@@ -118,10 +119,12 @@ export class MultiplayerService implements OnModuleInit {
   }
 
   getVersion(socket: WebSocket, packet: Proto.Version) {
+    const check = checkVersion(packet.version);
+
     socket.send(
       this.packetManager.serialize({
         packet: PacketType.VersionPacket,
-        payload: { version: packet.version },
+        payload: { version: getLatestVersionString(), type: check },
       }),
     );
   }

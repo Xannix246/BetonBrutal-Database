@@ -53,7 +53,7 @@ const Article = ({ id }: { id: string }) => {
 
               <div className="relative">
                 <div className="h-64 bg-gradient-to-t from-transparent to-black absolute inset-0 -z-10" />
-                <PreviewPanel document={article?.content} />
+                <PreviewPanel document={article?.content} className="min-h-screen" />
               </div>
             </div>
             <div className="lg:w-sm">
