@@ -115,11 +115,11 @@ type ItemData {
   id          String
   title       String
   creator     String
-  originality Int
-  aesthetic   Int
-  fun         Int
-  theme       Int
-  totalScore  Int
+  originality Float
+  aesthetic   Float
+  fun         Float
+  theme       Float
+  totalScore  Float
   userVotes   String[]
 }
 

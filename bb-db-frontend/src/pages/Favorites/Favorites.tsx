@@ -60,7 +60,7 @@ const Favorites = ({ id }: { id: string }) => {
           :
           <div className="flex gap-2 pt-32 px-4 h-screen w-full">
             <div className="w-full text-white text-center">
-              <Container className="text-6xl w-full">
+              <Container className="text-6xl w-full uppercase">
                 {t("dataCheck")}
               </Container>
             </div>
