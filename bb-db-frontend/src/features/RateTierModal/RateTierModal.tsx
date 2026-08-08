@@ -102,7 +102,7 @@ const RateTierModal = ({
                     {value !== -1 ? value : "P/I"}
                   </div>
                 }
-                tooltip={tiersTooltips[`tier${value.toFixed(0)}`]}
+                tooltip={t(tiersTooltips[`tier${value.toFixed(0)}`])}
                 bgColor="black"
               />
             );
@@ -132,7 +132,7 @@ const RateTierModal = ({
                   {tiersLabels[label].icon}
                 </div>
               }
-              tooltip={tiersLabels[label].tooltip}
+              tooltip={t(tiersLabels[label].tooltip)}
               bgColor="black"
             />
           ))}
