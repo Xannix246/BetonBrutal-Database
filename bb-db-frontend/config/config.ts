@@ -3,4 +3,5 @@ export const config = {
   baseAuthUrl: "https://db.betonbrutal.com",
   serverUri: "https://db.betonbrutal.com/api", // http://26.220.176.177:3000 for local development | https://db.betonbrutal.com/api for prod
   ruMirrorUrl: "https://ru-db.betonbrutal.com",
+  theme: "classic",
 }

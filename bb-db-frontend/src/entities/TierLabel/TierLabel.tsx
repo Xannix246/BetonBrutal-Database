@@ -1,3 +1,4 @@
+import { isClassic } from "@/utils";
 import clsx from "clsx";
 import { useState } from "react";
 
@@ -17,11 +18,13 @@ const TierLabel = ({icon, tooltip, bgColor = "gray"}: TierLabel) => {
         onMouseLeave={() => setVisibleTip(false)}
       >{icon}</div>
       {visibleTip && <span
-        className={clsx(
-          "absolute p-2 mt-2 ml-2 z-10 text-2xl text-gray-300 max-w-100 w-max whitespace-pre-line break-words",
-          bgColor === "gray" && "bg-[#202020]/90",
-          bgColor === "black" && "bg-black/80",
-          !["gray", "black"].includes(bgColor) && bgColor,
+        className={clsx("absolute p-2 mt-2 ml-2 z-10 max-w-100 w-max whitespace-pre-line break-words",
+          isClassic()
+            ? "container-yellow rounded-lg"
+            : "text-2xl text-gray-300",
+          !isClassic() && bgColor === "gray" && "bg-[#202020]/90",
+          !isClassic() && bgColor === "black" && "bg-black/80",
+          !isClassic() && !["gray", "black"].includes(bgColor) && bgColor,
         )}
       >{tooltip}</span>}
     </div>

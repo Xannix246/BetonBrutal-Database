@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, Container } from "@shared";
 import { PreviewPanel } from "@features";
 import { Background, Footer, Header } from "@widgets";
+import { isClassic } from "@utils";
 import { getArticle } from "./requests";
 
 const Article = ({ id }: { id: string }) => {
@@ -20,9 +21,9 @@ const Article = ({ id }: { id: string }) => {
   return (
     <div className="w-full h-screen bg-center bg-fixed bg-no-repeat bg-cover">
       <Background />
-      <div className="fixed left-0 w-full z-50">
+      {!isClassic() && <div className="fixed left-0 w-full z-50">
         <Header isAbsolute={true} />
-      </div>
+      </div>}
 
       <div className="flex flex-col justify-between min-h-screen pt-32 gap-8">
         {loaded ?
@@ -70,7 +71,7 @@ const Article = ({ id }: { id: string }) => {
           </div>
         }
 
-        <Footer />
+         {!isClassic() && <Footer/>}
       </div>
     </div>
   );

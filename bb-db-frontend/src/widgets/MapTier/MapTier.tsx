@@ -3,7 +3,7 @@ import clsx from "clsx";
 import { Container } from "@shared";
 import { TierLabel } from "@entities";
 import { RateTierModal } from "@features";
-import { getColor } from "@utils";
+import { getColor, isClassic } from "@utils";
 import { tiersLabels, tiersTooltips } from "@utils";
 import { getUser } from "@store";
 import { Keys } from "@locales/keys";
@@ -27,7 +27,11 @@ const MapTier = ({ tierData, userVote }: { tierData: TierData, userVote?: TierEn
   }
 
   return (
-    <Container className="w-full md:min-w-18 md:w-18 text-white flex flex-wrap md:flex-nowrap md:flex-col gap-2 place-items-center justify-center md:justify-start h-fit md:h-fit md:min-h-146">
+    <Container className={clsx("w-full md:min-w-18 md:w-18 flex flex-wrap md:flex-nowrap md:flex-col gap-2 place-items-center justify-center md:justify-start h-fit md:h-fit",
+      isClassic()
+        ? "container-gray py-2"
+        : "text-white md:min-h-146"
+    )}>
       <TierLabel
         icon={
           <div

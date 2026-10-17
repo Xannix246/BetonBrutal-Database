@@ -1,6 +1,8 @@
 import { Button } from "@headlessui/react";
+import clsx from "clsx";
 import { Modal } from "@shared";
 import { config } from "@config";
+import { isClassic } from "@utils";
 import { setUser } from "../../store/store";
 import { api, authClient } from "./Auth";
 
@@ -15,15 +17,19 @@ const DeleteModal = ({ open, setOpen }: { open: boolean, setOpen: (val: boolean)
 
   return (
     <div className="fixed">
-      <Modal open={open} onClose={() => setOpen(false)} className="p-5 md:p-10 w-3xl flex flex-col gap-5">
-        <h1 className="text-2xl md:text-4xl uppercase text-center">Are you sure you want to delete your account? All user data like comments, articles and favorite list will be deleted. This action cannot be canceled.</h1>
+      <Modal open={open} onClose={() => setOpen(false)} className={clsx(
+        isClassic()
+          ? "w-3xl"
+          : "p-5 md:p-10 w-3xl flex flex-col gap-5 font-bn-pro uppercase text-2xl md:text-4xl"
+      )}>
+        <h1 className="text-center">Are you sure you want to delete your account? All user data like comments, articles and favorite list will be deleted. This action cannot be canceled.</h1>
         <div className="flex w-full justify-between">
           <Button
-            className="text-2xl bg-red/80 hover:text-black hover:bg-red-500/80"
+            className={isClassic() ? "btn-classic-default flex place-items-center" : "text-2xl bg-red/80 hover:text-black hover:bg-red-500/80"}
             onClick={handleDelete}
           >Delete account</Button>
           <Button
-            className="text-2xl bg-white/20 hover:text-white hover:bg-green/80"
+            className={isClassic() ? "btn-classic-default flex place-items-center" : "text-2xl bg-white/20 hover:text-white hover:bg-green/80"}
             onClick={() => setOpen(false)}
           >Well... Maybe later</Button>
         </div>

@@ -10,6 +10,7 @@ import { Footer, Header, Background } from "@widgets";
 import { DeleteMap, RateTierModal } from "@features";
 import { getTargetData, getUser, setTargetData } from "@store";
 import { Keys } from "@locales/keys";
+import { isClassic } from "@utils";
 import { getMaps, getRandomMap } from "./requests";
 
 const key = Keys.workshop;
@@ -32,7 +33,7 @@ const Workshop = ({ tags }: { tags: string[] }) => {
 
   const menuItems = [
     {
-      name: t(key.deleteBtn, { map: targetData?.name }).toUpperCase(),
+      name: t(key.deleteBtn, { map: targetData?.name }),
       onClick: () => {
         if (!targetData) return;
 
@@ -67,7 +68,7 @@ const Workshop = ({ tags }: { tags: string[] }) => {
     setHasMore(true);
     setItems([]);
     loadMaps(activeSort, 1, false);
-  }, [activeSort]);
+  }, [activeSort, tags]);
 
   useEffect(() => {
     setPage(1);
@@ -119,19 +120,28 @@ const Workshop = ({ tags }: { tags: string[] }) => {
           onClose={() => setTargetData(null)}
         />
       )}
-      <div className="fixed left-0 w-full z-50">
+      {!isClassic() && <div className="fixed left-0 w-full z-50">
         <Header isAbsolute={true} />
-      </div>
-      <div className="flex flex-col min-h-screen justify-between pt-32">
-        <Container className="flex gap-10 text-2xl md:text-4xl tracking-wide md:justify-center place-items-center overflow-x-auto md:overflow-x-visible whitespace-nowrap">
-          <h1 className="text-white uppercase">{t(key.sort)}</h1>
-          <div className="flex gap-5">
+      </div>}
+      <div className="flex flex-col min-h-screen justify-between pt-32 w-full">
+        <Container className={clsx(
+          isClassic()
+            ? "flex place-items-center container-yellow !text-black mx-6 justify-center"
+            : "flex gap-10 text-2xl md:text-4xl tracking-wide md:justify-center place-items-center overflow-x-auto md:overflow-x-visible whitespace-nowrap"
+        )}>
+          <h1 className={clsx(
+            isClassic()
+              ? ""
+              : "text-white uppercase"
+          )}>{t(key.sort)}</h1>
+          <div className={(isClassic() ? "gap-0" : "gap-5") + " flex"}>
             {(tags ? ["newest", "oldest"] : ["newest", "oldest", "mostPopular", "mostPlayed"]).map(
               (sortOption) => (
                 <Button
                   key={sortOption}
                   className={clsx(
-                    "bg-none uppercase",
+                    "bg-none",
+                    isClassic() ? "text-black" : "uppercase",
                     activeSort === sortOption && "text-green",
                   )}
                   onClick={() => setActiveSort(sortOption as SortBy)}
@@ -174,15 +184,23 @@ const Workshop = ({ tags }: { tags: string[] }) => {
               className="mt-5.5 -left-24"
             />
           </div>}
-          {!tags?.includes("Prefabs") && <h1 className="text-white"> |</h1>}
+          {!tags?.includes("Prefabs") && <h1 className={isClassic() ? "mx-2" : "text-white"}> |</h1>}
           {!tags && <Button
-            className="bg-transparent p-0 uppercase"
+            className={clsx(
+              isClassic()
+                ? "btn-classic-default"
+                : "bg-transparent p-0 uppercase"
+            )}
             onClick={async () => await navigate(`/workshop/${await getRandomMap()}`)}
           >
             {t(key.randomMap)}
           </Button>}
           {tags?.includes("Collection") && user && <Button
-            className="bg-transparent hover:bg-green/50 p-2 uppercase"
+            className={clsx(
+              isClassic()
+                ? "btn-classic-default"
+                : "bg-transparent hover:bg-green/50 p-2 uppercase"
+            )}
             onClick={async () => await navigate(`/collection/create`)}
           >
             {t(key.create)}
@@ -191,7 +209,11 @@ const Workshop = ({ tags }: { tags: string[] }) => {
 
         {loaded ? (
           <div className="flex gap-2 w-full min-h-screen">
-            <div className="grid sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[200px] lg:auto-rows-[300px] gap-6 p-6 w-full">
+            <div className={clsx("gap-6 p-6 w-full",
+                isClassic()
+                  ? "flex flex-col !gap-4"
+                  : "grid sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[200px] lg:auto-rows-[300px]"
+              )}>
               {items.map((m) => (
                 <MapTile key={`${v4()}`} item={m} />
               ))}
@@ -207,7 +229,7 @@ const Workshop = ({ tags }: { tags: string[] }) => {
           </div>
         )}
 
-        <Footer />
+        {!isClassic() && <Footer/>}
       </div>
     </div>
   );

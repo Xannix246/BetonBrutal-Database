@@ -127,11 +127,12 @@ export class SteamApiService {
         previews:
           map.previews
             ?.filter((preview) => preview?.url)
-            .map((preview) => preview.url) || [],
+            .map((preview) => preview.url) ?? [],
         filename: null,
-        tags: map.tags
-          .map((item) => item.tag)
-          .filter((tag) => tag.toLowerCase() !== 'custommaps'),
+        tags:
+          map.tags
+            ?.map((item) => item.tag)
+            ?.filter((tag) => tag.toLowerCase() !== 'custommaps') ?? [],
       });
     }
     return returnedItems;

@@ -7,6 +7,7 @@ import { Header, Footer, Background, LeaderboardTable } from "@widgets";
 import { banReplay, deleteReplay } from "@features";
 import { getTargetData, getUser, setTargetData } from "@store";
 import { Keys } from "@locales/keys";
+import { isClassic } from "@utils";
 import { getBathReplays, getBdayReplays, getBrutalReplays } from "./requests";
 
 const key = Keys.rankings;
@@ -103,14 +104,18 @@ const Rankings = () => {
           onClose={() => setTargetData(null)}
         />
       )}
-      <div className="fixed left-0 w-full z-50">
+      {!isClassic() && <div className="fixed left-0 w-full z-50">
         <Header isAbsolute={true} />
-      </div>
+      </div>}
 
       <div className="flex flex-col h-full justify-between min-h-screen">
         <div className="flex gap-2 pt-32 w-full">
           <div className="w-full text-white text-center">
-            <Container className="flex justify-center gap-10 text-4xl tracking-wide place-items-center">
+            <Container className={clsx("flex justify-center",
+              isClassic()
+                ? "container-yellow text-black p-2"
+                : "gap-10 text-4xl tracking-wide place-items-center"
+            )}>
               <div className="flex gap-10">
                 <span
                   className={clsx(
@@ -168,7 +173,11 @@ const Rankings = () => {
                 </span>
               </div>
             </Container>
-            <Container className="my-16 text-5xl md:text-8xl uppercase">
+            <Container className={clsx(
+              isClassic()
+                ? "text-2xl font-bold border-b-1 border-classic-blue-500 my-16 text-classic-blue-500 text-left px-6"
+                : "my-16 text-5xl md:text-8xl uppercase"
+            )}>
               {(page === "TimeMS" && t(key.bBrutal)) ||
                 (page === "TimeDLC1" && t(key.bBath)) ||
                 t(key.bBday)}
@@ -179,7 +188,11 @@ const Rankings = () => {
           <div className="flex flex-col w-full place-items-center">
             <Input
               placeholder={t(key.placeholder)}
-              className="bg-white/10 text-xl w-full md:w-5xl mb-5"
+              className={clsx(
+                isClassic() 
+                  ? "w-full"
+                  : "bg-white/10 text-xl w-full md:w-5xl mb-5"
+              )}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
             />
@@ -188,7 +201,7 @@ const Rankings = () => {
             </div>
           </div>
         </div>
-        <Footer />
+        {!isClassic() && <Footer/>}
       </div>
     </div>
   );

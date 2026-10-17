@@ -3,7 +3,7 @@ import clsx from "clsx";
 import { t } from "i18next";
 import {Modal } from "@shared";
 import { TierLabel } from "@entities";
-import { getColor, tiersLabels, tiersTooltips, Labels } from "@utils";
+import { getColor, tiersLabels, tiersTooltips, Labels, isClassic } from "@utils";
 import { Keys } from "@locales/keys";
 
 const key = Keys.mapTiers;
@@ -68,11 +68,22 @@ const RateTierModal = ({
     >
       <div
         className={clsx(
-          "p-5 md:p-10 w-full h-full flex flex-col gap-6 place-items-center max-w-5xl",
+          "p-5 md:p-10 w-full h-full flex flex-col gap-6 max-w-5xl",
+          isClassic() ? "font-tahoma" : "place-items-center font-bn-pro",
           bg !== "black" && "bg-white/10",
         )}
       >
-        <h1 className="text-2xl md:text-4xl uppercase">{customTitle ?? t(key.rateMap)}</h1>
+        <div className="flex place-items-center gap-2">
+          {isClassic() && <img
+            src="/assets/icons/anniv-icons/ColorScan.png"
+            className="w-12"
+          />}
+          <h1 className={clsx(
+            isClassic()
+              ? "text-xl"
+              : "text-2xl md:text-4xl uppercase"
+          )}>{customTitle ?? t(key.rateMap)}</h1>
+        </div>
 
         <div className="flex gap-3 justify-items-center">
           {Array.from({ length: max }, (_, i) => {
@@ -87,6 +98,7 @@ const RateTierModal = ({
                     onClick={() => handleChoise(value)}
                     className={clsx(
                       "aspect-square w-14 flex items-center justify-center text-xl cursor-pointer transition duration-150",
+                      isClassic() && "text-white",
                       value !== -1
                         ? "bg-[hsl(var(--h)_80_40)] hover:bg-[hsl(var(--h)_50_30)]"
                         : "bg-black hover:bg-gray-900",

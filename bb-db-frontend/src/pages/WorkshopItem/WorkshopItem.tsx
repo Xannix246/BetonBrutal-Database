@@ -16,7 +16,7 @@ import {
 } from "@features";
 import { $prevLink, getFavorites, getTargetData, setTargetData } from "@store";
 import { config } from "@config";
-import { formatTime } from "@utils";
+import { formatTime, isClassic } from "@utils";
 import { Keys } from "@locales/keys";
 import getMedianTime from "./getMedianTime";
 import {
@@ -113,7 +113,7 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
         setMapData(null);
       }
     })();
-  }, []);
+  }, [id]);
 
   useEffect(() => {
     const socket = io(config.baseAuthUrl);
@@ -159,7 +159,7 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
 
   return (
     <div className="w-full min-h-screen h-full">
-      {previewId !== null && mapData ? (
+      {!isClassic() && previewId !== null && mapData ? (
         <img
           src={mapData.previews[previewId]}
           className="fixed inset-0 -z-10 w-full h-full object-cover blur-md"
@@ -177,22 +177,38 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
         />
       )}
 
-      <div className="fixed left-0 w-full z-50">
-        <Header isAbsolute={true} />
-      </div>
+      {!isClassic() && <div className="fixed left-0 w-full z-50">
+          <Header isAbsolute={true} />
+        </div>}
 
       <div className="h-full justify-between">
         {loaded ? (
-          <div className="flex flex-col gap-2 pt-32 px-4 min-h-screen w-full">
+          <div className={clsx("flex flex-col",
+            isClassic()
+              ? "pt-8 gap-8"
+              : "gap-2 pt-32 px-4 min-h-screen w-full"
+          )}>
             <div className="flex flex-col md:flex-row gap-2">
               <div className="flex flex-col gap-2">
-                <div className="aspect-square group relative w-full md:w-96 md:h-96 lg:w-128 lg:h-128 bg-black/70">
+                <div className={clsx("aspect-square",
+                  isClassic()
+                    ? "w-96 border-2 border-classic-blue-300 border-l-gray-200 border-t-gray-200"
+                    : "group relative w-full md:w-96 md:h-96 lg:w-128 lg:h-128 bg-black/70"
+                )}>
                   <img
                     src={mapData?.previewUrl}
-                    className="aspect-square absolute w-full md:w-96 md:h-96 lg:w-128 lg:h-128 object-cover bottom-0 right-0 group-hover:-bottom-5 group-hover:-right-5 transition-all duration-300"
+                    className={clsx(
+                      isClassic()
+                        ? "w-full"
+                        : "aspect-square absolute w-full md:w-96 md:h-96 lg:w-128 lg:h-128 object-cover bottom-0 right-0 group-hover:-bottom-5 group-hover:-right-5 transition-all duration-300"
+                    )}
                   />
                 </div>
-                <Container className="text-white flex gap-16 text-2xl sm:text-4xl justify-center mb-8 md:mb-0">
+                <Container className={clsx("flex justify-between px-2",
+                  isClassic()
+                    ? "container-gray"
+                    : "text-white text-2xl sm:text-4xl mb-8 md:mb-0"
+                )}>
                   <h2 className="text-green">
                     {mapData && mapData.ratingUp > 0 && "+"} {mapData?.ratingUp}
                   </h2>
@@ -225,7 +241,11 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                 )}
                 {mapData?.filename && (
                   <a
-                    className="uppercase bg-green/60 text-2xl sm:text-4xl p-3 w-full flex justify-center text-white hover:text-pink transition duration-150"
+                    className={clsx(
+                      isClassic()
+                        ? "btn-classic-default text-center"
+                        : "uppercase bg-green/60 text-2xl sm:text-4xl p-3 w-full flex justify-center text-white hover:text-pink transition duration-150"
+                    )}
                     href={`${config.serverUri}/db/download?id=${id}`}
                   >
                     {mapData?.tags.length === 0
@@ -236,7 +256,11 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
               </div>
               {tierData && <MapTier tierData={tierData} userVote={userVote} />}
               <div className="flex flex-col w-full gap-2">
-                <Container className="text-white text-5xl lg:text-8xl w-full text-center">
+                <Container className={clsx(
+                  isClassic()
+                    ? "container-blue font-semibold text-center text-xl"
+                    : "text-white text-5xl lg:text-8xl w-full text-center"
+                )}>
                   <a
                     className="hover:underline uppercase"
                     target="_blank"
@@ -246,14 +270,22 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                     {mapData?.title}
                   </a>
                 </Container>
-                <Container className="text-gray-300 text-2xl lg:text-4xl w-full text-center flex justify-between place-items-center">
+                <Container className={clsx("flex justify-between place-items-center",
+                  isClassic()
+                    ? "container-yellow p-2"
+                    : "text-gray-300 text-2xl lg:text-4xl w-full"
+                )}>
                   <a
                     href={`/workshop/player/${mapData?.creatorId}`}
                     onClick={() => $prevLink.set("mapCreator")}
                     onPointerDown={() => $prevLink.set("mapCreator")}
-                    className="hover:text-white hover:underline uppercase"
+                    className={clsx("hover:underline",
+                      isClassic()
+                        ? "hover:text-classic-blue-500"
+                        : "hover:text-white uppercase"
+                    )}
                   >
-                    BY {mapData?.creator ?? mapData?.creatorId}
+                    By {mapData?.creator ?? mapData?.creatorId}
                   </a>
                   {user && (
                     <Button
@@ -263,7 +295,9 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                           : addFavorites(id)
                       }
                       className={clsx(
-                        "bg-transparent p-1 text-2xl lg:text-4xl transition duration-300 text-white uppercase",
+                        isClassic()
+                          ? ""
+                          : "bg-transparent p-1 text-2xl lg:text-4xl transition duration-300 text-white uppercase",
                         favorites.includes(id)
                           ? "hover:bg-red/40"
                           : "hover:bg-green/40",
@@ -279,24 +313,32 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                       target="_blank"
                       href={`https://josiahshields.com/beton/leaderboard/?lb=${mapData?.id}`}
                       rel="noreferrer"
-                      className="hover:text-white hover:underline uppercase"
+                      className={clsx("hover:underline",
+                      isClassic()
+                        ? "hover:text-classic-blue-500"
+                        : "hover:text-white uppercase"
+                    )}
                     >
                       {t(key.bblb)}
                     </a>
                   )}
                 </Container>
-                <Container className="flex flex-col gap-6 text-2xl lg:text-3xl text-white">
+                <Container className={clsx("flex flex-col",
+                  isClassic()
+                    ? "container-gray p-2 gap-2"
+                    : "gap-6 text-2xl lg:text-3xl text-white uppercase"
+                )}>
                   <div className="flex gap-4">
-                    <h4 className="uppercase text-blue">{t(key.release)}</h4>
-                    <h4 className="uppercase">
+                    <h4 className="text-blue">{t(key.release)}</h4>
+                    <h4>
                       {mapData &&
                         new Date(mapData.createDate).toLocaleDateString()}
                     </h4>
                   </div>
                   {mapData?.tags.length === 0 && (
                     <div className="flex gap-4">
-                      <h4 className="uppercase text-green">{t(key.time)}</h4>
-                      <h4 className="uppercase">
+                      <h4 className="text-green">{t(key.time)}</h4>
+                      <h4>
                         {getMedianTime(replays)
                           ? formatTime(getMedianTime(replays)!)
                           : "N/A"}
@@ -310,16 +352,26 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
               </div>
             </div>
             {mapData?.tags.length === 0 && (
-              <div className="flex flex-col-reverse gap-16 mt-16 md:mt-0 md:flex-row md:gap-2 w-full">
-                <div className="flex flex-col gap-2 w-full uppercase">
-                  <Container>
-                    <h2 className="text-white tracking-wider text-xl">
+              <div className={clsx("flex",
+                isClassic()
+                  ? "flex-col container-gray"
+                  : "flex flex-col-reverse gap-16 mt-16 md:mt-0 md:flex-row md:gap-2 w-full"
+              )}>
+                <div className={clsx("flex flex-col gap-2 w-full",
+                  !isClassic() && "uppercase"
+                )}>
+                  <Container className={clsx(isClassic() && "!bg-transparent")}>
+                    <h2 className={clsx(
+                      isClassic()
+                        ? "p-2 font-bold"
+                        : "text-white tracking-wider text-xl"
+                    )}>
                       {t(key.comments)}
                     </h2>
                   </Container>
                   {user ? (
                     <Input
-                      className="text-xl md:mx-2 p-3 bg-white/10"
+                      className={isClassic() ? "mx-2" : "text-xl md:mx-2 p-3 bg-white/10"}
                       placeholder={t(key.placeholder)}
                       value={value}
                       onChange={(e) => {
@@ -328,7 +380,7 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                       onKeyDown={handleSendComment}
                     />
                   ) : (
-                    <Container className="text-white text-xl md:mx-2">
+                    <Container className={isClassic() ? "!bg-transparent p-2" : "text-white text-xl md:mx-2"}>
                       {t(key.commentsNoAuth)}
                     </Container>
                   )}
@@ -336,8 +388,12 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
                     <Comment comment={comment} key={comment.id} />
                   ))}
                   {comments.length === 0 && (
-                    <Container className="md:mx-2">
-                      <h2 className="text-[#f1e4c7] tracking-wider text-xl text-center">
+                    <Container className={isClassic() ? "!bg-transparent" : "md:mx-2"}>
+                      <h2 className={clsx(
+                        isClassic()
+                          ? "px-4"
+                          : "text-[#f1e4c7] tracking-wider text-xl text-center"
+                      )}>
                         {t(key.noComments)}
                       </h2>
                     </Container>
@@ -357,7 +413,7 @@ const WorkshopItemPage = ({ id }: { id: string }) => {
           </div>
         )}
 
-        <Footer />
+        {!isClassic() && <Footer/>}
       </div>
     </div>
   );

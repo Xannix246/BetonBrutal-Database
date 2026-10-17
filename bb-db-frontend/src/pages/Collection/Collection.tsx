@@ -9,6 +9,7 @@ import { addFavorites, removeFavorites, DescriptionFormatter } from "@features";
 import { Background, Header, Footer } from "@widgets";
 import { $prevLink, getFavorites, getUser } from "@store";
 import { Keys } from "@locales/keys";
+import { isClassic } from "@utils";
 import { getCollection, getItem, getItemData, getStats, getVote, voteCollection } from "./requests";
 
 const key = Keys.collection.item;
@@ -60,22 +61,34 @@ const Collection = ({ id }: { id: string }) => {
       )}
       <Background />
 
-      <div className="fixed left-0 w-full z-50">
+      {!isClassic() && <div className="fixed left-0 w-full z-50">
         <Header isAbsolute={true} />
-      </div>
+      </div>}
 
       <div className="h-full justify-between">
         {loaded ? (
           <div className="flex flex-col gap-2 pt-32 px-4 min-h-screen w-full">
             <div className="flex flex-col md:flex-row gap-2">
               <div className="flex flex-col gap-2">
-                <div className="aspect-square group relative w-full md:w-96 md:h-96 lg:w-128 lg:h-128 bg-black/70">
+                <div className={clsx("aspect-square",
+                  isClassic()
+                    ? "w-96 border-2 border-classic-blue-300 border-l-gray-200 border-t-gray-200"
+                    : "group relative w-full md:w-96 md:h-96 lg:w-128 lg:h-128 bg-black/70"
+                )}>
                   <img
                     src={item?.previewUrl}
-                    className="aspect-square absolute w-full md:w-96 md:h-96 lg:w-128 lg:h-128 object-cover bottom-0 right-0 group-hover:-bottom-5 group-hover:-right-5 transition-all duration-300"
+                    className={clsx(
+                      isClassic()
+                        ? "w-full"
+                        : "aspect-square absolute w-full md:w-96 md:h-96 lg:w-128 lg:h-128 object-cover bottom-0 right-0 group-hover:-bottom-5 group-hover:-right-5 transition-all duration-300"
+                    )}
                   />
                 </div>
-                <Container className="text-white flex gap-16 text-2xl sm:text-4xl justify-center mb-8 md:mb-0">
+                <Container className={clsx("flex justify-between px-2",
+                  isClassic()
+                    ? "container-gray"
+                    : "text-white text-2xl sm:text-4xl mb-8 md:mb-0"
+                )}>
                   <h2 className="text-green">
                     {stats && stats.totalVotesUp > 0 && "+"} {stats?.totalVotesUp}
                   </h2>
@@ -87,39 +100,59 @@ const Collection = ({ id }: { id: string }) => {
                 </Container>
                 {user && <div className="flex gap-2">
                   <Button
-                    className="p-2 text-4xl w-full uppercase bg-green/50"
+                    className={clsx("w-full",
+                      !isClassic() && "p-2 text-4xl uppercase bg-green/50"
+                    )}
                     disabled={vote?.type === "upvote"}
                     onClick={() => onVote("upvote")}
                   >{vote?.type === "upvote" ? t(key.voted) : t(key.voteUp)}</Button>
                   <Button
-                    className="p-2 text-4xl w-full uppercase bg-white/20"
+                    className={clsx("w-full",
+                      !isClassic() && "p-2 text-4xl uppercase bg-white/20"
+                    )}
                     disabled={vote?.type === "neutral"}
                     onClick={() => onVote("neutral")}
                   >{vote?.type === "neutral" ? t(key.voted) : t(key.clearVote)}</Button>
                   <Button
-                    className="p-2 text-4xl w-full uppercase bg-red/50"
+                    className={clsx("w-full",
+                      !isClassic() && "p-2 text-4xl uppercase bg-red/50"
+                    )}
                     disabled={vote?.type === "downvote"}
                     onClick={() => onVote("downvote")}
                   >{vote?.type === "downvote" ? t(key.voted) : t(key.voteDown)}</Button>
                 </div>}
                 {user?.role && (user?.id === collection?.authorId || ["moderator", "admin"].includes(user?.role)) &&
                   <Button
-                    className="p-2 text-4xl w-full uppercase bg-yellow/50"
+                    className={clsx("w-full",
+                      !isClassic() && "p-2 text-4xl uppercase bg-yellow/50"
+                    )}
                     onClick={async () => await navigate(`/collection/${id}/update`)}
                   >{t(key.edit)}</Button>}
               </div>
               <div className="flex flex-col w-full gap-2">
-                <Container className="text-white text-5xl lg:text-8xl w-full text-center">
+                <Container className={clsx(
+                  isClassic()
+                    ? "container-blue font-semibold text-center text-xl"
+                    : "text-white text-5xl lg:text-8xl w-full text-center"
+                )}>
                   <h2 className="uppercase">
                     {item?.title}
                   </h2>
                 </Container>
-                <Container className="text-gray-300 text-2xl lg:text-4xl w-full text-center flex justify-between place-items-center">
+                <Container className={clsx("flex justify-between place-items-center",
+                  isClassic()
+                    ? "container-yellow p-2"
+                    : "text-gray-300 text-2xl lg:text-4xl w-full"
+                )}>
                   <a
                     href={`/workshop/player/${item?.creatorId}`}
                     onClick={() => $prevLink.set("mapCreator")}
                     onPointerDown={() => $prevLink.set("mapCreator")}
-                    className="hover:text-white hover:underline uppercase"
+                    className={clsx("hover:underline",
+                      isClassic()
+                        ? "hover:text-classic-blue-500"
+                        : "hover:text-white uppercase"
+                    )}
                   >
                     {t(key.by)} {item?.creator ?? item?.creatorId}
                   </a>
@@ -131,7 +164,9 @@ const Collection = ({ id }: { id: string }) => {
                           : addFavorites(id)
                       }
                       className={clsx(
-                        "bg-transparent p-1 text-2xl lg:text-4xl transition duration-300 text-white uppercase",
+                        isClassic()
+                          ? ""
+                          : "bg-transparent p-1 text-2xl lg:text-4xl transition duration-300 text-white uppercase",
                         favorites.includes(id)
                           ? "hover:bg-red/40"
                           : "hover:bg-green/40",
@@ -143,23 +178,27 @@ const Collection = ({ id }: { id: string }) => {
                     </Button>
                   )}
                 </Container>
-                <Container className="flex flex-col gap-6 text-2xl lg:text-3xl text-white">
+                <Container className={clsx("flex flex-col",
+                  isClassic()
+                    ? "container-gray p-2 gap-2"
+                    : "gap-6 text-2xl lg:text-3xl text-white uppercase"
+                )}>
                   <div className="flex gap-4">
-                    <h4 className="uppercase text-blue">{t(key.release)}</h4>
-                    <h4 className="uppercase">
+                    <h4 className="text-blue">{t(key.release)}</h4>
+                    <h4>
                       {item &&
                         new Date(item.createDate).toLocaleDateString()}
                     </h4>
                   </div>
                   <div className="flex gap-4">
-                    <h4 className="uppercase text-green">{t(key.played)}</h4>
-                    <h4 className="uppercase">
+                    <h4 className="text-green">{t(key.played)}</h4>
+                    <h4>
                       {stats?.totalReplays} {t(key.replays)}
                     </h4>
                   </div>
                   <div className="flex gap-4">
-                    <h4 className="uppercase text-red">{t(key.totalMaps)}</h4>
-                    <h4 className="uppercase">
+                    <h4 className="text-red">{t(key.totalMaps)}</h4>
+                    <h4>
                       {stats?.totalMaps} {t(key.maps)}
                     </h4>
                   </div>
@@ -170,7 +209,11 @@ const Collection = ({ id }: { id: string }) => {
               </div>
             </div>
 
-            <div className="grid sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[200px] lg:auto-rows-[300px] gap-6 py-4 w-full">
+            <div className={clsx("gap-6 p-6 w-full",
+              isClassic()
+                ? "flex flex-col !gap-4"
+                : "grid sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[200px] lg:auto-rows-[300px]"
+            )}>
               {itemData.map((m) => (
                 <MapTile key={`${v4()}`} item={m} />
               ))}
@@ -186,7 +229,7 @@ const Collection = ({ id }: { id: string }) => {
           </div>
         )}
 
-        <Footer />
+         {!isClassic() && <Footer/>}
       </div>
     </div>
   );

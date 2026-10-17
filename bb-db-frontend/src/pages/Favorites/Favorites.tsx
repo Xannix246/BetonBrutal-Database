@@ -5,6 +5,7 @@ import { Container } from "@shared";
 import { MapTile } from "@entities";
 import { Footer, Header, Background } from "@widgets";
 import { setPrevLink } from "@store";
+import { isClassic } from "@utils";
 import { getUser, getUserFavorites } from "./requests";
 
 const Favorites = ({ id }: { id: string }) => {
@@ -31,9 +32,9 @@ const Favorites = ({ id }: { id: string }) => {
   return (
     <div className="w-full min-h-screen h-full">
       <Background />
-      <div className="fixed left-0 w-full z-50">
+      {!isClassic() && <div className="fixed left-0 w-full z-50">
         <Header isAbsolute={true} />
-      </div>
+      </div>}
 
       <div className="flex flex-col h-full justify-between">
         {loaded ?
@@ -67,7 +68,7 @@ const Favorites = ({ id }: { id: string }) => {
           </div>
         }
 
-        <Footer />
+        {!isClassic() && <Footer/>}
       </div>
     </div>
   );

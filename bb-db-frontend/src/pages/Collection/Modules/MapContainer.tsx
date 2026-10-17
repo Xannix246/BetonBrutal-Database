@@ -5,6 +5,7 @@ import { t } from "i18next";
 import { Button, Input, List, Textarea } from "@shared";
 import { handleSearch } from "@features";
 import { Keys } from "@locales/keys";
+import { isClassic } from "@/utils";
 
 type MapContainer = {
   maps: WorkshopItemHeader[];
@@ -59,9 +60,21 @@ const MapContainer = ({ maps, title, description, preview, setMaps, setTitle, se
   return (
     <div className="max-w-5xl w-full">
       <div className="place-items-center">
-        <h1 className="tracking-wider text-6xl text-white uppercase pb-2">
-          {t(key.newCollection)}
-        </h1>
+        <div
+          className={clsx(
+            isClassic()
+              ? "w-full p-6 text-classic-blue-500"
+              : "",
+          )}>
+          <h1
+            className={clsx(
+              isClassic()
+                ? "text-2xl font-bold border-b-1 border-classic-blue-500"
+                : "tracking-wider text-6xl text-white uppercase pb-2",
+            )}>
+            {t(key.newCollection)}
+          </h1>
+        </div>
         <div className="flex flex-col gap-4 w-full">
           <Input
             className="text-2xl w-full bg-black/60"

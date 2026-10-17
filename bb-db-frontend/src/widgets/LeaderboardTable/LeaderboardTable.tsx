@@ -4,6 +4,7 @@ import { t } from "i18next";
 import { Container } from "@shared";
 import { LeaderboardEntry } from "@entities";
 import { Keys } from "@locales/keys";
+import { isClassic } from "@utils";
 
 type Props = {
   replays: Replay[];
@@ -68,16 +69,36 @@ const LeaderboardTable = ({
   };
 
   return (
-    <div className="flex flex-col gap-2 w-full uppercase">
-      <Container className="flex justify-between items-center">
-        <h2 className="text-white tracking-wider text-xl">{t("leaderboard.title")}</h2>
+    <div className={clsx("flex flex-col w-full",
+      !isClassic() && "uppercase gap-2"
+    )}>
+      <Container className={clsx(
+        isClassic()
+          ? "p-2 !bg-transparent"
+          : "flex justify-between items-center"
+      )}>
+        <h2 className={clsx(
+          isClassic()
+            ? "font-bold"
+            : "text-white tracking-wider text-xl"
+        )}>{t("leaderboard.title")}</h2>
       </Container>
 
-      <Container className="sm:mx-2 px-6 text-white font-semibold">
-        <div className="flex items-center justify-between text-xl gap-4">
+      <Container className={clsx(
+        isClassic()
+          ? "!bg-transparent px-6 pt-2"
+          : "sm:mx-2 px-6 text-white font-semibold"
+      )}>
+        <div className={clsx("flex items-center justify-between",
+          isClassic()
+            ? "gap-4"
+            : "text-xl gap-4"
+        )}>
           <span
-            className={clsx(
-              "w-[120px] transition duration-300 cursor-pointer",
+            className={clsx("cursor-pointer",
+              isClassic()
+              ? "w-[140px]"
+              : "w-[120px] transition duration-300",
               sortKey === "place" && "text-green",
             )}
             onClick={() => handleSort("place")}
@@ -85,8 +106,8 @@ const LeaderboardTable = ({
             #
           </span>
           <span
-            className={clsx(
-              "w-full transition duration-300 cursor-pointer",
+            className={clsx("w-full cursor-pointer",
+              !isClassic() && "transition duration-300",
               sortKey === "creator" && "text-green",
             )}
             onClick={() => handleSort("creator")}
@@ -94,8 +115,10 @@ const LeaderboardTable = ({
             {useMap ? t(key.map) : t(key.player)}
           </span>
           <span
-            className={clsx(
-              "w-[150px] transition duration-300 cursor-pointer",
+            className={clsx("w-[150px] cursor-pointer",
+              isClassic()
+                ? "w-[200px]"
+                : "transition duration-300",
               sortKey === "score" && "text-green",
             )}
             onClick={() => handleSort("score")}
@@ -103,8 +126,10 @@ const LeaderboardTable = ({
             {t(key.time)}
           </span>
           <span
-            className={clsx(
-              "w-[150px] transition duration-300 cursor-pointer",
+            className={clsx("cursor-pointer",
+              isClassic()
+                ? "w-[100px]"
+                : "w-[150px] transition duration-300",
               sortKey === "date" && "text-green",
             )}
             onClick={() => handleSort("date")}

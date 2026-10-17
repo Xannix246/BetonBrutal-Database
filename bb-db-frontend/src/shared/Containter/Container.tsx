@@ -1,3 +1,4 @@
+import { isClassic } from "@/utils";
 import clsx from "clsx";
 
 type Props = {
@@ -10,7 +11,12 @@ type Props = {
 const Container = ({ children, className, onClick, onContextMenu }: Props) => {
   return (
     <div
-      className={clsx("p-3 bg-black/70", className)}
+      className={clsx(
+        isClassic()
+          ? "bg-white"
+          : "p-3 bg-black/70",
+        className
+      )}
       onClick={onClick}
       onContextMenu={onContextMenu}
     >

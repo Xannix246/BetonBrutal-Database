@@ -32,3 +32,16 @@ export const getTargetData = () => useStore($targetData);
 export const $activeMap = atom<WorkshopItem | null>(null);
 export const setActiveMap = (map: WorkshopItem | null) => $activeMap.set(map);
 export const getActiveMap = () => useStore($activeMap);
+
+export const $currentTheme = atom<"default" | "classic">("default");
+export const setCurrentTheme = (theme: "default" | "classic") => $currentTheme.set(theme);
+export const getCurrentTheme = () => useStore($currentTheme);
+
+export const $stats = atom<SummaryData>({
+  mapsCount: 0,
+  usersCount: 0,
+  replaysCount: 0,
+  collectionsCount: 0
+});
+export const setStats = (data: SummaryData) => $stats.set(data);
+export const getStats = () => useStore($stats);

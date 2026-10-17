@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import clsx from "clsx";
 import { MapCard, MapTile } from "@entities";
+import { isClassic } from "@utils";
 import { getMaps } from "./requests";
 
 const CollectionContainer = ({ collection }: { collection: Collection }) => {
@@ -35,17 +36,31 @@ const CollectionContainer = ({ collection }: { collection: Collection }) => {
 
   return (
     <div className="flex flex-col w-full px-4 place-items-center gap-4">
-      <div className="p-4 bg-black/70 w-fit">
-        <h1 className="text-center text-7xl text-[#ffd884] tracking-wider text-shadow-md">
-          {collection.title.toUpperCase()}
+      <div
+        className={clsx(
+          isClassic()
+            ? "w-full p-6 text-classic-blue-500"
+            : "p-4 bg-black/70 w-fit",
+        )}>
+        <h1
+          className={clsx(
+            isClassic()
+              ? "text-2xl font-bold"
+              : "text-center text-7xl text-[#ffd884] tracking-wider text-shadow-md",
+          )}>
+          {collection.title}
         </h1>
+        {isClassic() && <h2 className="text-black p-2 border-b-1 border-classic-blue-500">
+          {collection.description}
+        </h2>}
       </div>
-      {collection.description && <div className={clsx("p-4 w-full", getColorClassName())}>
-        <h1 className="text-center text-5xl tracking-wider text-shadow-md">
+      {collection.description && !isClassic() && <div className={clsx("p-4 w-full", getColorClassName())}>
+        <h2 className="text-center text-5xl tracking-wider text-shadow-md">
           {collection.description.toUpperCase()}
-        </h1>
+        </h2>
       </div>}
       <div className={clsx(
+        isClassic() && "!gap-4 !flex !flex-col",
         "justify-center gap-8 w-full",
         maps.length <= 3 && "flex flex-col lg:flex-row h-156 lg:h-196 overflow-clip",
         maps.length > 3 && maps.length <= 6 && "flex flex-wrap justify-center max-w-[1400px] mx-auto",

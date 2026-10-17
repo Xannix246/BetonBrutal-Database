@@ -1,5 +1,6 @@
 import DOMPurify from "dompurify";
 import parser from "bbcode-to-react";
+import { isClassic } from "@utils";
 
 interface DescriptionProps {
   content?: string;
@@ -12,7 +13,9 @@ const DescriptionFormatter = ({ content }: DescriptionProps) => {
   const hasHTML = /<\/?[a-z][\s\S]*>/i.test(sanitized);
   const hasBBCode = /\[[a-z]+[\s\S]*?\]/i.test(sanitized);
 
-  const baseClasses = "prose prose-invert max-w-none text-gray-300 text-2xl whitespace-pre-wrap";
+  const baseClasses = isClassic()
+    ? "prose prose-invert max-w-none text-black whitespace-pre-wrap"
+    : "prose prose-invert max-w-none text-gray-300 text-2xl whitespace-pre-wrap";
 
   if (hasHTML) {
     return (

@@ -6,6 +6,7 @@ import { MapTile } from "@entities";
 import { Footer, Header, Background, LeaderboardTable } from "@widgets";
 import { getPrevLink, getUser } from "@store";
 import { Keys } from "@locales/keys";
+import { isClassic } from "@utils";
 import UserProfile from "./UserProfile";
 import {
   getPlayer,
@@ -81,17 +82,22 @@ const PlayerPage = ({ id }: { id: string }) => {
       ) : (
         <Background />
       )}
-      <div className="fixed left-0 w-full z-50">
+      {!isClassic() && <div className="fixed left-0 w-full z-50">
         <Header isAbsolute={true} />
-      </div>
+      </div>}
 
       <div className="flex flex-col h-full justify-between">
         {loaded ?
           player ?
             <div className="flex gap-2 pt-32 w-full">
-              <div className="flex flex-col gap-2 w-full text-gray-300">
+              <div className={clsx("flex flex-col gap-2",
+                !isClassic() && "w-full text-gray-300 text-4xl"
+              )}>
                 {user?.steamId && player && <UserProfile user={user} player={player} publicData={publicData} setPublicData={setPublicData} /> }
-                <Container className="flex justify-center gap-10 text-4xl tracking-wide place-items-center">
+                <Container className={clsx(
+                  "flex justify-center gap-10 tracking-wide place-items-center",
+                  isClassic() && "container-yellow p-2"
+                )}>
                   <div className="flex gap-3 uppercase">
                     <div className="flex gap-3">
                       <span
@@ -109,7 +115,11 @@ const PlayerPage = ({ id }: { id: string }) => {
                       target="_blank"
                       href={`https://steamcommunity.com/profiles/${player?.id}`}
                       rel="noreferrer"
-                      className="hover:text-white hover:underline"
+                      className={clsx("hover:underline",
+                        isClassic()
+                          ? "hover:text-classic-blue-500"
+                          : "hover:text-white"
+                      )}
                     >{player?.username}</a>}
                     {user?.steamId && <>
                       |
@@ -123,7 +133,11 @@ const PlayerPage = ({ id }: { id: string }) => {
                 <div className="px-4">
                   {["mapCreator", "favorites"].includes(page) ?
                     <div className="flex w-full justify-center min-h-screen">
-                      {mapData.length > 0 && <div className="grid sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[200px] lg:auto-rows-[300px] gap-6 p-6 w-full">
+                      {mapData.length > 0 && <div className={clsx("gap-6 p-6 w-full",
+                            isClassic()
+                              ? "flex flex-col !gap-4"
+                              : "grid sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[200px] lg:auto-rows-[300px]"
+                          )}>
                         {mapData.map(m => (
                           <MapTile key={m.id} item={m} />
                         ))}
@@ -136,7 +150,9 @@ const PlayerPage = ({ id }: { id: string }) => {
                     </div>
                     :
                     <div className="flex w-full justify-center min-h-screen">
-                      <div className="w-full md:w-5xl">
+                      <div className={clsx("w-full md:w-5xl",
+                        isClassic() && "container-gray"
+                      )}>
                         <LeaderboardTable replays={replays} />
                       </div>
                     </div>
@@ -167,7 +183,7 @@ const PlayerPage = ({ id }: { id: string }) => {
           </div>
         }
 
-        <Footer />
+         {!isClassic() && <Footer/>}
       </div>
     </div>
   );

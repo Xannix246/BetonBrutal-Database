@@ -9,6 +9,7 @@ import {
   setUserPublicData,
   uploadImage,
 } from "./requests";
+import { isClassic } from "@/utils";
 
 type Props = {
   user: User;
@@ -102,13 +103,22 @@ const UserProfile = ({ user, player, publicData, setPublicData }: Props) => {
       {publicData?.profilePicUrl && (
         <img
           src={profilePicUrl}
-          className={clsx("aspect-square md:min-w-128 md:h-128 object-cover")}
+          className={clsx("aspect-square object-cover",
+            isClassic()
+              ? "h-64 w-64"
+              : "md:min-w-128 md:h-128"
+          )}
           alt="profile picture"
         />
       )}
 
-      <div className="flex flex-col w-full gap-2">
-        <Container className="flex uppercase tracking-wider text-4xl text-white justify-center">
+      <div className={clsx("flex flex-col w-full gap-2", isClassic() ? "!text-black" : "uppercase")}>
+        <Container className={clsx(
+          "flex justify-center",
+          isClassic()
+            ? "container-blue p-2"
+            : "text-white uppercase text-4xl tracking-wider"
+        )}>
           <a
             href={`https://steamcommunity.com/profiles/${player?.id}`}
             className="cursor-pointer hover:underline"
@@ -127,13 +137,13 @@ const UserProfile = ({ user, player, publicData, setPublicData }: Props) => {
         {editMode && (
           <div className="flex gap-2">
             <Input
-              className="text-3xl w-full"
+              className={clsx("w-full", !isClassic() && "text-3xl")}
               placeholder={t(key.pfpPlaceholder)}
               value={profilePicUrl}
               onChange={(e) => setProfilePicUrl(e.target.value)}
             />
             <Button
-              className="uppercase p-2 whitespace-nowrap"
+              className={clsx("whitespace-nowrap", !isClassic() && "uppercase p-2")}
               onClick={() => {
                 setType("pfp");
                 imageRef.current?.click();
@@ -144,13 +154,13 @@ const UserProfile = ({ user, player, publicData, setPublicData }: Props) => {
         {editMode && (
           <div className="flex gap-2">
             <Input
-              className="text-3xl w-full"
+              className={clsx("w-full", !isClassic() && "text-3xl")}
               placeholder={t(key.bgPlaceholder)}
               value={backgroundUrl}
               onChange={(e) => setBackgroundUrl(e.target.value)}
             />
             <Button
-              className="uppercase p-2 whitespace-nowrap"
+              className={clsx("whitespace-nowrap", !isClassic() && "uppercase p-2")}
               onClick={() => {
                 setType("bg");
                 imageRef.current?.click();
@@ -160,30 +170,43 @@ const UserProfile = ({ user, player, publicData, setPublicData }: Props) => {
         )}
         {editMode ? (
           <Textarea
-            className="text-3xl min-h-64 pl-1"
+            className={clsx(!isClassic() && "text-3xl min-h-64 pl-1")}
             placeholder="Write something about you"
             value={about}
             onChange={(e) => setAbout(e.target.value)}
           />
         ) : (
-          <Container className="text-3xl">
+          <Container className={clsx(!isClassic() && "text-3xl")}>
             <h2 className="pl-8 pb-8">{about || t(key.noDesc)}</h2>
           </Container>
         )}
-        <Container className="text-3xl">
-          <h2 className="uppercase tracking-wider text-white">{t(key.links)}</h2>
+        <Container className={clsx(isClassic() ? "font-bold" : "text-3xl")}>
+          <h2 className={clsx(
+            "uppercase tracking-wider",
+            !isClassic() && "text-white"
+          )}>{t(key.links)}</h2>
         </Container>
         {links.map((link, i) => (
           <div key={i} className="flex gap-2 w-full">
-            <Container className="flex gap-2 text-3xl w-full">
+            <Container className={clsx("flex w-full",
+              isClassic()
+                ? "gap-0.5"
+                : "gap-2 text-3xl"
+            )}>
               <h3>{link.showName}:</h3>
               <a
                 href={link.url}
-                className="hover:underline hover:text-white duration-150"
+                className={clsx("hover:underline cursor-pointer",
+                  isClassic()
+                    ? "hover:text-classic-blue-500"
+                    : "hover:text-white duration-150"
+                )}
               >{link.url}</a>
             </Container>
             {editMode && <Button
-              className="uppercase p-2 whitespace-nowrap text-white hover:bg-red/50 place-items-center"
+              className={clsx("whitespace-nowrap",
+                !isClassic() && "uppercase p-2 text-white hover:bg-red/50 place-items-center"
+              )}
               onClick={() => setLinks(links.filter((l) => l.url !== link.url))}
             >{t(key.deleteUrl)}</Button>}
           </div>
@@ -198,19 +221,19 @@ const UserProfile = ({ user, player, publicData, setPublicData }: Props) => {
         {editMode && (
           <div className="flex w-full gap-2">
             <Input
-              className="text-3xl w-full"
+              className={clsx("w-full", !isClassic() && "text-3xl")}
               placeholder={t(key.linkName)}
               value={nameInputValue}
               onChange={(e) => setNameInputValue(e.target.value)}
             />
             <Input
-              className="text-3xl w-full"
+              className={clsx("w-full", !isClassic() && "text-3xl")}
               placeholder={t(key.linkUrl)}
               value={urlInputValue}
               onChange={(e) => setUrlInputValue(e.target.value)}
             />
             <Button
-              className="uppercase p-2 whitespace-nowrap"
+              className={clsx("whitespace-nowrap", !isClassic() && "uppercase p-2")}
               onClick={onAddingLink}
             >{t(key.add)}</Button>
           </div>
@@ -220,11 +243,11 @@ const UserProfile = ({ user, player, publicData, setPublicData }: Props) => {
             {editMode ? (
               <div className="flex gap-2 w-full">
                 <Button
-                  className="uppercase p-3 bg-red/50 w-full"
+                  className={clsx("whitespace-nowrap w-full", !isClassic() && "uppercase p-3 bg-red/50")}
                   onClick={onCancel}
                 >{t(key.cancel)}</Button>
                 <Button
-                  className="uppercase p-3 bg-green/50 w-full"
+                  className={clsx("whitespace-nowrap w-full", !isClassic() && "uppercase p-3 bg-green/50")}
                   onClick={onSave}
                 >{t(key.save)}</Button>
                 {/* <Button

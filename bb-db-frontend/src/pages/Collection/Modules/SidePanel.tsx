@@ -1,8 +1,10 @@
 import { navigate } from "vike/client/router";
 import { t } from "i18next";
+import clsx from "clsx";
 import { Button, Container, Checkbox } from "@shared";
 import { getUser } from "@store";
 import { Keys } from "@locales/keys";
+import { isClassic } from "@utils";
 import { deleteCollection } from "../requests";
 
 type SidePanel = {
@@ -28,7 +30,11 @@ const SidePanel = ({ isPrivate, isMain, preview, setIsPrivate, setIsMain, onPubl
   }
 
   return (
-    <Container className="flex flex-col text-white place-items-center p-4 bg-black/60 w-[300px] h-full gap-16">
+    <Container className={clsx("flex flex-col place-items-center p-4 w-[300px] h-full gap-16",
+      isClassic()
+        ? "gradient-lb-b-ttb"
+        : "text-white bg-black/60"
+    )}>
       <div className="text-5xl font-bold uppercase">{t(key.settings)}</div>
 
       <div className="flex flex-col justify-between h-full">
@@ -57,7 +63,11 @@ const SidePanel = ({ isPrivate, isMain, preview, setIsPrivate, setIsMain, onPubl
           <h4 className="text-3xl uppercase font-bold">{t(key.preview)}</h4>
         </div>}
         <div>
-          <h5 className="text-gray-400 tracking-wide">{t(key.privateTip)}</h5>
+          <h5 className={clsx(
+            isClassic()
+              ? "text-gray-800"
+              : "text-gray-400 tracking-wide"
+          )}>{t(key.privateTip)}</h5>
         </div>
         <div className="w-full grid gap-4">
           {id && <Button

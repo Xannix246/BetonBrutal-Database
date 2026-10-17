@@ -32,6 +32,7 @@ declare type WorkshopItemHeader = {
   tags?: string[];
   rating?: number;
   isHidden?: boolean;
+  description?: string;
 };
 
 declare type Player = {
@@ -193,4 +194,11 @@ declare type EventData = {
   imageUrl: string;
   themeWords: string;
   items: ItemData[];
+}
+
+declare type SummaryData = {
+  mapsCount: number;
+  usersCount: number;
+  replaysCount: number;
+  collectionsCount: number;
 }

@@ -252,6 +252,7 @@ export class CollectionsService {
           title: updatedCollection.title,
           previewUrl: updatedCollection.previewUrl || '',
           description: updatedCollection.description || 'No description',
+          isHidden: !(isPublic === undefined ? collection.isPublic : isPublic),
         },
       });
     } else {
@@ -282,6 +283,7 @@ export class CollectionsService {
     });
 
     await this.workshop.deleteItem(id);
+    await this.prisma.collection.delete({ where: { id } });
 
     return stats.collectionId;
   }

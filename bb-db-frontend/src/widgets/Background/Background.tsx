@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import { DummyTile } from "@entities";
+import { isClassic } from "@utils";
 
 const bg = (placeTiles = 30) => {
   const tiles = [];
@@ -17,6 +18,16 @@ type Props = {
 };
 
 const Background = ({ tiles, fullWindowHeight }: Props) => {
+  if (isClassic()) return <div className="inset-0 bg-white -z-10 fixed h-screen w-screen"/>;
+  // if (isClassic()) return (
+  //   <div className="inset-0 bg-white -z-10 fixed h-screen w-screen">
+  //     <img
+  //       src="/assets/img/bliss.webp"
+  //       className="brightness-75"
+  //     />
+  //   </div>
+  // );
+  
   return (
     <div
       className={clsx(

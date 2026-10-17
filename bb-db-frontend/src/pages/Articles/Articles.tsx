@@ -7,6 +7,7 @@ import { ArticleTile } from "@entities";
 import { Background, Header, Footer } from "@widgets";
 import { getUser } from "@store";
 import { Keys } from "@locales/keys";
+import { isClassic } from "@utils";
 import { getArticles } from "./requests";
 
 const key = Keys.articles;
@@ -136,9 +137,9 @@ const Articles = () => {
   return (
     <div className="w-full h-full bg-center bg-fixed bg-no-repeat bg-cover">
       <Background />
-      <div className="fixed left-0 w-full z-50">
+      {!isClassic() && <div className="fixed left-0 w-full z-50">
         <Header isAbsolute={true} />
-      </div>
+      </div>}
       <div className="flex flex-col min-h-screen justify-between pt-32">
         {loaded ? (
           <div className="flex flex-col">
@@ -269,7 +270,7 @@ const Articles = () => {
           </div>
         )}
 
-        <Footer />
+         {!isClassic() && <Footer/>}
       </div>
     </div>
   );

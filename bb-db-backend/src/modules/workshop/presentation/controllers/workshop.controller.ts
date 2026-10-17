@@ -64,6 +64,8 @@ export class WorkshopController {
     @Query('timeRange') timeRange?: 'day' | 'week' | 'month' | 'year',
     @Query('page', new ParseIntPipe({ optional: true })) page: number = 1,
     @Query('tier', new ParseIntPipe({ optional: true })) tier?: number,
+    @Query('includeDesc', new ParseBoolPipe({ optional: true }))
+    includeDesc?: boolean,
   ): Promise<WorkshopItemHeader[]> {
     if (!quantity) {
       throw new BadRequestException('Quantity is required');
@@ -77,7 +79,14 @@ export class WorkshopController {
       page,
       tags,
       tier,
+      includeDesc,
     );
+  }
+
+  @Get('summary-data')
+  @OptionalAuth()
+  async getSummaryData(): Promise<SummaryData> {
+    return this.workshopService.getSummaryData();
   }
 
   @Get('get-random-item')

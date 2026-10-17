@@ -1,14 +1,15 @@
 import { Container } from "@shared";
 import { Background, Footer, Header } from "@widgets";
+import { isClassic } from "@utils";
 
 const PrivacyPolicy = () => {
   return (
     <>
       <div className="w-full min-h-screen h-full">
         <Background/>
-        <div className="fixed left-0 w-full z-50">
+        {!isClassic() && <div className="fixed left-0 w-full z-50">
           <Header isAbsolute={true} />
-        </div>
+        </div>}
 
         <div className="flex flex-col h-full justify-between">
           <div className="flex gap-2 pt-32 min-h-screen w-full">
@@ -118,7 +119,7 @@ const PrivacyPolicy = () => {
           </div>
         </div>
 
-        <Footer />
+        {!isClassic() && <Footer/>}
       </div>
     </>
   );

@@ -5,6 +5,7 @@ import { Keys } from "@locales/keys";
 import { useEffect, useState } from "react";
 import { sendKey } from "./requests";
 import { navigate } from "vike/client/router";
+import { isClassic } from "@utils";
 
 const key = Keys.search;
 
@@ -25,9 +26,9 @@ const GetToken = ({ callbackUrl }: { callbackUrl: string }) => {
   return (
     <div className="w-full min-h-screen h-full">
       <Background />
-      <div className="fixed left-0 w-full z-50">
+      {!isClassic() && <div className="fixed left-0 w-full z-50">
         <Header isAbsolute={true} />
-      </div>
+      </div>}
       <div className="flex flex-col h-full justify-between">
         <div className="flex gap-2 pt-32 min-h-screen w-full">
           <div className="flex flex-col gap-2 w-full text-gray-300">
@@ -47,7 +48,7 @@ const GetToken = ({ callbackUrl }: { callbackUrl: string }) => {
             </Container>
           </div>
         </div>
-        <Footer />
+        {!isClassic() && <Footer/>}
       </div>
     </div>
   );

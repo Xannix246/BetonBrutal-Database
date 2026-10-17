@@ -29,6 +29,7 @@ declare type WorkshopItemHeader = {
   linkedCollection?: string;
   tags?: string[];
   rating?: number;
+  description?: string;
 };
 
 declare type Replay = {
@@ -186,3 +187,9 @@ declare type EventData = {
   items: ItemData[];
 }
 
+declare type SummaryData = {
+  mapsCount: number;
+  usersCount: number;
+  replaysCount: number;
+  collectionsCount: number;
+}

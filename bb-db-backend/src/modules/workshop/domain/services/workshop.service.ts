@@ -71,6 +71,7 @@ export class WorkshopService {
     page: number = 1,
     tags?: string[],
     tier?: number,
+    includeDesc?: boolean,
   ): Promise<WorkshopItemHeader[]> {
     let orderBy: {
       ratingUp?: 'asc' | 'desc';
@@ -229,6 +230,7 @@ export class WorkshopService {
         previews: sendPreviews ? item.previews : [],
         tags: item.tags,
         rating: (await this.tierService.getTierData(item.steamId))?.avgTier,
+        description: includeDesc ? (item.description ?? undefined) : undefined,
       });
     }
 
@@ -679,5 +681,16 @@ export class WorkshopService {
       ...upload,
       description: upload.description ?? 'no description',
     };
+  }
+
+  async getSummaryData(): Promise<SummaryData> {
+    const data: SummaryData = {
+      mapsCount: await this.prisma.workshopItem.count(),
+      usersCount: await this.prisma.user.count(),
+      replaysCount: await this.prisma.leaderboardEntry.count(),
+      collectionsCount: await this.prisma.collection.count(),
+    };
+
+    return data;
   }
 }

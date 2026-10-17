@@ -1,5 +1,6 @@
 import { api } from "@features";
 import { config } from "@config";
+import { isClassic } from "@utils";
 
 export const getMaps = async (
   sortBy: SortBy = "newest",
@@ -13,6 +14,10 @@ export const getMaps = async (
   searchParams.set("sortBy", sortBy);
   searchParams.append("quantity", quantity.toString());
   searchParams.append("page", page.toString());
+  if (isClassic()) {
+    searchParams.append("includeDesc", "true");
+    searchParams.append("sendPreviews", "true");
+  }
 
   if (tags) searchParams.append("tags", tags.join(","));
   if (tier !== undefined) {

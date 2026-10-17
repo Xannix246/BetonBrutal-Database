@@ -8,6 +8,7 @@ import { EditorSidebar, EditorToolbar, PreviewPanel, EditorView, EditorDatabar }
 import { Background, Header, Footer } from "@widgets";
 import { getUser } from "@store";
 import { uploadArticle, uploadFiles } from "./requests";
+import { isClassic } from "@utils";
 
 const Editor = () => {
   const [title, setTitle] = useState("");
@@ -37,7 +38,7 @@ const Editor = () => {
   return (
     <div className="w-full h-screen bg-center bg-fixed bg-no-repeat bg-cover">
       <Background />
-      <div className="fixed left-0 w-full z-50">
+      {!isClassic() && <div className="fixed left-0 w-full z-50">
         <Header
           additionalComponent={
             <div className="h-full text-white text-shadow-lg text-4xl flex gap-10 place-items-center pl-8">
@@ -46,7 +47,7 @@ const Editor = () => {
           }
           hideSearch={true}
         />
-      </div>
+      </div>}
 
       <div className="flex flex-col min-h-screen pt-32 gap-8">
         <Container className="flex justify-center gap-10 text-2xl md:text-4xl tracking-wide place-items-center text-white">
@@ -148,7 +149,7 @@ const Editor = () => {
           </div>
         </div>
 
-        <Footer />
+         {!isClassic() && <Footer/>}
       </div>
     </div>
   );

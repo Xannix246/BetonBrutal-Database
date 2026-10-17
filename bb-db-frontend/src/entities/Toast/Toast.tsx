@@ -3,6 +3,7 @@ import { motion, PanInfo, useMotionValue, useTransform } from "motion/react";
 import clsx from "clsx";
 import { Container } from "@shared";
 import { Toast as ToastType, removeToast } from "@store";
+import { isClassic } from "@utils";
 
 const colors = {
   error: {
@@ -23,7 +24,6 @@ const colors = {
   },
 };
 
-
 const Toast = ({ toast }: { toast: ToastType }) => {
   const [isPaused, setIsPaused] = useState(false);
   const startTime = useRef(Date.now());
@@ -32,6 +32,7 @@ const Toast = ({ toast }: { toast: ToastType }) => {
   const width = useTransform(progress, (v) => `${v}%`);
   const x = useMotionValue(0);
   const currentColor = colors[toast.type];
+  const classic = isClassic();
 
   useEffect(() => {
     if (!toast.time) return;
@@ -46,7 +47,8 @@ const Toast = ({ toast }: { toast: ToastType }) => {
         progress.set(percent);
 
         if (percent <= 0) {
-          return removeToast(toast.id);
+          removeToast(toast.id);
+          return;
         }
       }
 
@@ -56,16 +58,25 @@ const Toast = ({ toast }: { toast: ToastType }) => {
     frame = requestAnimationFrame(tick);
 
     return () => cancelAnimationFrame(frame);
-  }, [isPaused, toast.id, toast.time]);
+  }, [isPaused, toast.id, toast.time, progress]);
 
   const handleMouseEnter = () => {
     setIsPaused(true);
-    remaining.current = toast.time - (Date.now() - startTime.current);
+
+    if (toast.time) {
+      remaining.current = Math.max(
+        0,
+        toast.time - (Date.now() - startTime.current),
+      );
+    }
   };
 
   const handleMouseLeave = () => {
+    if (toast.time) {
+      startTime.current = Date.now() - (toast.time - remaining.current);
+    }
+
     setIsPaused(false);
-    startTime.current = Date.now() - (toast.time - remaining.current);
   };
 
   const handleDragEnd = (_: PointerEvent, info: PanInfo) => {
@@ -86,22 +97,80 @@ const Toast = ({ toast }: { toast: ToastType }) => {
       onDragEnd={handleDragEnd}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      className={clsx("relative", classic && "pb-2")}
     >
-      <Container className="bg-black/90 relative cursor-grabbing text-white w-full md:w-100">
+      <Container
+        className={clsx(
+          classic
+            ? [
+                "relative w-full min-w-64",
+                "rounded-lg",
+                "border",
+                "[box-shadow:2px_2px_0_#b8b8b8,0_3px_10px_#0003]",
+                "!bg-[#fffbe6]",
+              ]
+            : "relative w-full cursor-grabbing bg-black/90 text-white md:w-100",
+        )}>
+        {classic && (
+          <>
+            <div
+              className={clsx(
+                "flex min-h-8 items-center gap-2 border-b px-2 py-1 rounded-t-lg",
+                "border-[#d3c99d] bg-gradient-to-r from-[#fff8d6] to-[#f5e7ad]",
+              )}>
+              <span
+                className={clsx(
+                  "min-w-0 flex-1 truncate text-sm font-bold text-[#333333]",
+                  colors[toast.type].text,
+                )}>
+                {toast.title}
+              </span>
+            </div>
+          </>
+        )}
+
         <motion.div
           style={{ width }}
           className={clsx(
-            "absolute top-0 left-0 h-1",
+            "absolute left-0 top-0 h-1",
             currentColor.bg,
-          )}
-        />
+            classic && "hidden",
+          )}/>
 
-        <div className="p-3">
-          <div className={clsx("uppercase text-2xl", currentColor.text)}>{toast.title}</div>
+        <div className={clsx(classic ? "px-3 py-2" : "p-3")}>
+          {!classic && (
+            <div className={clsx("text-2xl uppercase", currentColor.text)}>
+              {toast.title}
+            </div>
+          )}
           {toast.description && (
-            <div className="text-lg text-gray-300">{toast.description}</div>
+            <div
+              className={clsx(
+                classic
+                  ? "text-sm leading-snug text-[#333333]"
+                  : "text-lg text-gray-300",
+              )}>
+              {toast.description}
+            </div>
           )}
         </div>
+
+        {classic && (
+          <>
+            <div
+              className={clsx(
+                "absolute -bottom-[7px] right-2 size-3",
+                "rotate-45 border-b border-r",
+                "bg-[#fffbe6]",
+              )}/>
+            {!isClassic() && (
+              <motion.div
+                style={{ width }}
+                className="absolute bottom-0 left-0 h-[3px]"
+              />
+            )}
+          </>
+        )}
       </Container>
     </motion.div>
   );

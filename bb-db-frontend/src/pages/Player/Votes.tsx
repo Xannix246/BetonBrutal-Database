@@ -5,6 +5,7 @@ import { TierCard } from "@entities";
 import { Footer, Header, Background } from "@widgets";
 import { getUser } from "@store";
 import { Keys } from "@locales/keys";
+import { isClassic } from "@utils";
 import { getItems, getTierVoteRequests } from "./requests";
 
 const key = Keys.mapTiers;
@@ -32,9 +33,9 @@ const VotesPage = ({ id }: { id: string }) => {
   return (
     <div className="w-full min-h-screen h-full">
       <Background />
-      <div className="fixed left-0 w-full z-50">
+      {!isClassic() && <div className="fixed left-0 w-full z-50">
         <Header isAbsolute={true} />
-      </div>
+      </div>}
 
       <div className="flex flex-col min-h-screen justify-between place-items-center ">
         <div className="flex flex-col gap-16 w-5xl pt-32">
@@ -54,7 +55,7 @@ const VotesPage = ({ id }: { id: string }) => {
           </div>
         </div>
 
-        <Footer />
+         {!isClassic() && <Footer/>}
       </div>
     </div>
   );

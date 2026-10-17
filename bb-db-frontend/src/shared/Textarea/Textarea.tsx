@@ -1,5 +1,6 @@
 import { Textarea as HeadlessTextarea, TextareaProps } from "@headlessui/react";
 import clsx from "clsx";
+import { isClassic } from "@utils";
 
 interface Props extends TextareaProps {
   className?: string;
@@ -7,7 +8,11 @@ interface Props extends TextareaProps {
 
 const Textarea = ({ className, ...props }: Props) => {
   return (
-    <div className={clsx(className, "flex gap-2 bg-black/50 h-full")}>
+    <div className={clsx(className,
+      isClassic()
+        ? "bg-white rounded-[3px] border-1 border-[#043972]"
+        : "flex gap-2 bg-black/50 h-full"
+    )}>
       <HeadlessTextarea
         className={clsx(className, "outline-none w-full resize-none overflow-auto")}
         {...props}

@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import { navigate } from "vike/client/router";
 import { v4 } from "uuid";
 import { t } from "i18next";
+import clsx from "clsx";
 import { Container, Button, ContextMenu } from "@shared";
 import { MapTile } from "@entities";
 import { signIn } from "@features";
 import { Background, Footer, Header } from "@widgets";
 import { getTargetData, getUser, setTargetData } from "@store";
 import { Keys } from "@locales/keys";
+import { isClassic } from "@/utils";
 import { getCollection, getItem, getItemData, postCollection, uploadPreview } from "./requests";
 import MapContainer from "./Modules/MapContainer";
 import SidePanel from "./Modules/SidePanel";
@@ -93,7 +95,7 @@ const CollectionEditor = ({ id }: { id?: string }) => {
           setIsPrivate(!collection.isPublic);
           setIsMain(collection.showOnMain);
         } else {
-          return window.location.href = `/collection/${id}`;
+          return navigate(`/collection/${id}`);
         }
       }
     })();
@@ -111,9 +113,9 @@ const CollectionEditor = ({ id }: { id?: string }) => {
         onClose={() => setTargetData(null)}
       />
 
-      <div className="fixed left-0 w-full z-50">
+      {!isClassic() && <div className="fixed left-0 w-full z-50">
         <Header isAbsolute={true} />
-      </div>
+      </div>}
 
       <div className="h-full justify-between">
         {user ? <div className="flex gap-6 pt-32 p-6 min-h-screen h-full w-full">
@@ -136,7 +138,11 @@ const CollectionEditor = ({ id }: { id?: string }) => {
             />
 
             <div className="flex gap-2 w-full">
-              <div className="grid sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[200px] lg:auto-rows-[300px] gap-6 w-full">
+              <div className={clsx("gap-6 p-6 w-full",
+                isClassic()
+                  ? "flex flex-col !gap-4"
+                  : "grid sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[200px] lg:auto-rows-[300px]"
+              )}>
                 {maps.map((m) => (
                   <MapTile key={`${v4()}`} item={m} />
                 ))}
@@ -162,7 +168,7 @@ const CollectionEditor = ({ id }: { id?: string }) => {
            </div>
         </div>}
 
-        <Footer />
+         {!isClassic() && <Footer/>}
       </div>
     </div>
   );

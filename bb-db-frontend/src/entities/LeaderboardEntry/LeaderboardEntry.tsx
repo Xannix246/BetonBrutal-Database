@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
+import clsx from "clsx";
 import { Container } from "@shared";
 import { $prevLink, getUser, setTargetData } from "@store";
-import { formatTime } from "@utils";
+import { formatTime, isClassic } from "@utils";
 
 type Props = {
   replay: Replay;
@@ -31,7 +32,11 @@ const LeaderboardEntry = ({ replay }: Props) => {
 
   return (
     <Container
-      className="sm:mx-2 tracking-wider hover:bg-[#1f1f1f] transition"
+      className={clsx(
+        isClassic()
+          ? "p-1 px-2 !bg-transparent border-t-1 border-classic-blue-100"
+          : "sm:mx-2 tracking-wider hover:bg-[#1f1f1f] transition"
+      )}
       onContextMenu={(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
         if (["moderator", "admin"].includes(user?.role as string)) {
           e.preventDefault();
@@ -39,12 +44,22 @@ const LeaderboardEntry = ({ replay }: Props) => {
         }
       }}
     >
-      <div className="flex items-center justify-between text-[#f1e4c7] gap-4">
-        <h3 className="text-sm md:text-xl text-center md:w-[40px] shrink-0">
+      <div className={clsx("flex items-center justify-between",
+        isClassic()
+          ? ""
+          : "text-[#f1e4c7] gap-4"
+      )}>
+        <h3 className={clsx("text-center md:w-[40px] shrink-0",
+          !isClassic() &&"text-sm md:text-xl"
+        )}>
           {replay.place}
         </h3>
         <a
-          className="flex-grow w-full text-sm md:text-xl truncate text-ellipsis whitespace-nowrap font-semibold max-w-[50%] hover:underline cursor-pointer hover:text-white transition duration-300"
+          className={clsx("flex-grow w-full max-w-[50%] hover:underline cursor-pointer",
+            isClassic()
+              ? "!text-sm hover:text-classic-blue-500"
+              : "text-sm md:text-xl truncate text-ellipsis whitespace-nowrap font-semibold hover:text-white transition duration-300"
+          )}
           onClick={() => $prevLink.set("run")}
           onPointerDown={() => $prevLink.set("run")}
           href={
@@ -63,7 +78,9 @@ const LeaderboardEntry = ({ replay }: Props) => {
             : replay.creator
           ).toUpperCase()}
         </a>
-        <h3 className="text-sm md:text-xl text-right md:w-[100px] shrink-0">
+        <h3 className={clsx("text-center md:w-[30px] shrink-0",
+          !isClassic() &&"text-sm md:text-xl md:w-[100px]"
+        )}>
           {formatTime(replay.score)}
         </h3>
         {replay.date && new Date(replay.date).getFullYear() >= 2023 ? (

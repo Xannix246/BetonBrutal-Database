@@ -27,7 +27,8 @@
   --color-green: #6a902b;
   --color-dark-green: #405819;
 
-  --bn-pro: "BebasNeue", sans-serif;
+  --font-bn-pro: "BebasNeue", sans-serif;
+  --font-tahoma: Tahoma, Arial, Helvetica, sans-serif;
 
   --text-sm: 14px;
   --text-md: 15px;
@@ -35,9 +36,27 @@
   --text-xl: 27px;
 }
 
+@theme {
+  --color-classic-blue-100: #aec1ed;
+  --color-classic-blue-200: #7ba2e7;
+  --color-classic-blue-300: #6487dc;
+  --color-classic-blue-400: #2d5fc5;
+  --color-classic-blue-500: #1447ae;
+  --color-classic-yellow-100: #fff9cc;
+  --color-classic-yellow-200: #d4b000;
+  --color-classic-green-100: #dfffcc;
+  --color-classic-green-200: #288b00;
+  --color-classic-red-100: #ffcccc;
+  --color-classic-red-200: #d40000;
+}
+
 @layer components {
   button {
     @apply outline-0 cursor-pointer transform transition duration-150 p-2.5 justify-center flex w-fit text-white hover:text-pink disabled:text-gray-400 disabled:hover:text-gray-400 disabled:cursor-not-allowed;
+  }
+
+  .default {
+    @apply font-bn-pro;
   }
 
   .btn-default {
@@ -56,6 +75,59 @@
     grid-column: span 2;
     grid-row: span 2;
   }
+
+  /* classic things */
+
+  .classic {
+    @apply font-tahoma;
+    text-shadow: 0px 1px 2px #ffffff;
+    font-smooth: never;
+    -webkit-font-smoothing: none;
+  }
+
+  .gradient-lb-b-ltr {
+    @apply bg-linear-to-r from-classic-blue-100 to-classic-blue-300;
+  }
+
+  .gradient-lb-b-ttb {
+    @apply bg-linear-to-b from-classic-blue-100 to-classic-blue-300;
+  }
+
+  .gradient-w-lb-ltr {
+    @apply bg-linear-to-r from-white to-classic-blue-100;
+  }
+
+  .gradient-w-lb-ttb {
+    @apply bg-linear-to-b from-white to-classic-blue-100;
+  }
+
+  .gradient-b-db-ttb {
+    @apply bg-linear-to-b from-classic-blue-300 to-classic-blue-400;
+  }
+
+  .btn-classic-default {
+    @apply text-black hover:!text-black bg-linear-to-b from-white to-[#e5dcd3] p-0.5 px-2 text-xs rounded-[3px] border-1 border-[#043972] hover:bg-linear-to-b hover:from-[#e9e9e9] hover:to-[#cfb79f] hover:border-b-[#a3833d];
+  }
+
+  .container-yellow {
+    @apply border-1 border-classic-yellow-200 !bg-classic-yellow-100;
+  }
+
+  .container-blue {
+    @apply border-1 border-classic-blue-500 !bg-classic-blue-100;
+  }
+
+  .container-red {
+    @apply border-1 border-classic-yellow-200 !bg-classic-yellow-100;
+  }
+
+  .container-green {
+    @apply border-1 border-classic-green-200 !bg-classic-green-100;
+  }
+
+  .container-gray {
+    @apply border-1 border-[#dde6f4] !bg-[#f4f7fc];
+  }
 }
 
 .scrollbar-hide::-webkit-scrollbar {
@@ -65,10 +137,6 @@
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
-}
-
-* {
-  font-family: "BebasNeue", sans-serif;
 }
 
 body {
