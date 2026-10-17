@@ -1,11 +1,25 @@
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
+import { viteStaticCopy } from "vite-plugin-static-copy";
 import vike from "vike/plugin";
 import { defineConfig } from "vite";
 import path from "path";
 
 export default defineConfig({
-  plugins: [vike(), react(), tailwindcss()],
+  plugins: [
+    vike(),
+    react(),
+    tailwindcss(),
+    viteStaticCopy({
+      targets: [
+        {
+          src: "./assets/icons/anniv-icons",
+          dest: "assets/icons/anniv-icons",
+          rename: { stripBase: 3 },
+        },
+      ],
+    }),
+  ],
   build: {
     target: "es2022",
   },
