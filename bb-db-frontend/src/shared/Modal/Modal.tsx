@@ -54,7 +54,7 @@ const Modal = ({ children, className, open, onClose }: Props) => {
                 Beton Brutal Database
               </span>
               <img
-                src="/assets/icons/anniv-icons/exit.png"
+                src="/assets/icons/anniv-icons/Exit.png"
                 onClick={() => onClose?.()}
                 className="size-6 shadow-[inset_-1px_-1px_0_#777] hover:brightness-90 cursor-pointer"
               />
