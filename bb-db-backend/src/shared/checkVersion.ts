@@ -1,6 +1,6 @@
 import { VersionType } from 'src/generated/protos/multiplayer';
 
-const supportedVersions = ['1.2.0', '1.3.0'];
+const supportedVersions = ['1.2.0', '1.3.0', '1.4.0'];
 const outdatedVersions: string[] = [];
 
 export function checkVersion(version: string): VersionType {
