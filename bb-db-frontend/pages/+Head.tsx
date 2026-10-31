@@ -2,8 +2,9 @@
 // Environment: server
 
 // import previewImage from './previewImage.jpg'
+// ./../assets/icons/anniv-icons/IndexingService.png
 // './../assets/icons/favicon.png'
-import favicon from './../assets/icons/anniv-icons/IndexingService.png'
+import favicon from './../assets/icons/favicon.png'
 // import iconMobile from './iconMobile.png'
 
 export function Head() {
