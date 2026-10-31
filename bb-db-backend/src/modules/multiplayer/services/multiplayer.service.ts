@@ -52,7 +52,7 @@ export class MultiplayerService implements OnModuleInit {
   }
 
   async onModuleInit() {
-    (global as any).multiplayerService = this;
+    // (global as any).multiplayerService = this;
     const maps = await this.prisma.workshopItem.findMany({
       select: {
         id: true,

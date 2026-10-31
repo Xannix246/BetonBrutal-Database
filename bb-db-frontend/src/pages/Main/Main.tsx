@@ -72,7 +72,7 @@ const Main = () => {
       </div>
       <div className="flex flex-col gap-32 justify-center">
         <div className="flex flex-col gap-4 place-items-center w-full mt-16">
-          <div className={clsx(
+          {/* <div className={clsx(
             isClassic()
               ? "bg-class text-black w-full px-8"
               : "bg-black/70 p-4 text-4xl text-white mt-32"
@@ -97,7 +97,7 @@ const Main = () => {
                 <span>Classic theme</span>
               </div>
             </div>
-          </div>
+          </div> */}
           {isClassic() && <div className="bg-class text-black w-full px-8">
             <div className="border-l-4 px-4 py-1 flex gap-2 container-green">
               <span className="font-bold">Pro tip:</span>

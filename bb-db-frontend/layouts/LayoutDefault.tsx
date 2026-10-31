@@ -42,6 +42,10 @@ export const LayoutDefault = ({ children }: { children: React.ReactNode }) => {
       i18n.changeLanguage(locale);
     }
 
+    if (localStorage.getItem("theme") === "classic") {
+      localStorage.setItem("theme", "default");
+    }
+
     setCurrentTheme(localStorage.getItem("theme") as "classic" | "default" ?? "classic");
     if(window.innerWidth < 1115) {
       setCurrentTheme("default");
