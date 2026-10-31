@@ -80,14 +80,14 @@ type PlaceBlock = {
   payload: Proto.PlaceBlock;
 };
 
-type DeleteBlock = {
-  packet: Proto.PacketType.DeleteBlockPacket;
-  payload: Proto.DeleteBlock;
+type DeleteBlocks = {
+  packet: Proto.PacketType.DeleteBlocksPacket;
+  payload: Proto.DeleteBlocks;
 };
 
-type ChangeBlock = {
-  packet: Proto.PacketType.ChangeBlockPacket;
-  payload: Proto.ChangeBlock;
+type ChangeBlocks = {
+  packet: Proto.PacketType.ChangeBlocksPacket;
+  payload: Proto.ChangeBlocks;
 };
 
 type MapSettings = {
@@ -175,6 +175,11 @@ type AckPacket = {
   payload: Proto.AckPacket;
 };
 
+type LinkedSelectionPacket = {
+  packet: Proto.PacketType.LinkedSelectionPacket;
+  payload: Proto.LinkedSelection;
+};
+
 type UnknownPacket = {
   packet: Proto.PacketType.UnknownPacket;
   payload: unknown;
@@ -197,8 +202,8 @@ export type ProtoPacket =
   | LoadMap
   | PlaceBlocks
   | PlaceBlock
-  | DeleteBlock
-  | ChangeBlock
+  | DeleteBlocks
+  | ChangeBlocks
   | MapSettings
   | MapColor
   | CreateGroup
@@ -216,6 +221,7 @@ export type ProtoPacket =
   | PlayerData
   | ActivateTrigger
   | AckPacket
+  | LinkedSelectionPacket
   | UnknownPacket;
 
 export enum ProtoType {
@@ -235,10 +241,11 @@ export enum ProtoType {
   LoadMap = 'loadMap',
   PlaceBlocks = 'placeBlocks',
   PlaceBlock = 'placeBlock',
-  DeleteBlock = 'deleteBlock',
-  ChangeBlock = 'changeBlock',
+  DeleteBlocks = 'deleteBlocks',
+  ChangeBlocks = 'changeBlocks',
   MapSettings = 'mapSettings',
   MapColor = 'mapColor',
+  LinkedSelection = 'linkedSelection',
   CreateGroup = 'createGroup',
   ChangeGroup = 'changeGroup',
   DeleteGroup = 'deleteGroup',

@@ -23,8 +23,8 @@ enum PacketType {
   // LightColorPacket = 17;
   PlaceBlocksPacket = 18;
   PlaceBlockPacket = 19;
-  DeleteBlockPacket = 20;
-  ChangeBlockPacket = 21;
+  DeleteBlocksPacket = 20;
+  ChangeBlocksPacket = 21;
   MapSettingsPacket = 22;
   MapColorPacket = 23;
   CreateGroupPacket = 24;
@@ -41,6 +41,7 @@ enum PacketType {
   RemoveOperationPacket = 35;
   PlayerDataPacket = 36;
   ActivateTriggerPacket = 47;
+  LinkedSelectionPacket = 48;
   AckResPacket = 100;
   UnknownPacket = 404;
 }
@@ -181,6 +182,11 @@ enum VersionType {
   Latest = 0;
   Outdated = 1;
   Incompatible = 2;
+}
+
+enum LinkedSelectionOperation {
+  Link = 0;
+  Unlink = 1;
 }
 
 message Vector3 {
@@ -414,14 +420,14 @@ message PlaceBlock {
   Block block = 2;
 }
 
-message DeleteBlock {
+message DeleteBlocks {
   int64 id = 1;
-  string instance_id = 2;
+  repeated string instance_ids = 2;
 }
 
-message ChangeBlock {
+message ChangeBlocks {
   int64 id = 1;
-  Block block = 2;
+  repeated Block blocks = 2;
   Operations operation = 3;
 }
 
@@ -522,6 +528,12 @@ message AckPacket {
   optional PacketType packet_type = 2;
 }
 
+message LinkedSelection {
+  int64 id = 1;
+  repeated string block_ids = 2;
+  LinkedSelectionOperation operation = 3;
+}
+
 message Packet {
   oneof payload {
     Version version = 1;
@@ -543,8 +555,8 @@ message Packet {
     // LightColor = 17;
     PlaceBlocks place_blocks = 18;
     PlaceBlock place_block = 19;
-    DeleteBlock delete_block = 20;
-    ChangeBlock change_block = 21;
+    DeleteBlocks delete_blocks = 20;
+    ChangeBlocks change_blocks = 21;
     MapSettings map_settings = 22;
     MapColor map_color = 23;
     CreateGroup create_group = 24;
@@ -561,6 +573,7 @@ message Packet {
     RemoveOperation remove_operation = 35;
     PlayerData player_data = 36;
     ActivateTrigger activate_trigger = 37;
+    LinkedSelection linked_selection = 38;
     AckPacket ack_packet = 100;
   }
 }

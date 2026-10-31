@@ -7,7 +7,12 @@ import {
   SessionCollab,
   SessionPlayer,
 } from '../../types/multiplayer';
-import { Events, GameMode, PacketType } from 'src/generated/protos/multiplayer';
+import {
+  Events,
+  GameMode,
+  LinkedSelectionOperation,
+  PacketType,
+} from 'src/generated/protos/multiplayer';
 import { CollabService } from '../collab.service';
 
 @Injectable()
@@ -81,6 +86,7 @@ export class CollabCommand implements OnModuleInit {
       players: new Set([player]),
       blocks: new Map(),
       groups: new Map(),
+      linkedSelections: new Set(),
       settings: new Map(),
       color: new Map(),
       triggers: new Map(),
@@ -107,7 +113,10 @@ export class CollabCommand implements OnModuleInit {
 
     this.commandsService.sendEvent(player, Events.StartCollab);
 
-    await this.sendData(player, collab);
+    const sendDataResult = await this.sendData(player, collab);
+    if (typeof sendDataResult === 'string') {
+      return sendDataResult;
+    }
 
     return `<color=${C.green}>Collab opened!</color>`;
   }
@@ -142,7 +151,10 @@ export class CollabCommand implements OnModuleInit {
 
     this.commandsService.sendEvent(player, Events.JoinCollab);
 
-    await this.sendData(player, collab);
+    const sendDataResult = await this.sendData(player, collab);
+    if (typeof sendDataResult === 'string') {
+      return sendDataResult;
+    }
 
     return `<color=${C.yellow}>You have joined the collab</color>`;
   }
@@ -168,7 +180,7 @@ export class CollabCommand implements OnModuleInit {
     });
 
     if (!blocksPromise) {
-      return `<color=${C.red}>Collab connection failed: blocks transfer timeout.</color>`;
+      return `<color=${C.red}>Failed to send data: blocks transfer timeout.</color>`;
     }
 
     await this.commandsService.sendPacketAsync(player, {
@@ -191,6 +203,19 @@ export class CollabCommand implements OnModuleInit {
         },
       );
       if (!triggerPromise) break;
+    }
+
+    for (const linkedSelection of collab.linkedSelections) {
+      const ids = linkedSelection.split('|');
+
+      this.commandsService.sendPacket(player, {
+        packet: PacketType.LinkedSelectionPacket,
+        payload: {
+          id: player.id,
+          blockIds: ids,
+          operation: LinkedSelectionOperation.Link,
+        },
+      });
     }
   }
 

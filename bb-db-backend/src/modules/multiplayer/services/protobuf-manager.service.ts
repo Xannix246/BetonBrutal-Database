@@ -149,19 +149,19 @@ export class ProtobufManager {
             },
           });
           break;
-        case PacketType.DeleteBlockPacket:
+        case PacketType.DeleteBlocksPacket:
           packet = Packet.toBinary({
             payload: {
-              oneofKind: ProtoType.DeleteBlock,
-              deleteBlock: data.payload,
+              oneofKind: ProtoType.DeleteBlocks,
+              deleteBlocks: data.payload,
             },
           });
           break;
-        case PacketType.ChangeBlockPacket:
+        case PacketType.ChangeBlocksPacket:
           packet = Packet.toBinary({
             payload: {
-              oneofKind: ProtoType.ChangeBlock,
-              changeBlock: data.payload,
+              oneofKind: ProtoType.ChangeBlocks,
+              changeBlocks: data.payload,
             },
           });
           break;
@@ -178,6 +178,14 @@ export class ProtobufManager {
             payload: {
               oneofKind: ProtoType.MapColor,
               mapColor: data.payload,
+            },
+          });
+          break;
+        case PacketType.LinkedSelectionPacket:
+          packet = Packet.toBinary({
+            payload: {
+              oneofKind: ProtoType.LinkedSelection,
+              linkedSelection: data.payload,
             },
           });
           break;
@@ -400,16 +408,16 @@ export class ProtobufManager {
             packet: PacketType.PlaceBlockPacket,
             payload: packet.payload.placeBlock,
           };
-        case ProtoType.DeleteBlock:
+        case ProtoType.DeleteBlocks:
           return {
-            packet: PacketType.DeleteBlockPacket,
-            payload: packet.payload.deleteBlock,
+            packet: PacketType.DeleteBlocksPacket,
+            payload: packet.payload.deleteBlocks,
           };
-        case ProtoType.ChangeBlock:
-          if (!packet.payload.changeBlock.block) return;
+        case ProtoType.ChangeBlocks:
+          if (packet.payload.changeBlocks.blocks.length === 0) return;
           return {
-            packet: PacketType.ChangeBlockPacket,
-            payload: packet.payload.changeBlock,
+            packet: PacketType.ChangeBlocksPacket,
+            payload: packet.payload.changeBlocks,
           };
         case ProtoType.MapSettings:
           return {
@@ -420,6 +428,11 @@ export class ProtobufManager {
           return {
             packet: PacketType.MapColorPacket,
             payload: packet.payload.mapColor,
+          };
+        case ProtoType.LinkedSelection:
+          return {
+            packet: PacketType.LinkedSelectionPacket,
+            payload: packet.payload.linkedSelection,
           };
         case ProtoType.CreateGroup:
           return {

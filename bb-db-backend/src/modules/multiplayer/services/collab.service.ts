@@ -47,30 +47,56 @@ export class CollabService {
     }
   }
 
-  deleteBlock(player: SessionPlayer, packet: Proto.DeleteBlock) {
+  deleteBlock(player: SessionPlayer, packet: Proto.DeleteBlocks) {
     if (!player.collab.value) return;
 
     const collab = player.collab.value;
 
-    collab.blocks.delete(packet.instanceId);
+    for (const id of packet.instanceIds) {
+      collab.blocks.delete(id);
+    }
+
+    for (const blockId of packet.instanceIds) {
+      for (const group of collab.groups.values()) {
+        group.blocks.delete(blockId);
+      }
+
+      for (const idsString of collab.linkedSelections) {
+        const ids = idsString.split('|');
+        const hasIntersection = idsString.includes(blockId);
+
+        if (hasIntersection) {
+          const updatedLink = ids.filter((id) => id !== blockId);
+
+          collab.linkedSelections.delete(idsString);
+
+          if (updatedLink.length !== 0) {
+            collab.linkedSelections.add(updatedLink.join('|'));
+          }
+        }
+      }
+    }
+
     this.multiplayer.broadcastPacket(
-      { packet: PacketType.DeleteBlockPacket, payload: packet },
+      { packet: PacketType.DeleteBlocksPacket, payload: packet },
       [player.id],
       collab.getIds(),
     );
   }
 
-  changeBlock(player: SessionPlayer, packet: Proto.ChangeBlock) {
+  changeBlock(player: SessionPlayer, packet: Proto.ChangeBlocks) {
     if (!player.collab.value) return;
 
     const collab = player.collab.value;
 
-    collab.blocks.set(packet.block!.instanceId, {
-      ...packet.block!,
-    });
+    for (const block of packet.blocks) {
+      collab.blocks.set(block.instanceId, {
+        ...block,
+      });
+    }
 
     this.multiplayer.broadcastPacket(
-      { packet: PacketType.ChangeBlockPacket, payload: packet },
+      { packet: PacketType.ChangeBlocksPacket, payload: packet },
       [player.id],
       collab.getIds(),
     );
@@ -97,6 +123,38 @@ export class CollabService {
     collab.color.set(packet.settings, packet.color!);
     this.multiplayer.broadcastPacket(
       { packet: PacketType.MapColorPacket, payload: packet },
+      [player.id],
+      collab.getIds(),
+    );
+  }
+
+  handleLinkingBlocks(player: SessionPlayer, packet: Proto.LinkedSelection) {
+    if (!player.collab.value || packet.blockIds.length === 0) return;
+
+    const collab = player.collab.value;
+    const sortedIds = [...packet.blockIds].sort();
+    const linkKey = sortedIds.join('|');
+
+    if (packet.operation === Proto.LinkedSelectionOperation.Link) {
+      for (const existingKey of collab.linkedSelections) {
+        const existingIds = existingKey.split('|');
+
+        const hasIntersection = sortedIds.some((id) =>
+          existingIds.includes(id),
+        );
+
+        if (hasIntersection) {
+          collab.linkedSelections.delete(existingKey);
+        }
+      }
+
+      collab.linkedSelections.add(linkKey);
+    } else {
+      collab.linkedSelections.delete(linkKey);
+    }
+
+    this.multiplayer.broadcastPacket(
+      { packet: PacketType.LinkedSelectionPacket, payload: packet },
       [player.id],
       collab.getIds(),
     );

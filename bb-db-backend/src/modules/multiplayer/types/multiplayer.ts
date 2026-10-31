@@ -98,6 +98,7 @@ export type SessionCollabParams = {
   players: Set<SessionPlayer>;
   blocks: Map<string, ProtoBlock>;
   groups: Map<string, Group>;
+  linkedSelections: Set<string>;
   settings: Map<ProtoMapSetting, boolean>;
   color: Map<ProtoMapSetting, ProtoColor>;
   triggers: Map<string, Trigger & { isActive?: Ref<boolean> }>;
@@ -105,7 +106,6 @@ export type SessionCollabParams = {
   triggersSyncEnabled?: Ref<boolean>;
 };
 
-// blocks can be changed quickly, so maybe it's better to save in ram but idk
 export class SessionCollab {
   public id: string;
   public owner: SessionPlayer;
@@ -115,6 +115,7 @@ export class SessionCollab {
   public settings: Map<ProtoMapSetting, boolean>;
   public color: Map<ProtoMapSetting, ProtoColor>;
   public triggers: Map<string, Trigger & { isActive?: Ref<boolean> }>;
+  public linkedSelections: Set<string>;
   public autosaveEnabled?: Ref<boolean>;
   public triggersSyncEnabled?: Ref<boolean>;
 
@@ -125,6 +126,7 @@ export class SessionCollab {
     this.blocks = params.blocks;
     this.groups = params.groups;
     this.settings = params.settings;
+    this.linkedSelections = params.linkedSelections;
     this.color = params.color;
     this.triggers = params.triggers;
     this.autosaveEnabled = params.autosaveEnabled;

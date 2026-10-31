@@ -38,7 +38,7 @@ export class CompatibilityService {
   ) {}
 
   async connectPlayer(playerId: string) {
-    // return;
+    return;
     // wss://betonbrutal.com:55071 - exp
     // wss://betonbrutal.com:55082 - dev
     const socket = new WebSocket('wss://betonbrutal.com:55071');

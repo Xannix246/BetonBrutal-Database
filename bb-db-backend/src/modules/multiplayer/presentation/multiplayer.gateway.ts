@@ -104,6 +104,7 @@ export class MultiplayerWebsocketGateway implements OnModuleInit {
         }
         break;
       case PacketType.AckResPacket:
+        // this.logger.warn(`Got ack packet: ${packet.payload.packetType}`);
         this.multiplayer.handleAckPacket(packet.payload);
         break;
       case PacketType.MovePacket:
@@ -131,11 +132,11 @@ export class MultiplayerWebsocketGateway implements OnModuleInit {
         if (!player) return;
         this.collab.placeBlock(player, packet.payload);
         break;
-      case PacketType.DeleteBlockPacket:
+      case PacketType.DeleteBlocksPacket:
         if (!player) return;
         this.collab.deleteBlock(player, packet.payload);
         break;
-      case PacketType.ChangeBlockPacket:
+      case PacketType.ChangeBlocksPacket:
         if (!player) return;
         this.collab.changeBlock(player, packet.payload);
         break;
@@ -146,6 +147,10 @@ export class MultiplayerWebsocketGateway implements OnModuleInit {
       case PacketType.MapColorPacket:
         if (!player) return;
         this.collab.setMapColor(player, packet.payload);
+        break;
+      case PacketType.LinkedSelectionPacket:
+        if (!player) return;
+        this.collab.handleLinkingBlocks(player, packet.payload);
         break;
       case PacketType.CreateGroupPacket:
         this.collab.createGroup(player!, packet.payload);

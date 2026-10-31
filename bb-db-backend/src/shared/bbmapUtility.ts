@@ -171,6 +171,11 @@ export function serializeCollab(session: SessionCollab): Buffer<ArrayBuffer> {
     );
   }
 
+  writer.writeInt32LE(session.linkedSelections.size);
+  for (const key of session.linkedSelections) {
+    writer.writeString(key);
+  }
+
   writer.writeInt32LE(session.settings.size);
   for (const [settingKey, state] of session.settings) {
     writer.writeInt32LE(settingKey);
@@ -223,6 +228,13 @@ export function deserializeCollab(
     });
   }
 
+  const linkedSelections = new Set<string>();
+  const linksCount = reader.readInt32LE();
+  for (let i = 0; i < linksCount; i++) {
+    const ids = reader.readString();
+    linkedSelections.add(ids);
+  }
+
   const settings = new Map<number, boolean>();
   const settingsCount = reader.readInt32LE();
   for (let i = 0; i < settingsCount; i++) {
@@ -251,6 +263,7 @@ export function deserializeCollab(
     owner,
     players,
     blocks,
+    linkedSelections,
     groups,
     settings,
     color,
