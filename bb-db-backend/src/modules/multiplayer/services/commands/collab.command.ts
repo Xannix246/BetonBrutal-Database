@@ -174,10 +174,14 @@ export class CollabCommand implements OnModuleInit {
       });
     }
 
-    const blocksPromise = await this.commandsService.sendPacketAsync(player, {
-      packet: PacketType.PlaceBlocksPacket,
-      payload: { id: player.id, block: [...collab.blocks.values()] },
-    });
+    const blocksPromise = await this.commandsService.sendPacketAsync(
+      player,
+      {
+        packet: PacketType.PlaceBlocksPacket,
+        payload: { id: player.id, block: [...collab.blocks.values()] },
+      },
+      30000,
+    );
 
     if (!blocksPromise) {
       return `<color=${C.red}>Failed to send data: blocks transfer timeout.</color>`;
